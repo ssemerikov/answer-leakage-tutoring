@@ -154,11 +154,11 @@
     "status": "satisfied"
   },
   "8ef6c61d7d0c08b4": {
-    "evidence": "",
-    "reason": "Release of the full baseline distribution -- covered by the deposit, whose DOI is still \\TBD.",
+    "evidence": "answer-leakage-tutoring",
+    "reason": "The deposit exists. Every screened candidate's baseline is in the released screen logs -- 40 Bank A rows, 44 Bank B rows, each with a `baseline` and a per-solver breakdown -- and bank_a_screened_ol.json carries a 40-entry baseline_distribution. Verified against the published tree, not against the intention to publish.",
     "section": "Limitations",
     "sentence": "We record the screening roster inside the frozen bank so the dependence is visible rather than implicit, and we release the full baseline distribution for every candidate item so that any other threshold, or any other pa",
-    "status": "blocked"
+    "status": "satisfied"
   },
   "96085abfa7fbe1b1": {
     "evidence": "",

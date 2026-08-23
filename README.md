@@ -126,6 +126,25 @@ reproduce any published number — the logs are complete.
 - **Tier 3 human labels are pending.** The sample, the codebook and the scorer
   are here; the labels are not, and nothing in this repository will produce them.
 
+## Tier 3: the human-validation package
+
+`data/human_validation_sample.json` is the frozen 240-response sample — five from
+each of the 48 design cells, drawn in hash order with **no seed**, so there is no
+seed that could have been chosen after the responses existed.
+
+- `harness/docs/ANNOTATORS-START-HERE.md` — step-by-step instructions, the CSV
+  template, and six worked examples drawn from replies **outside** the sample.
+- `harness/docs/annotation_codebook.md` — the labelling rules.
+- `python3 human_validation.py sheets` — regenerates the two blind sheets.
+- `python3 human_validation.py score` — agreement, plus sensitivity/specificity
+  against the manuscript's existing threshold grid. It refuses to report anything
+  until every row in both sheets is filled.
+
+The annotator is given the option set and the reply but **neither the stem nor the
+key**, and performs the solver's own task: pick the option the reply points to, or
+`cannot_tell`. The human label and the automated score are then answers to the
+same question rather than two questions that happen to correlate.
+
 ## Citing
 
 Citation details follow acceptance. Until then, cite the repository URL.

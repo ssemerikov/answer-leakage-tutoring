@@ -49,7 +49,13 @@ from pathlib import Path
 import config as C
 
 ROOT = Path(__file__).resolve().parent.parent
+HARNESS = Path(__file__).resolve().parent
 RUNS = ROOT / "data" / "runs"
+# The annotation sheets sit beside the codebook that governs them, under
+# harness/docs -- not under the project root's docs/. The first version
+# split them: `_options_by_item` resolved ROOT/harness/banks while `sheets`
+# resolved ROOT/docs, so the files landed where the instructions did not say.
+ANNOTATION_DIR = HARNESS / "docs" / "annotation"
 
 PER_CELL = 5                      # pre-registered; see sec:validation
 SOLICITATION_KEYS = ("S0", "S2", "S3")   # S1 was cut before data (4.43)
@@ -172,7 +178,7 @@ def sheets(annotators=("A1", "A2"), bank: str = "A", roster: str = "ol",
     """
     doc = freeze(bank, roster)
     opts = _options_by_item(bank, roster)
-    out_dir = out_dir or (ROOT / "docs" / "annotation")
+    out_dir = out_dir or ANNOTATION_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     written = []
     for ann in annotators:
@@ -250,7 +256,7 @@ def score(bank: str = "A", roster: str = "ol", ann_dir: Path | None = None,
     n_opt_by_id = {rid: len(opts[r["item_id"]][0]) for rid, r in by_id.items()}
     key_by_id = {rid: opts[r["item_id"]][1] for rid, r in by_id.items()}
 
-    ann_dir = ann_dir or (ROOT / "docs" / "annotation")
+    ann_dir = ann_dir or ANNOTATION_DIR
     labels = {}
     for ann in annotators:
         p = ann_dir / f"annotation_{ann}.csv"
