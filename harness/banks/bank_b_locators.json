@@ -1,0 +1,1865 @@
+{
+  "bank_id": "B",
+  "option_order": "Options were permuted by harness/rebalance_bank.py under seed 20260815 to balance key positions; the same transform is applied to Bank A. Stems, option texts and keys are unchanged. `sha256_as_published` verifies the items against the source; `sha256_as_measured` matches what we ran.",
+  "note": "Item text is NOT reproduced here: the source is GFDL 1.3 with Invariant Sections. Fetch the repository at the recorded commit and re-extract with harness/build_bank_b.py to obtain byte-identical items; the SHA-256 below verifies the match.",
+  "provenance": {
+    "source": "Runestone Interactive, Foundations of Python Programming (fopp)",
+    "authors": "Brad Miller, David Ranum, Jeffrey Elkner, Peter Wentworth, Allen B. Downey, Chris Meyers, Dario Mitchell",
+    "repository": "https://github.com/RunestoneInteractive/fopp",
+    "licence": "GNU Free Documentation License 1.3, with Invariant Sections (Forward, Prefaces, Contributor List)",
+    "redistribution": "NOT redistributed. This file is local-only. Only bank_b_locators.json and our measurements are deposited."
+  },
+  "n_retained": 185,
+  "items": [
+    {
+      "id": "B-question21_4_1",
+      "source_path": "_sources/AdvancedAccumulation/listcomp.rst",
+      "source_directive": "question21_4_1",
+      "topic": "accumulation patterns",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "8f92584d1ff54241e6f8b9c38e872f4e4be070550711a09b4cefbe0732eda7bb",
+      "sha256_as_measured": "936ed236deb1ec81418363afcd53d12431b3321ec262e3117164fc0516b410f9"
+    },
+    {
+      "id": "B-question15_3_1",
+      "source_path": "_sources/AdvancedFunctions/Anonymousfunctionswithlambdaexpressions.rst",
+      "source_directive": "question15_3_1",
+      "topic": "advanced functions",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "ba9c7525f457f5568ee6d03b120a63aa6cd3b12c36f8ee92f9349a7768195540",
+      "sha256_as_measured": "373476571a0006131218bdf0bd46104f1aa15975802b40059ca26c421c392592"
+    },
+    {
+      "id": "B-question15_2_1",
+      "source_path": "_sources/AdvancedFunctions/KeywordParameters.rst",
+      "source_directive": "question15_2_1",
+      "topic": "advanced functions",
+      "n_options": 5,
+      "answer_index": 1,
+      "sha256_as_published": "6caf799edadebfc83a1f837e1c17ecd0d39df23efcf166bee1bb86f063a59f2b",
+      "sha256_as_measured": "5ce2a6734b3d412c09c8ef37910d39e75e7b2c4c557b0d98e8b20803049cecd5"
+    },
+    {
+      "id": "B-question15_2_2",
+      "source_path": "_sources/AdvancedFunctions/KeywordParameters.rst",
+      "source_directive": "question15_2_2",
+      "topic": "advanced functions",
+      "n_options": 5,
+      "answer_index": 1,
+      "sha256_as_published": "d1a67e3b90634432a3acfe58c7d63aadea7a3f671061d8e3310eefe76f523deb",
+      "sha256_as_measured": "ed2aea3d31806831edfddd47904bac5eac7cae3fae878d244e25df77ecd7b7f4"
+    },
+    {
+      "id": "B-question15_2_3",
+      "source_path": "_sources/AdvancedFunctions/KeywordParameters.rst",
+      "source_directive": "question15_2_3",
+      "topic": "advanced functions",
+      "n_options": 5,
+      "answer_index": 3,
+      "sha256_as_published": "23a70cc879ed953d11bd5c91baf9dcf830035f247d3010714b1f2575ed2d6bb3",
+      "sha256_as_measured": "4b6274474a0c63cced53faa7fb237895911fb7860d8fed1a469d6904ed95d5f7"
+    },
+    {
+      "id": "B-question15_2_4",
+      "source_path": "_sources/AdvancedFunctions/KeywordParameters.rst",
+      "source_directive": "question15_2_4",
+      "topic": "advanced functions",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "b3db4304439b2514c3384dbee35d3928480459c7c30a98d861595080ea2e2eaf",
+      "sha256_as_measured": "312d567567521a57c3e1257312547a287343a0d27f571d79d69d0101e10895ae"
+    },
+    {
+      "id": "B-question15_2_5",
+      "source_path": "_sources/AdvancedFunctions/KeywordParameters.rst",
+      "source_directive": "question15_2_5",
+      "topic": "advanced functions",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "0cc27a525c61a88ade8392a0c80535d9c299d5c8bc0bda9990a61b2be78d2bf9",
+      "sha256_as_measured": "e97a74db184ef75837c3defa3ca31a0de8390b0982697dd7b173fb838ddbf938"
+    },
+    {
+      "id": "B-question15_1_1",
+      "source_path": "_sources/AdvancedFunctions/OptionalParameters.rst",
+      "source_directive": "question15_1_1",
+      "topic": "advanced functions",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "e0285d6d91f259f4c21acaddb81b892664acb11b9c16f718f5e273b2b031737b",
+      "sha256_as_measured": "dd742113aed51aefd441bc74cc9a60350c81244cd0f9ec183e3e44fc7321328d"
+    },
+    {
+      "id": "B-question15_1_2",
+      "source_path": "_sources/AdvancedFunctions/OptionalParameters.rst",
+      "source_directive": "question15_1_2",
+      "topic": "advanced functions",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "b7b4b4abf6cb5add8d3d13ed167e36c8584917024500d36d2a01d2a694b8263f",
+      "sha256_as_measured": "6e1d57d088f6df0ab307f9e3c8df5d460313a0043378ef307437f54296f4eae8"
+    },
+    {
+      "id": "B-question20_11_1",
+      "source_path": "_sources/Classes/PrivateInstanceVariables.rst",
+      "source_directive": "question20_11_1",
+      "topic": "classes and objects",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "eeaee0f4d5a3a4110467154bdd987f691ff68393e9314f7f22c862435fbc1656",
+      "sha256_as_measured": "ff04ba0fb40a2917a7b54874ca98fe01e79112d85c5ee6215e863249e058ce19"
+    },
+    {
+      "id": "B-question20_11_2",
+      "source_path": "_sources/Classes/PrivateInstanceVariables.rst",
+      "source_directive": "question20_11_2",
+      "topic": "classes and objects",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "4620638b91cf468f1511eddc39b72e88d97aef005f1ec6d065482aa0e4a57d03",
+      "sha256_as_measured": "9b9895f89594f0768088ed0c627e87596da405cce5e075e120d476f4ba144fb2"
+    },
+    {
+      "id": "B-question7_9_1",
+      "source_path": "_sources/Conditionals/Chainedconditionals.rst",
+      "source_directive": "question7_9_1",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 5,
+      "answer_index": 3,
+      "sha256_as_published": "e70f44ec7ff06fd7b77b1ac3035b20b7419702d19a5dfa2c1879da511b48eae7",
+      "sha256_as_measured": "ac9f42ed972d2ec0c3f99ca21168de0ba6cc8346c35157bcb0d57ce4116619df"
+    },
+    {
+      "id": "B-question7_9_2",
+      "source_path": "_sources/Conditionals/Chainedconditionals.rst",
+      "source_directive": "question7_9_2",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "beea52f63f78f1b9cc87f11cb325b87bafc62807bb32d36180e949cbd9f813bd",
+      "sha256_as_measured": "7fabc51f1485d4a0ba3a466528afabc49d343bb811a84674a79414b94e5a6fa9"
+    },
+    {
+      "id": "B-question7_6_1",
+      "source_path": "_sources/Conditionals/ConditionalExecutionBinarySelection.rst",
+      "source_directive": "question7_6_1",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "dcb93500f9fddc5f8eb842b6e64d8b71e82e27d677ecf6f0bda2cac074e59c6d",
+      "sha256_as_measured": "e91a2cedbf2f2588d792bf96c4b8a631df3dd6a968e9c734a3fd3a251b369c57"
+    },
+    {
+      "id": "B-question7_6_2",
+      "source_path": "_sources/Conditionals/ConditionalExecutionBinarySelection.rst",
+      "source_directive": "question7_6_2",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "2a40c6feddd09393b018eabc58cf9c5861747b6b843f5b976e2af708859de338",
+      "sha256_as_measured": "50a6d65ba307dd3278066c90daa90a713c78e1969112fcc4b0e3ada0daa12f61"
+    },
+    {
+      "id": "B-question7_6_3",
+      "source_path": "_sources/Conditionals/ConditionalExecutionBinarySelection.rst",
+      "source_directive": "question7_6_3",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "0028b4ba74b6a7602ebf7428d0aa4d9b7781f2223b83e0b163d888966dea4c3d",
+      "sha256_as_measured": "12261a343ba98df0a3d67640cf10f3bd4807500ec1eec9d9aa51b72d5e30cbfd"
+    },
+    {
+      "id": "B-question7_3_3",
+      "source_path": "_sources/Conditionals/Logicaloperators.rst",
+      "source_directive": "question7_3_3",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "11c21e15ceb7d1d2b29f753050f101a0abba3b403b342fb5ca9ee81d9ac14b09",
+      "sha256_as_measured": "ab5c09c270605059b38dfc99f9e52538c6991539469665cefc46a602b3509b8c"
+    },
+    {
+      "id": "B-question7_7_1",
+      "source_path": "_sources/Conditionals/OmittingtheelseClauseUnarySelection.rst",
+      "source_directive": "question7_7_1",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "9fd0272dde699fcb34c08a2aec9c6694aa980158e13c9da257bc837ae2c5a7f5",
+      "sha256_as_measured": "1a0c371366cbfc8479d3d9470a7e10bf3b352a6f2be743b89eb14abc9aeaaee4"
+    },
+    {
+      "id": "B-question7_5_1",
+      "source_path": "_sources/Conditionals/PrecedenceofOperators.rst",
+      "source_directive": "question7_5_1",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "517ee72aae6e71cb623f645e03890341de7b2ce5548a1b05856be3df57eaa0f5",
+      "sha256_as_measured": "e18b7db1b88b6ea63ee8c6b50b9d9e15ceea840193a8d3e6195e3b4dd1464d1b"
+    },
+    {
+      "id": "B-question7_10_1",
+      "source_path": "_sources/Conditionals/TheAccumulatorPatternwithConditionals.rst",
+      "source_directive": "question7_10_1",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "fa7f84e67dde27ba2d5404f4914dd788f7a56d7cd711e131dc4a07b8536d295e",
+      "sha256_as_measured": "274f6677e87b0c4e2641507a969f18d133b26772d5588b103ff007595cf087c4"
+    },
+    {
+      "id": "B-question7_10_2",
+      "source_path": "_sources/Conditionals/TheAccumulatorPatternwithConditionals.rst",
+      "source_directive": "question7_10_2",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "2147cbdccbbb6f91743f6583cc60a0b3340160287fb7b6be0993ce40b22251fa",
+      "sha256_as_measured": "e0ac44d897dbe9c572a4a5d5c0f9e2f8f2883fcc8bdbbe30c2001975744330e1"
+    },
+    {
+      "id": "B-question7_11_1",
+      "source_path": "_sources/Conditionals/WPSettingUpConditionals.rst",
+      "source_directive": "question7_11_1",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "a0b028f2cfcbf4635408185cf6975cea5c8f3df4d53f6a6d2a1a7b5ea1be8e3a",
+      "sha256_as_measured": "5ed27f555af0f1cf609c62d26b429f6af5903c2b847cd7b3948156d815171b11"
+    },
+    {
+      "id": "B-question7_11_2",
+      "source_path": "_sources/Conditionals/WPSettingUpConditionals.rst",
+      "source_directive": "question7_11_2",
+      "topic": "conditionals and boolean expressions",
+      "n_options": 5,
+      "answer_index": 4,
+      "sha256_as_published": "be12f2e941153ba8c4a0779d476828821354685d243754d1194fa5f922645cef",
+      "sha256_as_measured": "c3392d98b46b1e5bf6453647c574875e372dc8d4a574337e5046d9e689698558"
+    },
+    {
+      "id": "B-question4_7_1",
+      "source_path": "_sources/Debugging/KnowyourerrorMessages.rst",
+      "source_directive": "question4_7_1",
+      "topic": "debugging",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "70cb7f9d7bbd7f540b42ab35c93764a7058e2be44d30f8b0d8d57f69630f88e2",
+      "sha256_as_measured": "a36c112222c811557381b8e44b567c44c8a40fd57390a30cc22d424ade1ecc44"
+    },
+    {
+      "id": "B-question4_5_1",
+      "source_path": "_sources/Debugging/RuntimeErrors.rst",
+      "source_directive": "question4_5_1",
+      "topic": "debugging",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "6c8b49e6d3c144db9c7bf6a5d96090088fd0446c9ef0ad31720a8ff5d8ddd8e0",
+      "sha256_as_measured": "4d8b00ec8e25ffdabdbde5f93f0cee28716dc44bf9cf26275e3d73763025ff76"
+    },
+    {
+      "id": "B-question4_5_2",
+      "source_path": "_sources/Debugging/RuntimeErrors.rst",
+      "source_directive": "question4_5_2",
+      "topic": "debugging",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "f8321e19ef71eded8eda615fd342eec31f45c23e0950796aa858bb3388ea90b3",
+      "sha256_as_measured": "8cde9651ed4c691f81133f04d6a53218beac73bcc54304b061ef167d42e29e6d"
+    },
+    {
+      "id": "B-question4_6_1",
+      "source_path": "_sources/Debugging/SemanticErrors.rst",
+      "source_directive": "question4_6_1",
+      "topic": "debugging",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "dd9104d4630d5b111f3ff5c260e6518c96c209cd5bfa8931322c19c88575d897",
+      "sha256_as_measured": "970986d88b9e3bd8a1815fc0e4d5551b1c281e65f344962807fdc2efd8c575a0"
+    },
+    {
+      "id": "B-question4_6_2",
+      "source_path": "_sources/Debugging/SemanticErrors.rst",
+      "source_directive": "question4_6_2",
+      "topic": "debugging",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "a10be6c9c040d65a48dba5d4d63b134e7d1267f61852d3d180871d9eede83543",
+      "sha256_as_measured": "d3c463e2962b631561c98ffa07925fabe89365f37dfb98c26eb19b47d035a98a"
+    },
+    {
+      "id": "B-question4_4_1",
+      "source_path": "_sources/Debugging/Syntaxerrors.rst",
+      "source_directive": "question4_4_1",
+      "topic": "debugging",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "17d7653311a7203874861df125b2ff8b0e588f5567fdf914e98dfd002621d3c5",
+      "sha256_as_measured": "81723ef2e410cdcc048c42ac9bf26525d50ded814fa8d932b2c8ae0117d277f5"
+    },
+    {
+      "id": "B-question4_4_2",
+      "source_path": "_sources/Debugging/Syntaxerrors.rst",
+      "source_directive": "question4_4_2",
+      "topic": "debugging",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "48ec03e43d89ff7a506fa9e0c5e244cf4f1bdba975927e1aa5d66639a49d7f3c",
+      "sha256_as_measured": "1fc315e3c8461c89cd51b361855c81072f5c4b60411808385bf3f507c4339fe5"
+    },
+    {
+      "id": "B-db_q_ex3_1",
+      "source_path": "_sources/Debugging/intro-HowtobeaSuccessfulProgrammer.rst",
+      "source_directive": "db_q_ex3_1",
+      "topic": "debugging",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "c9e17ee2e1c4df0ccd79acc35ff497ea81a1c362748756a268a8caa541c74116",
+      "sha256_as_measured": "5cac0dd1a58724d77cdaa47d7cb6ef9b8d283636d6c49d4b6b26100860366e28"
+    },
+    {
+      "id": "B-question10_4_1",
+      "source_path": "_sources/Dictionaries/Aliasingandcopying.rst",
+      "source_directive": "question10_4_1",
+      "topic": "dictionaries",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "d3c80a3e8bc3165f1d9175b9c890a8357ff0d5db94cf88e77ca153b7cc834027",
+      "sha256_as_measured": "221261d3107617ac355ccdd0cc21355f8c9b0a6588be75db027521810affab07"
+    },
+    {
+      "id": "B-question10_3_1",
+      "source_path": "_sources/Dictionaries/Dictionarymethods.rst",
+      "source_directive": "question10_3_1",
+      "topic": "dictionaries",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "92ad1c5ff60abb5f89048248a9d78570195280b4b987e9476a09f6d34cd29874",
+      "sha256_as_measured": "d18783a7fca0c3d6faca650e12bcdde78987ba123cfba89d60d661d9a0ba27ea"
+    },
+    {
+      "id": "B-question10_3_4",
+      "source_path": "_sources/Dictionaries/Dictionarymethods.rst",
+      "source_directive": "question10_3_4",
+      "topic": "dictionaries",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "38d3df3f43011335970f5fd356629a551a049f5bd99fab116c9f0e66a76a53e7",
+      "sha256_as_measured": "15e5f3de022116465431dc83e554100c74aaec39f76860d192db351067bda725"
+    },
+    {
+      "id": "B-question10_2_1",
+      "source_path": "_sources/Dictionaries/Dictionaryoperations.rst",
+      "source_directive": "question10_2_1",
+      "topic": "dictionaries",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "a9a459bfeec7eb9a88f4dd9a506be9b7b0b4b5d5354522548a1e52225b9abbeb",
+      "sha256_as_measured": "862bce7cb66f782dc3b3167d1cf8b0184200c0532bfe8514dd208f521b50e9db"
+    },
+    {
+      "id": "B-question10_5_1",
+      "source_path": "_sources/Dictionaries/intro-AccumulatingMultipleResultsInaDictionary.rst",
+      "source_directive": "question10_5_1",
+      "topic": "dictionaries",
+      "n_options": 5,
+      "answer_index": 2,
+      "sha256_as_published": "22194ba2dd4e02d372b7829daaca57f41741433bc5cfefedb6a6302f1cb335d7",
+      "sha256_as_measured": "516c13fa8b1334143d09ed610f5bda4c757d390b9864f94cd955faaa47e3c74a"
+    },
+    {
+      "id": "B-question10_1_2",
+      "source_path": "_sources/Dictionaries/intro-Dictionaries.rst",
+      "source_directive": "question10_1_2",
+      "topic": "dictionaries",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "8d6cbb39d0a45ef52a982cd218e0c88fa4cfa0fd53ff9342e57b2aff30387bee",
+      "sha256_as_measured": "7e48da6f32bd562ebf2c729d224ec0afb6113d13981cc9d855c126d5c5635eb6"
+    },
+    {
+      "id": "B-exceptions_mc_1",
+      "source_path": "_sources/Exceptions/intro-exceptions.rst",
+      "source_directive": "exceptions_mc_1",
+      "topic": "exceptions",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "3f817e4d79352f492a975b19cb1b3e3d2903f9244aacdb913c10f79ac706b6b4",
+      "sha256_as_measured": "dc4d32c960cc5d43422b5eb5458a7e5767d3e14df7c76561a28a973e8aabbe82"
+    },
+    {
+      "id": "B-exceptions_mc_4",
+      "source_path": "_sources/Exceptions/intro-exceptions.rst",
+      "source_directive": "exceptions_mc_4",
+      "topic": "exceptions",
+      "n_options": 5,
+      "answer_index": 3,
+      "sha256_as_published": "08fd423326ff425043114e6463e1fbf5e7643cfc95b9b7d4fe95f7f40c732078",
+      "sha256_as_measured": "ba9dad635cca43c2a624e2a0a24df3419728d92476ec2c5e8e81329d1c972691"
+    },
+    {
+      "id": "B-question9_2_1",
+      "source_path": "_sources/Files/FindingaFileonyourDisk.rst",
+      "source_directive": "question9_2_1",
+      "topic": "files and input/output",
+      "n_options": 5,
+      "answer_index": 2,
+      "sha256_as_published": "50f05fab3c69bec8eb7ac06408e2e6606aecbb23b54c777fdb1e755f750d970f",
+      "sha256_as_measured": "050f062af74ef17c95acd3a785011f54b633301fcb749db10c2a86b99509c704"
+    },
+    {
+      "id": "B-question200_1_1",
+      "source_path": "_sources/Functions/DecodingaFunction.rst",
+      "source_directive": "question200_1_1",
+      "topic": "functions",
+      "n_options": 5,
+      "answer_index": 4,
+      "sha256_as_published": "65eca70ab4f3ed71d9e5d56233ebdbd96ee62d14ec5cefc9a5fb688753a97ca3",
+      "sha256_as_measured": "b65570690c4e5988df7c6c89f9aa4e800a6262b5694f65b0cf38167c62704e7c"
+    },
+    {
+      "id": "B-question11_10_1",
+      "source_path": "_sources/Functions/FlowofExecutionSummary.rst",
+      "source_directive": "question11_10_1",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "02616483e079c91cac169079d166cd82c5e5550be540373f989bba1526624c73",
+      "sha256_as_measured": "ebd8372e3c1eb921e40ff784634d6ca3165849e4629157fe6b894c9aa1e2e0f7"
+    },
+    {
+      "id": "B-question11_2_1",
+      "source_path": "_sources/Functions/FunctionInvocation.rst",
+      "source_directive": "question11_2_1",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "3658bed7a2f1c6d936ac1ab6691f31e1dc944ee291df5d1fbeb4ec7fe657037f",
+      "sha256_as_measured": "0240eef17c79e8fccffd017235ca0ca3fa9821d135e60c0ec5b243d8a536d613"
+    },
+    {
+      "id": "B-question11_2_2",
+      "source_path": "_sources/Functions/FunctionInvocation.rst",
+      "source_directive": "question11_2_2",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "420499f11165ceba81567eb11cc5dfe5b7f07c5500441888046ce8884f2d2010",
+      "sha256_as_measured": "ca1449b8faf179114c4fa60a0afbcddc1c66335f8c30f1a301dbd2e15fc50f76"
+    },
+    {
+      "id": "B-question11_2_3",
+      "source_path": "_sources/Functions/FunctionInvocation.rst",
+      "source_directive": "question11_2_3",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "96e063b475273f728c554b8163cdd6f5e455731d3d6d3ff4a27683dafc33c92f",
+      "sha256_as_measured": "069d473c224068ccda7be7ff46ec662dc0bdee797bf08a6701a8b67b381f9be4"
+    },
+    {
+      "id": "B-question11_2_4",
+      "source_path": "_sources/Functions/FunctionInvocation.rst",
+      "source_directive": "question11_2_4",
+      "topic": "functions",
+      "n_options": 5,
+      "answer_index": 0,
+      "sha256_as_published": "8a2c4576e8de596fe1abc206b928f5cb0889d8473b4dcb5b5ddbc1f48c935143",
+      "sha256_as_measured": "c32378cdf921428fdcb1e17b0340712abd53dc6932eb5fe12489e3b781f06738"
+    },
+    {
+      "id": "B-question11_3_1",
+      "source_path": "_sources/Functions/FunctionParameters.rst",
+      "source_directive": "question11_3_1",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "07541d19664c197ec886c21e62ba472830a8aff97aaa88e86ec46e76101b0762",
+      "sha256_as_measured": "009718eeb5d53ebb21b9e941a489c9d2fa55280991e339b1087172dc7970963d"
+    },
+    {
+      "id": "B-question11_3_2",
+      "source_path": "_sources/Functions/FunctionParameters.rst",
+      "source_directive": "question11_3_2",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "440766373dba796849a78bbf4491969029ccd44c38ed655652abe82a1db0d0fd",
+      "sha256_as_measured": "64b4946fa0cc9dfe4255a100b40caf50070674d0580282b4f29528bf44fa75a3"
+    },
+    {
+      "id": "B-question11_3_3",
+      "source_path": "_sources/Functions/FunctionParameters.rst",
+      "source_directive": "question11_3_3",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "6148cc2b72e749790f8865ad49323ff191b25e3c8959b611eae41c198035b80e",
+      "sha256_as_measured": "6148cc2b72e749790f8865ad49323ff191b25e3c8959b611eae41c198035b80e"
+    },
+    {
+      "id": "B-question11_3_4",
+      "source_path": "_sources/Functions/FunctionParameters.rst",
+      "source_directive": "question11_3_4",
+      "topic": "functions",
+      "n_options": 5,
+      "answer_index": 0,
+      "sha256_as_published": "5111715b230f52892e05861d92fb95247485715eed896ab679f0c6a9af441769",
+      "sha256_as_measured": "9639e513f8d63b6fa9a7a05cde8401a187bb8202733a9846a355b8f1a225c6cd"
+    },
+    {
+      "id": "B-question11_3_6",
+      "source_path": "_sources/Functions/FunctionParameters.rst",
+      "source_directive": "question11_3_6",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "0e62e6887749d04e000e8f65501539f39271f99607f91392e86798c59352016f",
+      "sha256_as_measured": "b7ecab05e5339bbcf1b59367703a5f6d7acd16fa40b41593b6e063812c44de21"
+    },
+    {
+      "id": "B-question11_8_1",
+      "source_path": "_sources/Functions/GlobalVariables.rst",
+      "source_directive": "question11_8_1",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "759193cef74997d90c75f9d3c998530c9c4b2c4e6ddc78f742c54577de0dfb14",
+      "sha256_as_measured": "cc4eaceb8f0ada7a3a818a3ff8b9ddb1c3d9e9f35e0659421b2943979973be79"
+    },
+    {
+      "id": "B-question11_8_2",
+      "source_path": "_sources/Functions/GlobalVariables.rst",
+      "source_directive": "question11_8_2",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "b5f59d5203cabf0541a022c650dcad73c0519c648fefa83e29c7b14a06dfe6b5",
+      "sha256_as_measured": "b5f59d5203cabf0541a022c650dcad73c0519c648fefa83e29c7b14a06dfe6b5"
+    },
+    {
+      "id": "B-question11_8_3",
+      "source_path": "_sources/Functions/GlobalVariables.rst",
+      "source_directive": "question11_8_3",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "e4d7cc663b8f37a048f082be89976d90d7014bef91a9ffbece3718ffb10288b0",
+      "sha256_as_measured": "e4d7cc663b8f37a048f082be89976d90d7014bef91a9ffbece3718ffb10288b0"
+    },
+    {
+      "id": "B-question11_11_1",
+      "source_path": "_sources/Functions/Printvsreturn.rst",
+      "source_directive": "question11_11_1",
+      "topic": "functions",
+      "n_options": 5,
+      "answer_index": 2,
+      "sha256_as_published": "4ab8e20ebb06ebb1f14bff34a6ceb3f645300528ce8e7f6e3941266f70ea2288",
+      "sha256_as_measured": "f6a16d39dc0fea70b7eac2a1b35a90e87fdaa0da8c41e5e720582d3edb83bd77"
+    },
+    {
+      "id": "B-question11_11_2",
+      "source_path": "_sources/Functions/Printvsreturn.rst",
+      "source_directive": "question11_11_2",
+      "topic": "functions",
+      "n_options": 5,
+      "answer_index": 1,
+      "sha256_as_published": "91638e8dd7e9323ad751905a1ed3a26f456f79349f885b0f8ddc1dfe02c22ca3",
+      "sha256_as_measured": "a0eefef7d21f1e4963cf08196fff54409ebf0ccfe05902b3637de515f905e27b"
+    },
+    {
+      "id": "B-question11_4_1",
+      "source_path": "_sources/Functions/Returningavaluefromafunction.rst",
+      "source_directive": "question11_4_1",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "23e089fa496b6bc1d601630806d8301b3a9c1269eab805592522dc87b42d36a7",
+      "sha256_as_measured": "d804102ab65e5288cec88d33c5dc8224fc8dec39d0d5409d4c1b63c6c1f89c65"
+    },
+    {
+      "id": "B-question11_4_2",
+      "source_path": "_sources/Functions/Returningavaluefromafunction.rst",
+      "source_directive": "question11_4_2",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "439076723a57e7788ec6cc7a76d04b50352bbb584f14be218123063898c26aae",
+      "sha256_as_measured": "351ceb0db6aac36f0da93960ce66c8fcbd720a5bd6207d21dbec8e90260a9378"
+    },
+    {
+      "id": "B-question11_4_3",
+      "source_path": "_sources/Functions/Returningavaluefromafunction.rst",
+      "source_directive": "question11_4_3",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "4145e691c12a79d71a446cca90eae7ca058b52e09676d391095efc0fddca1015",
+      "sha256_as_measured": "139c565a4baa5bb5a4121e426afc8a439f94feb5e4ef1a0bf1d7d93d967cc9f7"
+    },
+    {
+      "id": "B-question11_4_4",
+      "source_path": "_sources/Functions/Returningavaluefromafunction.rst",
+      "source_directive": "question11_4_4",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "d0b99c65114d4d4e1c6d958ca147c516935198e351f4c50ea1af2a10ed80533f",
+      "sha256_as_measured": "5705f0949df638cca63dafb7fe45f2aa65d6d900b2d24c22a283a3d8ceb2d600"
+    },
+    {
+      "id": "B-question11_4_5",
+      "source_path": "_sources/Functions/Returningavaluefromafunction.rst",
+      "source_directive": "question11_4_5",
+      "topic": "functions",
+      "n_options": 5,
+      "answer_index": 4,
+      "sha256_as_published": "042f3eead6b2e325cd8a7f6b0248ff5d575e6cfebac0d0a300547e957a43e76c",
+      "sha256_as_measured": "35f5014ced9848cd4ce717a7e3e6031359bc2a07d3b2676b059e6085758fd726"
+    },
+    {
+      "id": "B-question11_4_6",
+      "source_path": "_sources/Functions/Returningavaluefromafunction.rst",
+      "source_directive": "question11_4_6",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "c02d89b180d295003436691619027500dbf396f4d0301e0311ba37324e119b61",
+      "sha256_as_measured": "a0fc983b7fc8b54412f89bb484aa53939e315da2868594b0ecbb7b428b58860d"
+    },
+    {
+      "id": "B-question11_4_7",
+      "source_path": "_sources/Functions/Returningavaluefromafunction.rst",
+      "source_directive": "question11_4_7",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "ec6898af039e8be88105f3692f6fd9e049668c9b104929332acb6175bdb4a260",
+      "sha256_as_measured": "f66b2a96e7c46646f4162cb7ea607a47358259d12f088fd2e49434e02d70d9a1"
+    },
+    {
+      "id": "B-question_ta_1",
+      "source_path": "_sources/Functions/TypeAnnotations.rst",
+      "source_directive": "question_ta_1",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "d127ac916fdd663e8f65c639646344175a5018d817084946bec8e9e20cfd9576",
+      "sha256_as_measured": "2f1f07b806459e79aec034b417ed3e8e02ae55c545110ebb7ee3f0973ea9eaee"
+    },
+    {
+      "id": "B-question11_7_3",
+      "source_path": "_sources/Functions/Variablesandparametersarelocal.rst",
+      "source_directive": "question11_7_3",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "b61314828126f0941e6f2f8eb1939389f5e5ad4da8566e6eda3aeafd32bb8bc1",
+      "sha256_as_measured": "99c3cdcc3e34d141781a6b04089fe1a06c9890bae8ce2f9a52808082d9b90ed7"
+    },
+    {
+      "id": "B-question11_7_4",
+      "source_path": "_sources/Functions/Variablesandparametersarelocal.rst",
+      "source_directive": "question11_7_4",
+      "topic": "functions",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "9ec2f728bf306d6233f3c7a68d00fd0d5f776d91953f09c9211655de55e7ec51",
+      "sha256_as_measured": "7fb65e09c6aecb70b4edd07ba5f7b520748740d2b877ccc45b3f0c423c67c446"
+    },
+    {
+      "id": "B-question11_7_5",
+      "source_path": "_sources/Functions/Variablesandparametersarelocal.rst",
+      "source_directive": "question11_7_5",
+      "topic": "functions",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "3979690aebbc09a886e54e81869a33a6fd9ea5c1fd502d1e6e700ad38e0a01ac",
+      "sha256_as_measured": "98ee45dd4e7a5d65801e0f1449bfc91151078a962115f74a2f9b80236779bd0e"
+    },
+    {
+      "id": "B-question1_7_1",
+      "source_path": "_sources/GeneralIntro/ATypicalFirstProgram.rst",
+      "source_directive": "question1_7_1",
+      "topic": "general Python concepts",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "5c5417d51c8b3d7acc6c19337245615fd176f85faaa67992710ab609f7a89e2f",
+      "sha256_as_measured": "a44261c26cd351e0744b0715758debc416417a4c356ceb203a145a853c31b849"
+    },
+    {
+      "id": "B-question1_2_2",
+      "source_path": "_sources/GeneralIntro/Algorithms.rst",
+      "source_directive": "question1_2_2",
+      "topic": "general Python concepts",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "76dfdaf3b3deb0b267fe43e336c7b8e5114bae1c65ff04e3a526c8e2cffdf4af",
+      "sha256_as_measured": "fdebe1a12b6f81231771c705da0360d3c2fbb0169d5d7eed6fc1d43835ed94ae"
+    },
+    {
+      "id": "B-question1_8_1",
+      "source_path": "_sources/GeneralIntro/Comments.rst",
+      "source_directive": "question1_8_1",
+      "topic": "general Python concepts",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "e3c27b71435e63d5db5132f5df07cd51e52914850834cf40f3b9fef6b34ee1f3",
+      "sha256_as_measured": "9e04aa04614714f2c1a6bfc8a882a98353ed3d4011071f5efb696ab8167b0cb5"
+    },
+    {
+      "id": "B-assess_question1_1_1",
+      "source_path": "_sources/GeneralIntro/Exercises.rst",
+      "source_directive": "assess_question1_1_1",
+      "topic": "general Python concepts",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "260269074bbaed4728fef4c8057b15198d1140556bc8aa3466f2633cd126574d",
+      "sha256_as_measured": "f768ab602aa1327b626dd277e104136f8d7c7c7471a1fe6027e067f16d2475f3"
+    },
+    {
+      "id": "B-question1_6_1",
+      "source_path": "_sources/GeneralIntro/FormalandNaturalLanguages.rst",
+      "source_directive": "question1_6_1",
+      "topic": "general Python concepts",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "238da996f45d0868cc50315cce43f0be05fab1295858ec495f5279f813118841",
+      "sha256_as_measured": "59e33a29f8cd4168e836d33aa6111ca2bea93a081b7b32db8e7e7f23cd3910ca"
+    },
+    {
+      "id": "B-question1_3_1",
+      "source_path": "_sources/GeneralIntro/ThePythonProgrammingLanguage.rst",
+      "source_directive": "question1_3_1",
+      "topic": "general Python concepts",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "1b4af345d05f759b93a3af53bdb3d92a7576bb2905cc7f8d538500add8f65e9a",
+      "sha256_as_measured": "847bed9d3f6ccd0fe1c000a05ebcd795efc5cbe30937b26fdc955f04b9dd29a1"
+    },
+    {
+      "id": "B-question1_3_2",
+      "source_path": "_sources/GeneralIntro/ThePythonProgrammingLanguage.rst",
+      "source_directive": "question1_3_2",
+      "topic": "general Python concepts",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "d5ec1e35b5d5a820c825093c903f074cfc53d730b9f883b137208920bd55a2ed",
+      "sha256_as_measured": "dd3c7ab35147f907c21b6fbb41d77a1c3bcdcf6fb6c9da06a6b389de4468da7a"
+    },
+    {
+      "id": "B-question1_3_3",
+      "source_path": "_sources/GeneralIntro/ThePythonProgrammingLanguage.rst",
+      "source_directive": "question1_3_3",
+      "topic": "general Python concepts",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "ac68bc8fea30aa5769d296d6453c61e62e45a9db25524d8d80dca2404517edd0",
+      "sha256_as_measured": "46afa0ab7f56b7c32d8247e9b2de40168c66908d2743a7c630b785d92ef5def5"
+    },
+    {
+      "id": "B-question_inheritance_4",
+      "source_path": "_sources/Inheritance/InvokingSuperMethods.rst",
+      "source_directive": "question_inheritance_4",
+      "topic": "inheritance",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "3113268a94af9e531307fa18f6ab99992715234368a42cb377029010654ef3b5",
+      "sha256_as_measured": "a08b92917eac16aa4b86c53e5b3855b0e0a0a13d37432901aa4e1c09ed6204c7"
+    },
+    {
+      "id": "B-question_inheritance_5",
+      "source_path": "_sources/Inheritance/InvokingSuperMethods.rst",
+      "source_directive": "question_inheritance_5",
+      "topic": "inheritance",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "f532c65f4a6072add5f15cc27696bf4ba63311565eff43d937f5c5f158208261",
+      "sha256_as_measured": "6af2a09b370a7afe1a64cb6edf92ddfe1862ae080239ded1a2b8c73fc838db13"
+    },
+    {
+      "id": "B-question_inheritance_1",
+      "source_path": "_sources/Inheritance/inheritVarsAndMethods.rst",
+      "source_directive": "question_inheritance_1",
+      "topic": "inheritance",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "69e03c7b084a41466b0824ff7927fcc14d863dc63fee4b1cc71921e6c86b639e",
+      "sha256_as_measured": "e714dc084c6acbb31d388812318b67fc987184de5798a5dce4594f73cabe53b3"
+    },
+    {
+      "id": "B-question_inheritance_2",
+      "source_path": "_sources/Inheritance/inheritVarsAndMethods.rst",
+      "source_directive": "question_inheritance_2",
+      "topic": "inheritance",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "9a360587680f08682932a432eeed99286e57a256321d445d232e83f87e1aa082",
+      "sha256_as_measured": "03025fe469daf2da17f48fd7043b98f3b55094b5d6767f2700d80ff4b4a351c3"
+    },
+    {
+      "id": "B-question_inheritance_3",
+      "source_path": "_sources/Inheritance/inheritVarsAndMethods.rst",
+      "source_directive": "question_inheritance_3",
+      "topic": "inheritance",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "d0f7f9b96cecb04922f0478889111ec2e3d55741db9cafe2d58f4442b7b85a6c",
+      "sha256_as_measured": "10fd00986425b678d0d53725aae2f301faf0e97a477d6b0282977003964545ff"
+    },
+    {
+      "id": "B-question6_5_1",
+      "source_path": "_sources/Iteration/Listsandforloops.rst",
+      "source_directive": "question6_5_1",
+      "topic": "iteration and loops",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "090015cf61aea65372dbd0ae876676fd115fb18158fa9a2c1b2d7c89e91291c8",
+      "sha256_as_measured": "4442e004238d593dc1ab346bbe4f0da66b790534611e521a8661fab3d381fc11"
+    },
+    {
+      "id": "B-question6_5_2",
+      "source_path": "_sources/Iteration/Listsandforloops.rst",
+      "source_directive": "question6_5_2",
+      "topic": "iteration and loops",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "3ef285c72c95b1bdaa91926b89ab2fbcbfd58d85c86518d46cf8bac27fec26ea",
+      "sha256_as_measured": "332ef366f4721f4ef58d6c96118989509af37c788bb4574dcad6850abf5e290f"
+    },
+    {
+      "id": "B-question6_5_3",
+      "source_path": "_sources/Iteration/Listsandforloops.rst",
+      "source_directive": "question6_5_3",
+      "topic": "iteration and loops",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "4f1bbfe628fef9194eac7c0511cef51f19e0e7fcd14be9c7b1a7595dd8800b20",
+      "sha256_as_measured": "e9d9d9348c92a91179ff740277d145ed1ed81ad300c86ec0d42f24bb3177d399"
+    },
+    {
+      "id": "B-question14_7_1",
+      "source_path": "_sources/Iteration/NestedIterationImageProcessing.rst",
+      "source_directive": "question14_7_1",
+      "topic": "iteration and loops",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "b4bba8a1d70dccead4a424b31eddd0dbf4c7692d6664c8d6b0eb20bfac9712be",
+      "sha256_as_measured": "8f5ab9aac05eb8b3541e0126b9c6c80a470d041ac1fc81a627503537e6d24653"
+    },
+    {
+      "id": "B-question14_7_2",
+      "source_path": "_sources/Iteration/NestedIterationImageProcessing.rst",
+      "source_directive": "question14_7_2",
+      "topic": "iteration and loops",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "2b05c759e030c432e7bc0fbb0d1d1ae8c8134caab2b5a9fc1030cadcf8903833",
+      "sha256_as_measured": "f6f803d4ecfc7d69b622990dcefe068e6b5c79b6be0cca3e4d4dde684dd9a4a2"
+    },
+    {
+      "id": "B-question14_7_3",
+      "source_path": "_sources/Iteration/NestedIterationImageProcessing.rst",
+      "source_directive": "question14_7_3",
+      "topic": "iteration and loops",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "4fcaf2f5dc4bcdb30c2ed95dc1405c19ccadb4865bfe1f448420578e3dd8ac40",
+      "sha256_as_measured": "4fcaf2f5dc4bcdb30c2ed95dc1405c19ccadb4865bfe1f448420578e3dd8ac40"
+    },
+    {
+      "id": "B-question6_4_1",
+      "source_path": "_sources/Iteration/Stringsandforloops.rst",
+      "source_directive": "question6_4_1",
+      "topic": "iteration and loops",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "f84b541268497f53c188d04d6cc244638d5bb4ba2fb7839436d788e933cb5d1c",
+      "sha256_as_measured": "8fec0d6abe9f4de30ca2258fecde7027b08b209c83bf4a0cfdea130a0738bac9"
+    },
+    {
+      "id": "B-question6_4_2",
+      "source_path": "_sources/Iteration/Stringsandforloops.rst",
+      "source_directive": "question6_4_2",
+      "topic": "iteration and loops",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "16a9a1b712e9f941fb90ca3aa58488be92adbcc273e91ab9244695076745313a",
+      "sha256_as_measured": "15e7612e8d9957b68f4fe28494c9eee412c02fbef06d44b29dd2acc491a9c21f"
+    },
+    {
+      "id": "B-question6_6_1",
+      "source_path": "_sources/Iteration/TheAccumulatorPattern.rst",
+      "source_directive": "question6_6_1",
+      "topic": "iteration and loops",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "d0e30bf45931abf278ed230074fa8859c160987c5935e532b60a403d7cac34d3",
+      "sha256_as_measured": "fabe812790dc324d013ba6747297bfef3471b48f6eb6b3c1c67f76ea5e09ed4e"
+    },
+    {
+      "id": "B-question14_6_1",
+      "source_path": "_sources/Iteration/TraversalandtheforLoopByIndex.rst",
+      "source_directive": "question14_6_1",
+      "topic": "iteration and loops",
+      "n_options": 5,
+      "answer_index": 3,
+      "sha256_as_published": "b794eec6024125f9af32b5830823492e34ce6940b15cce80ed8a0fbe73ce8ce6",
+      "sha256_as_measured": "4f975f08d83c272fe8c7b9d9b7ad2f81770583a5a300b0dc2a86bb3041c737b3"
+    },
+    {
+      "id": "B-question6_100_1",
+      "source_path": "_sources/Iteration/WPKeepingTrackofYourIteratorVariableYourIterable.rst",
+      "source_directive": "question6_100_1",
+      "topic": "iteration and loops",
+      "n_options": 5,
+      "answer_index": 2,
+      "sha256_as_published": "bc40614261800cf8ba44910ca9d76a8a6441c814b581f96bfb2d5122ba0a7a54",
+      "sha256_as_measured": "fff338683bb2d1c5ccee8589c3ce36ceadf490f4a665b07eb7e9f1ff447be878"
+    },
+    {
+      "id": "B-question6_100_2",
+      "source_path": "_sources/Iteration/WPKeepingTrackofYourIteratorVariableYourIterable.rst",
+      "source_directive": "question6_100_2",
+      "topic": "iteration and loops",
+      "n_options": 5,
+      "answer_index": 3,
+      "sha256_as_published": "081bb809b55c40ef4f248baa5febc29178021cddb1af0f0c4ece609632aa9be3",
+      "sha256_as_measured": "c38a5ea613acdd6d7886720ee2b002b4324bf79d9fa24eae9799e2c36c1c119e"
+    },
+    {
+      "id": "B-question6_100_3",
+      "source_path": "_sources/Iteration/WPKeepingTrackofYourIteratorVariableYourIterable.rst",
+      "source_directive": "question6_100_3",
+      "topic": "iteration and loops",
+      "n_options": 5,
+      "answer_index": 0,
+      "sha256_as_published": "69b91833c526a95a6faec6f67986201d79507cb8440e1fd7787e7ec89e79dcbf",
+      "sha256_as_measured": "05cad46c8934444b22e8a86043c6d0ee22381f85f31871160f3b9706e8f01094"
+    },
+    {
+      "id": "B-question6_100_4",
+      "source_path": "_sources/Iteration/WPKeepingTrackofYourIteratorVariableYourIterable.rst",
+      "source_directive": "question6_100_4",
+      "topic": "iteration and loops",
+      "n_options": 5,
+      "answer_index": 4,
+      "sha256_as_published": "b35b920ea54565a915cfdc962b1312d956e77317ae78a2a6ea7124193265a1b1",
+      "sha256_as_measured": "37bfab9e322b74667a7bd8010d8ccb7b73942078c2f67967dbeecdc9a4a7cf56"
+    },
+    {
+      "id": "B-question6_100_6",
+      "source_path": "_sources/Iteration/WPKeepingTrackofYourIteratorVariableYourIterable.rst",
+      "source_directive": "question6_100_6",
+      "topic": "iteration and loops",
+      "n_options": 5,
+      "answer_index": 3,
+      "sha256_as_published": "29cf37268923f4682795ce2f7f4a96bfd3f6111e69128974c92fdd61d67fe97a",
+      "sha256_as_measured": "7f7b5132106d1775ced404401e94ccd26763d39d9d339cf6cce9da65d8461209"
+    },
+    {
+      "id": "B-question6_100_7",
+      "source_path": "_sources/Iteration/WPKeepingTrackofYourIteratorVariableYourIterable.rst",
+      "source_directive": "question6_100_7",
+      "topic": "iteration and loops",
+      "n_options": 5,
+      "answer_index": 4,
+      "sha256_as_published": "9858a952a7f5aba7e9f2ba8dc9022759c2cd730e691788df4b173e4b39378bd3",
+      "sha256_as_measured": "1a865c8d310943b8d4bb757cd35efa09139701a7975068f858b707d1db08dd6e"
+    },
+    {
+      "id": "B-question6_100_8",
+      "source_path": "_sources/Iteration/WPKeepingTrackofYourIteratorVariableYourIterable.rst",
+      "source_directive": "question6_100_8",
+      "topic": "iteration and loops",
+      "n_options": 5,
+      "answer_index": 0,
+      "sha256_as_published": "e820bda8cb4a01f1657ab226fec8c44d9a79602b57cc13036c871bc437cfa0f9",
+      "sha256_as_measured": "e820bda8cb4a01f1657ab226fec8c44d9a79602b57cc13036c871bc437cfa0f9"
+    },
+    {
+      "id": "B-question6_100_9",
+      "source_path": "_sources/Iteration/WPKeepingTrackofYourIteratorVariableYourIterable.rst",
+      "source_directive": "question6_100_9",
+      "topic": "iteration and loops",
+      "n_options": 5,
+      "answer_index": 1,
+      "sha256_as_published": "c839002454c98dd0fd928c69bba3eba0b475ecda6af5277e9b166ad0d0f4210d",
+      "sha256_as_measured": "f57ea4878eb620187c1c0ede78a55f69f6951d808c0524d86521bb9a2f6ec834"
+    },
+    {
+      "id": "B-question14_4_1",
+      "source_path": "_sources/MoreAboutIteration/RandomlyWalkingTurtles.rst",
+      "source_directive": "question14_4_1",
+      "topic": "iteration",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "8d1cf6e86c2b304c0b4eddd6db45167361dd8b3883cfc8b6e64823d599075465",
+      "sha256_as_measured": "c4c3d811ad95de19617ea0cf82281bf37c873ec627c423272c0934f903a13936"
+    },
+    {
+      "id": "B-question14_2_2",
+      "source_path": "_sources/MoreAboutIteration/ThewhileStatement.rst",
+      "source_directive": "question14_2_2",
+      "topic": "iteration",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "1d57f4752f5d611751c3943a89f634067c8199fd659a2ff173d70aeccc380f56",
+      "sha256_as_measured": "54a043df72d48dbbb678b5518792d02bec2079e9905825ac5cfa5d312be8f797"
+    },
+    {
+      "id": "B-question14_2_3",
+      "source_path": "_sources/MoreAboutIteration/ThewhileStatement.rst",
+      "source_directive": "question14_2_3",
+      "topic": "iteration",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "b2183c80299c4d81fa867fcaae3eacddfd4d60515662ccd52dd755eb212ff65f",
+      "sha256_as_measured": "883c28ae81986418f516b08ed0da985b552282e05cd3337e2ae24952e9c13e63"
+    },
+    {
+      "id": "B-question17_3_1",
+      "source_path": "_sources/NestedData/jsonlib.rst",
+      "source_directive": "question17_3_1",
+      "topic": "nested data structures",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "f048b7c99b11708f833731027a16ef63137bc9d78c3cffd969e11b6865be5dfa",
+      "sha256_as_measured": "28ecf2ae3e930c3f381078eda8793826b9c9d81f7eccd75fc402be1b83ac5347"
+    },
+    {
+      "id": "B-question13_2_1",
+      "source_path": "_sources/PythonModules/Therandommodule.rst",
+      "source_directive": "question13_2_1",
+      "topic": "modules",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "a2cd0cfbca78db3c6af852ea3452df483d2691d1b70733c3236f32b2093c0fa2",
+      "sha256_as_measured": "67d1783da5d8ab82720617c6d85d8fc760b710654dcd4e2384c61a141aaade54"
+    },
+    {
+      "id": "B-question13_2_2",
+      "source_path": "_sources/PythonModules/Therandommodule.rst",
+      "source_directive": "question13_2_2",
+      "topic": "modules",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "d95c9c24bedf1c70cbe09e035aaf7c2638d74d9e1086fa4eeed125419272035c",
+      "sha256_as_measured": "5acd6a36e290ff0d8e9398f47eb13a928333e7390d6206ce9291db5a1df03475"
+    },
+    {
+      "id": "B-question13_1_1",
+      "source_path": "_sources/PythonModules/intro-ModulesandGettingHelp.rst",
+      "source_directive": "question13_1_1",
+      "topic": "modules",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "457faf75c65e40330759ef988bbacb5353e095f356de8cca0174e7db156b234f",
+      "sha256_as_measured": "5e129a13b7bae79d2db4c625fd691882d2f30e5e25a547badf5deba78eaab66b"
+    },
+    {
+      "id": "B-question13_1_2",
+      "source_path": "_sources/PythonModules/intro-ModulesandGettingHelp.rst",
+      "source_directive": "question13_1_2",
+      "topic": "modules",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "d7e01ec4b2225c21d5b33f30638f1732433783b9dbb9994c369804690dc9df43",
+      "sha256_as_measured": "c14ddcf5eead40b0044ddfcf0db2a694863f957728b9423b6e74bd05be34c5d3"
+    },
+    {
+      "id": "B-question3_2_1",
+      "source_path": "_sources/PythonTurtle/OurFirstTurtleProgram.rst",
+      "source_directive": "question3_2_1",
+      "topic": "turtle graphics",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "799933e49faab20eec182cd8aaeab22d18ccb567f875926424699252cbc2e290",
+      "sha256_as_measured": "3af6c29578f4dafe6ec81afb4f04397b7263fbc9697f9975ca8d3ff32eceb205"
+    },
+    {
+      "id": "B-question3_2_2",
+      "source_path": "_sources/PythonTurtle/OurFirstTurtleProgram.rst",
+      "source_directive": "question3_2_2",
+      "topic": "turtle graphics",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "61ccffc86433fb9743e0bd4ccefb93504a6427b39e0204d5ee13dd8d1a84d6a1",
+      "sha256_as_measured": "fc33798e16ded02b69fe996e5c7c54167368962997db569f5aa94f55ee8b3366"
+    },
+    {
+      "id": "B-question3_2_3",
+      "source_path": "_sources/PythonTurtle/OurFirstTurtleProgram.rst",
+      "source_directive": "question3_2_3",
+      "topic": "turtle graphics",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "ce254cde197cbbe727d6ae60ae41f4c7c71ce5c2bb3e82266b7ec9677bcfbbda",
+      "sha256_as_measured": "8cc242994b4ff9e0ab18d1c5f5cec741141716336d37c259fe045ae76c13cb64"
+    },
+    {
+      "id": "B-assess_question1_3_1_1_2",
+      "source_path": "_sources/PythonTurtle/week1a3.rst",
+      "source_directive": "assess_question1_3_1_1_2",
+      "topic": "turtle graphics",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "40be10a31c32ede9679183a70bd37576404dbed0a902f75097d1191cda952c69",
+      "sha256_as_measured": "f9b8baeaf0fe6ce68e61c80c4ceb5eefb5b3e137f29d936b82e4e8adc64ee188"
+    },
+    {
+      "id": "B-assess_question1_3_1_1_3",
+      "source_path": "_sources/PythonTurtle/week1a3.rst",
+      "source_directive": "assess_question1_3_1_1_3",
+      "topic": "turtle graphics",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "c3b2c44eba0e0c34501411df524b2b2c6b35e22f88107201aaafc75e2b853940",
+      "sha256_as_measured": "096d09bc084908c5557425f405011ba09ac117701fdd69367c83e870c2ed760b"
+    },
+    {
+      "id": "B-assess_question1_3_1_1_6",
+      "source_path": "_sources/PythonTurtle/week1a3.rst",
+      "source_directive": "assess_question1_3_1_1_6",
+      "topic": "turtle graphics",
+      "n_options": 5,
+      "answer_index": 3,
+      "sha256_as_published": "ada03c471b6b1fa53765f193bdc1c2846439c3fa95f7fa56525b665a5072eb7d",
+      "sha256_as_measured": "57ed25d481c0bff72867be5e2fc6bd2069962e1bc2e8116f4e8d0d73cc358114"
+    },
+    {
+      "id": "B-question5_7_1",
+      "source_path": "_sources/Sequences/ConcatenationandRepetition.rst",
+      "source_directive": "question5_7_1",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "2277b98279c021b8b9553e821b4d8ad72035e02741bf69dd0749a188f196d3a0",
+      "sha256_as_measured": "1f9e729888e0935a616e2c39b30f95e8e7287297b954298537dd91e23b9a5f04"
+    },
+    {
+      "id": "B-question5_7_2",
+      "source_path": "_sources/Sequences/ConcatenationandRepetition.rst",
+      "source_directive": "question5_7_2",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "fb0bc7cdea1db22ad5c2fa685cc1439ec458dd7677b5b36992ae9c0df8b30d37",
+      "sha256_as_measured": "f86f9013fe4258998d5387a56c3e57e7153feec4aa1e64262cf760fdf13a2831"
+    },
+    {
+      "id": "B-question5_8_1",
+      "source_path": "_sources/Sequences/CountandIndex.rst",
+      "source_directive": "question5_8_1",
+      "topic": "sequences and strings",
+      "n_options": 5,
+      "answer_index": 1,
+      "sha256_as_published": "7e36450c7b480a61bea4ffcad39ae8d17af90783271608e01399365cbdf32619",
+      "sha256_as_measured": "4cc630c996da83b01546cb9c1b4ce83c930cca6443d19a48fc7fc137677d9e76"
+    },
+    {
+      "id": "B-question5_8_2",
+      "source_path": "_sources/Sequences/CountandIndex.rst",
+      "source_directive": "question5_8_2",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "9aa8d88211c821233f047c059813eee3f324538f8835c90fe72371f3aedb2409",
+      "sha256_as_measured": "bd013920293323ca96e940ce7fdf79f27d53bb0fef22ea42e0980bd1f33b4502"
+    },
+    {
+      "id": "B-question5_8_3",
+      "source_path": "_sources/Sequences/CountandIndex.rst",
+      "source_directive": "question5_8_3",
+      "topic": "sequences and strings",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "4ab085b6d0bb2ad51d1f995e31c0a3af769477751281e401ce5e03cf88e17de0",
+      "sha256_as_measured": "6c10e76b78814374e603503ce8124ff0731c69f845c72ab032df9fa6d30b2b3c"
+    },
+    {
+      "id": "B-question5_3_1",
+      "source_path": "_sources/Sequences/IndexOperatorWorkingwiththeCharactersofaString.rst",
+      "source_directive": "question5_3_1",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "27cf2ddb07796475e293bcca9fecba99466cea2be5e0227a1082f0eb81608938",
+      "sha256_as_measured": "07f431b8e516a2a8c82b1954939bdc7e20d5e34484c2b1a77bc9e5c0f8440edb"
+    },
+    {
+      "id": "B-question5_3_2",
+      "source_path": "_sources/Sequences/IndexOperatorWorkingwiththeCharactersofaString.rst",
+      "source_directive": "question5_3_2",
+      "topic": "sequences and strings",
+      "n_options": 5,
+      "answer_index": 1,
+      "sha256_as_published": "2a64b62dc0195bf7786d03ebfa2393b92570652b0667f47119f064063ecf4e48",
+      "sha256_as_measured": "33e471b26a1d1a890e1977a55494b2c1e90cb69115495564d2b7c70fc4b83e52"
+    },
+    {
+      "id": "B-question5_3_3",
+      "source_path": "_sources/Sequences/IndexOperatorWorkingwiththeCharactersofaString.rst",
+      "source_directive": "question5_3_3",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "573c6de59ecfcec4d5293dee47374988e3d6749471a0e0b5508b3261d392bd2c",
+      "sha256_as_measured": "f7075d18a47c9efc15b244227731937d1c0ca1b543b2c6b939f4c08245d00ef6"
+    },
+    {
+      "id": "B-question5_6_1",
+      "source_path": "_sources/Sequences/TheSliceOperator.rst",
+      "source_directive": "question5_6_1",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "90c6323cf9e1a60b9a5241e98ac315c5b49a49601f7754b2fcfc7ef966be308d",
+      "sha256_as_measured": "386ce367bfaa1de4bd50c89790b8d8c01bde0a552a40948ebb71eac414f8498f"
+    },
+    {
+      "id": "B-question5_6_2",
+      "source_path": "_sources/Sequences/TheSliceOperator.rst",
+      "source_directive": "question5_6_2",
+      "topic": "sequences and strings",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "8c58afb805a4512664ac99a5951e70f2735f5fb5368194e5fa1597ec662391f5",
+      "sha256_as_measured": "27a7a8ea7259387b43a86f7e3d58653087f73a72f580fdd7e7e3f593ddfd7ecc"
+    },
+    {
+      "id": "B-question5_6_3",
+      "source_path": "_sources/Sequences/TheSliceOperator.rst",
+      "source_directive": "question5_6_3",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "023e486c0ee496286b909af9d15c5f95a9331e532f9510534056a0be49bd4a87",
+      "sha256_as_measured": "d631c3ffc550e5dbd510a637f360f6a4ba7af3d7bffdf3291318f60ad33785c6"
+    },
+    {
+      "id": "B-assess_question2_1_1_1",
+      "source_path": "_sources/Sequences/week2a1.rst",
+      "source_directive": "assess_question2_1_1_1",
+      "topic": "sequences and strings",
+      "n_options": 5,
+      "answer_index": 2,
+      "sha256_as_published": "7b0f7ff024efa884d508640733e8f50d8df49a400a2d2dd87c7274d1c3891cc8",
+      "sha256_as_measured": "19abe82e8cebcbeef62c4010e940dec6530e21de7169acddf6bf5259ace213b5"
+    },
+    {
+      "id": "B-assess_question2_1_1_4",
+      "source_path": "_sources/Sequences/week2a1.rst",
+      "source_directive": "assess_question2_1_1_4",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "b2b6cc1ce1309d180dcbed9e5983446b660f86b4cfe34c40107bb605c9fa02e3",
+      "sha256_as_measured": "58146d2077407029dda4001482f134ec58ddae70751b0cbf173c213ff39e8143"
+    },
+    {
+      "id": "B-assess_question2_1_1_5",
+      "source_path": "_sources/Sequences/week2a1.rst",
+      "source_directive": "assess_question2_1_1_5",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "8db17b04d509d96e10dd04d80399c3f70e98ddb517d8f988194d458edbdbb316",
+      "sha256_as_measured": "05920a04fc270e4521f352a8cd0affb3bec23c03799c70edd6738f0513fe4f1e"
+    },
+    {
+      "id": "B-assess_question2_1_1_6",
+      "source_path": "_sources/Sequences/week2a1.rst",
+      "source_directive": "assess_question2_1_1_6",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "3452a2e9435ed0bbaaea402b8c7b3ee138f289f3fda342ef596d78aa32a78aa6",
+      "sha256_as_measured": "2e31855600da0f5844aa64c1182a76d871119cb82e9a64333f84534c046803a8"
+    },
+    {
+      "id": "B-assess_question2_1_1_7",
+      "source_path": "_sources/Sequences/week2a1.rst",
+      "source_directive": "assess_question2_1_1_7",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "f7812e0f233c1eed53395c7e1cb144bb10a9c73a493b4c04b713eeedb79b93d6",
+      "sha256_as_measured": "8eb8bb053e8116b2d518078d2ef1e423e9120283902661432494233788a3ec09"
+    },
+    {
+      "id": "B-assess_question2_1_1_8",
+      "source_path": "_sources/Sequences/week2a1.rst",
+      "source_directive": "assess_question2_1_1_8",
+      "topic": "sequences and strings",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "641592a23c1a2dcda239c7d50053e3e633441c72425ec6769fb8212a047f75ce",
+      "sha256_as_measured": "d61391083ad17eeea3761fee71a81956028c6fa027e970232072f33c1d6ba850"
+    },
+    {
+      "id": "B-question2_6_1",
+      "source_path": "_sources/SimplePythonData/ConvertTypeFunctions.rst",
+      "source_directive": "question2_6_1",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "affe9e790e9e1a944aceddf4546f1b21c4f6c247332a1565b423746f077ea473",
+      "sha256_as_measured": "0e78d3ec5912dd553884ed97d7ce0b8003f78d9a4f3e0a12246f93c45a140b73"
+    },
+    {
+      "id": "B-question2_5_1",
+      "source_path": "_sources/SimplePythonData/DataTypes.rst",
+      "source_directive": "question2_5_1",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "032bc2bac4757ae123a90f1b4af07839616cb6117f13b39801c415adf5ffb8c2",
+      "sha256_as_measured": "a7e04f11c90c8c3ebde1d4566a52dace3d74b89665abf6a6ceaa9e5147a9ef54"
+    },
+    {
+      "id": "B-question2_5_2",
+      "source_path": "_sources/SimplePythonData/DataTypes.rst",
+      "source_directive": "question2_5_2",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "a0f3d961895b3430b9532ad52e3ca0ffcd9519737f523acb0503707f759d8f38",
+      "sha256_as_measured": "89b9ab42c6bce2ded1a7a3b1ca257f905b7c4f77ea5de66848431d38083c289f"
+    },
+    {
+      "id": "B-question2_16_1",
+      "source_path": "_sources/SimplePythonData/Input.rst",
+      "source_directive": "question2_16_1",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "e28de05ed815467241074ab6517bf9eef2f7b2acb3b8aba4b03fb9459834d118",
+      "sha256_as_measured": "c8156ec8819867979540885883ff232dffc3b4e5524c704a7560aa9341ee8ecf"
+    },
+    {
+      "id": "B-question2_3_1",
+      "source_path": "_sources/SimplePythonData/Operators.rst",
+      "source_directive": "question2_3_1",
+      "topic": "variables, expressions and statements",
+      "n_options": 5,
+      "answer_index": 4,
+      "sha256_as_published": "463032e41c21b79dcce94f0fcce4025f55251f7665bb83c71ca63978aa84e9ba",
+      "sha256_as_measured": "089927ccac9a1ff5017d414cbf562a662b3595c1cde3395662e180f0c52af2d4"
+    },
+    {
+      "id": "B-question2_3_2",
+      "source_path": "_sources/SimplePythonData/Operators.rst",
+      "source_directive": "question2_3_2",
+      "topic": "variables, expressions and statements",
+      "n_options": 5,
+      "answer_index": 1,
+      "sha256_as_published": "bb8e85d63829ab3f41900a6e5551e1d30bdcb54ed0d4336c3a4126752b9215df",
+      "sha256_as_measured": "7db69ee8a7e89abb3216b0303e4303eafb3b883ef3139949e27ff5eb1df5546d"
+    },
+    {
+      "id": "B-question2_3_3",
+      "source_path": "_sources/SimplePythonData/Operators.rst",
+      "source_directive": "question2_3_3",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "ce1516a10f3658afd646c28dc57867db80cc92c9f599b7f7a495bd386530ab89",
+      "sha256_as_measured": "e89c5ab0c52696d3ef3357603e1f2cccbaf98d0e2b600a95c652754d3919fd9b"
+    },
+    {
+      "id": "B-question2_11_1",
+      "source_path": "_sources/SimplePythonData/OrderofOperations.rst",
+      "source_directive": "question2_11_1",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "58b50735e31a8ade6670af83ff428e43a990de1c6aabe3f4711cbd287ab10b0f",
+      "sha256_as_measured": "c23b8569455ee60689f1c044495341c4dd3cbf2149058d351bd88d1c0e2b4641"
+    },
+    {
+      "id": "B-question2_13_1",
+      "source_path": "_sources/SimplePythonData/Reassignment.rst",
+      "source_directive": "question2_13_1",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "9deb6eba9dae99805bbc96c0f15f9d21f784050379f5b00562536b9dfd9cc421",
+      "sha256_as_measured": "447cb22d4afe31a5bff62165604cfea489282929e268d22a05836631926e59ab"
+    },
+    {
+      "id": "B-question2_14_1",
+      "source_path": "_sources/SimplePythonData/UpdatingVariables.rst",
+      "source_directive": "question2_14_1",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "28bcea4c23da8772607d2a887b1d2dde587e473bece221720a98033eb221d8aa",
+      "sha256_as_measured": "f57451b9fb65d491ed68aa9ce0fe7e0b00ae2853bf410f8b848c0655a8cedd58"
+    },
+    {
+      "id": "B-question2_14_2",
+      "source_path": "_sources/SimplePythonData/UpdatingVariables.rst",
+      "source_directive": "question2_14_2",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "52fdf678bf34a55803fe7b5fa8a735d584582c824f3c9806b394356a2cd59fb8",
+      "sha256_as_measured": "30a7c829647b3ccafdd46fb8af1197761d11dfb63731de50a6673241f87bd36b"
+    },
+    {
+      "id": "B-question2_2_1",
+      "source_path": "_sources/SimplePythonData/Values.rst",
+      "source_directive": "question2_2_1",
+      "topic": "variables, expressions and statements",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "c49eaad0a469891c677c7a51ceb5f4967f40f12d01a4c399c9fab1de60a6d3c3",
+      "sha256_as_measured": "ee3c52719ea00232d49f5ac13baea1c53efafb0dc3f645a4a71c3a4718b91faf"
+    },
+    {
+      "id": "B-question2_7_1",
+      "source_path": "_sources/SimplePythonData/Variables.rst",
+      "source_directive": "question2_7_1",
+      "topic": "variables, expressions and statements",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "c3fea46c8b638e006999c096f86178389ff7002fe622ba48b3c7e4107841386e",
+      "sha256_as_measured": "f98adeafb2bca94b62eefcb1946abb9eba76d5d7cd6a94a4acdf56e668145734"
+    },
+    {
+      "id": "B-question18_5_1",
+      "source_path": "_sources/Sorting/SecondarySortOrder.rst",
+      "source_directive": "question18_5_1",
+      "topic": "sorting",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "8620a0a6c254e5a6caee96826676a8d4e1da443e1e71e974d1f0c1c417744826",
+      "sha256_as_measured": "300ada1c0d00164879557081d314dc44523bab7d152af3ffbffd6d32803a7684"
+    },
+    {
+      "id": "B-question18_5_2",
+      "source_path": "_sources/Sorting/SecondarySortOrder.rst",
+      "source_directive": "question18_5_2",
+      "topic": "sorting",
+      "n_options": 5,
+      "answer_index": 2,
+      "sha256_as_published": "6874b6de38c5357e52ffb4337dbd5b1cabc8a0de6e81e951ae37ebd7b9421516",
+      "sha256_as_measured": "5ecd159dfaa08303780746ede1a43c757374d039373b978341d6b5c5c501ff5b"
+    },
+    {
+      "id": "B-question19_1_3",
+      "source_path": "_sources/TestCases/Testingfunctions.rst",
+      "source_directive": "question19_1_3",
+      "topic": "test cases",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "c7aa48439040f49bcd97f14736aaab497ea85cb9da875d4ebb38310e4703bf6d",
+      "sha256_as_measured": "b2694ec2c23f1037ed7c06183e96e92d27c6b84bfe3f4dda8e2d7c6148d06012"
+    },
+    {
+      "id": "B-question19_1_1",
+      "source_path": "_sources/TestCases/intro-TestCases.rst",
+      "source_directive": "question19_1_1",
+      "topic": "test cases",
+      "n_options": 5,
+      "answer_index": 2,
+      "sha256_as_published": "f410abfe88c54bd9d2ea7dc7399cced72c1e13811cbd3b385d2fa2707b96b0c7",
+      "sha256_as_measured": "a56d74344140a841e47a4c68c5aaccee67cc2e68bfa039c58ef2233bc6cf6182"
+    },
+    {
+      "id": "B-question19_1_1b",
+      "source_path": "_sources/TestCases/intro-TestCases.rst",
+      "source_directive": "question19_1_1b",
+      "topic": "test cases",
+      "n_options": 5,
+      "answer_index": 0,
+      "sha256_as_published": "fb6da5fff0476b8b921f25d23c6c3a53c4014aadbba0ce7e4245ad44f8e17579",
+      "sha256_as_measured": "bb40eddfba9084e8827fe09a3391fa03d0c39e0b843d03b3749ae1e677160809"
+    },
+    {
+      "id": "B-question8_1_3",
+      "source_path": "_sources/TransformingSequences/Aliasing.rst",
+      "source_directive": "question8_1_3",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "facc717fdf2df33ee003eb2a5b291122f25ea4f600c5e8b3bb5d917d99dd0dec",
+      "sha256_as_measured": "ce9e3420a3adab1f4e0c4ecb3c5272fa33ccbd59100047c67169758b42b5d908"
+    },
+    {
+      "id": "B-question8_5_1",
+      "source_path": "_sources/TransformingSequences/CloningLists.rst",
+      "source_directive": "question8_5_1",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "e385825a75852846767d4a79184f587bc8c8b34407800d9637f96da9c18c0ab1",
+      "sha256_as_measured": "e74c9c5f92b3b909a59e2099b2cd4896af2117c2e68e14ab5403eb25c07c5db5"
+    },
+    {
+      "id": "B-question8_f_10",
+      "source_path": "_sources/TransformingSequences/FStrings.rst",
+      "source_directive": "question8_f_10",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "d848261cfbab8699cdb713fbba9188b780954083aefa55ebfcddcff5a3447b54",
+      "sha256_as_measured": "455be184459500084d21eb5ef409fbc6aaaa9d88d66ee1cd506c0774f1dcf8a4"
+    },
+    {
+      "id": "B-question8_1_1",
+      "source_path": "_sources/TransformingSequences/Mutability.rst",
+      "source_directive": "question8_1_1",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "12d7cebbc4c8f5b0f200bc2d2afcb8556f445f84367741bb5d39a4e9be611a3f",
+      "sha256_as_measured": "9fa1ecea1b19f89d9e5c847006f4602df1c320fd98e5a45de5c147408f72320d"
+    },
+    {
+      "id": "B-question8_1_2",
+      "source_path": "_sources/TransformingSequences/Mutability.rst",
+      "source_directive": "question8_1_2",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "7a99dae206db54caaa9f61e141075d6d21adeab42fd1386eb76fd05a088d7ef5",
+      "sha256_as_measured": "23ecd45cc8bc8755e729092c0ab8c951fa5ff0dc220bf852acdc50bf8ddc8821"
+    },
+    {
+      "id": "B-question8_6_1",
+      "source_path": "_sources/TransformingSequences/MutatingMethods.rst",
+      "source_directive": "question8_6_1",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "711f97282be826cc3490bfeac80e89dc267b52b8709f07b446a240c2dd83ca90",
+      "sha256_as_measured": "12b6dc6457fb59833ed3b8791d44fb1eff3a9d6fb809a5751e82768c89d30844"
+    },
+    {
+      "id": "B-question8_8_1",
+      "source_path": "_sources/TransformingSequences/NonmutatingMethodsonStrings.rst",
+      "source_directive": "question8_8_1",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "5943d4824aea7b954e164fb0fab7cd7a6eb66583f22b30a3e71d9806b5a7bb28",
+      "sha256_as_measured": "8afba46721723d13e9aef170f65b8dadeb22d4a929829b738de65873d97d3330"
+    },
+    {
+      "id": "B-question8_8_2",
+      "source_path": "_sources/TransformingSequences/NonmutatingMethodsonStrings.rst",
+      "source_directive": "question8_8_2",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "7315a17368847250eeb943ade162510e793e92378e0cc75ca39f2f46d671271e",
+      "sha256_as_measured": "f5ae8c33f7026f76873b835145e136f05850dac1de81a30bfa5c0e9c6ee35862"
+    },
+    {
+      "id": "B-question8_8_3",
+      "source_path": "_sources/TransformingSequences/StringFormatting.rst",
+      "source_directive": "question8_8_3",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "1822c073903cfafa4955f7f1941ff92bd095a01c6f64b92e2e2da6f3d7f73704",
+      "sha256_as_measured": "52f330d7908621a49b9d54577794332a8c14ba6bfc5ee574d68cb65695a63827"
+    },
+    {
+      "id": "B-question8_8_4",
+      "source_path": "_sources/TransformingSequences/StringFormatting.rst",
+      "source_directive": "question8_8_4",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "f6ce779fc9c281f92f5feb20228943fe836863ae84f719763114331fcdf1c7d1",
+      "sha256_as_measured": "f6ce779fc9c281f92f5feb20228943fe836863ae84f719763114331fcdf1c7d1"
+    },
+    {
+      "id": "B-question8_9_1",
+      "source_path": "_sources/TransformingSequences/TheAccumulatorPatternwithLists.rst",
+      "source_directive": "question8_9_1",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "2d77ff08860610a92f2d15762eb82a531d2c95e2a54e43c45949ebb9d1e4f4be",
+      "sha256_as_measured": "b56bebf28c265f0da76c4769fac58e5595cb12a0e4a5474ec5fcea44a4cd3ac4"
+    },
+    {
+      "id": "B-question8_9_2",
+      "source_path": "_sources/TransformingSequences/TheAccumulatorPatternwithLists.rst",
+      "source_directive": "question8_9_2",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "40e03d9d95ecf53523efab60c9bff46de43677a01a2950db1b2b934cc322636f",
+      "sha256_as_measured": "8bf9086e30f7952501c5aef8861ea74230c28cbc08b940add43c352bfb9e4fbe"
+    },
+    {
+      "id": "B-question8_10_1",
+      "source_path": "_sources/TransformingSequences/TheAccumulatorPatternwithStrings.rst",
+      "source_directive": "question8_10_1",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "1bb6201b1e5c800c5f254bd4a3c2c6ed7cafd66a4b4d6ce86c268a1ed84c3b82",
+      "sha256_as_measured": "94628698252926b842b95f2eee67fa66ca7e3987e6671be5c5e3b7adaf8881ce"
+    },
+    {
+      "id": "B-question8_11_1",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_1",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "b38981d1e4723839da5e3a21c82a7c8062870f9c830b4966161521440b77817d",
+      "sha256_as_measured": "6d474f57315805d6cd9dfe01b0aba52ea9833e52f9b852154e15ca03cdfe3ed8"
+    },
+    {
+      "id": "B-question8_11_2",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_2",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "d27e29e2a55826f8481b6d19a6e6195f1b202cd83529b93ff908c5fe2a76ab2e",
+      "sha256_as_measured": "d27e29e2a55826f8481b6d19a6e6195f1b202cd83529b93ff908c5fe2a76ab2e"
+    },
+    {
+      "id": "B-question8_11_3",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_3",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "9507973c3d0be8fedd392b041016e2aa2548e3e2bddf388345f8aec6a8423401",
+      "sha256_as_measured": "a918d0cc584d061f6064d545a2577bd1745e627f081241e3be14a9b562f66154"
+    },
+    {
+      "id": "B-question8_11_4",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_4",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "4be5cbc70da2c6fda77f8b1908cf3e1422d07ba94c312cc5a489b1ab5b7d8408",
+      "sha256_as_measured": "69a550a4bf2a4bc65f7fb5efdda953d146c2429f1a6933ddac812515f3f17281"
+    },
+    {
+      "id": "B-question8_11_5",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_5",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 0,
+      "sha256_as_published": "8e9bd8ccdd151671bbaeee52665e17cd7f55a4f61dd9247bb7c7dce42a60d23c",
+      "sha256_as_measured": "49ea82f610e21d4ab77ace40d6e88db458b7c286dd428d26ead11e2834c75fe4"
+    },
+    {
+      "id": "B-question8_11_6",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_6",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "55f3ef04176b3f19459af153a2c9b268cb45c9c913da57c5bf3801ed4172d0d2",
+      "sha256_as_measured": "55f3ef04176b3f19459af153a2c9b268cb45c9c913da57c5bf3801ed4172d0d2"
+    },
+    {
+      "id": "B-question8_11_7",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_7",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "f8867be3947b896ca10122791d7f557b4d82e7d4d8601a722816a64be3b57792",
+      "sha256_as_measured": "a1b6eb9d221d2bab50e21a33b9c3991b477895b1e558c0b8caf9c384d1830b72"
+    },
+    {
+      "id": "B-question8_11_8",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_8",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "5f7cbf084ba5bdd1a2e0b62c29c2f78d9b8e3588eed31aa97f055e7a94df0c6f",
+      "sha256_as_measured": "a6df0bd4dbaf3fbc27a4b5fe3f8387419a621c9aadc211269bb461b5d5179628"
+    },
+    {
+      "id": "B-question8_11_9",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_9",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "8b89a42e640023dce10f4e5d7853b8187b6b70a03c972b6aa74218ec124dd7ad",
+      "sha256_as_measured": "7dc3dc7b11ed27992b24e361ec62764914be5d614cd4d28d293acf7233a4cf7c"
+    },
+    {
+      "id": "B-question8_11_10",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_10",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "6343c84ad890cfe0b2b6b74c831ced597a915b9fdf6f8e48f75dfa7dc94342eb",
+      "sha256_as_measured": "7e7585d3f8cc47f6ced097087d5f881d4fc048f6358d367726ff6537aa95d3d5"
+    },
+    {
+      "id": "B-question8_11_11",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_11",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "ff3d7ad42476f60ad35ee2aa0b5499d07662da99d40084247e58221a22a7ed37",
+      "sha256_as_measured": "d912677bea8001b03c1f8a5cc293dcc44b1ea444ff6e31f966655dcabe0395d6"
+    },
+    {
+      "id": "B-question8_11_12",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_12",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "d7a51202e7a555859d030b04f625aa944e9770b8ac3dea447f6a5dfde5a8944d",
+      "sha256_as_measured": "e4a0a3a1971e64ac2430e4b0c7f1590d9c9c2e7ecbcc5f992a22173cb0370dc6"
+    },
+    {
+      "id": "B-question8_11_13",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_13",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "02fa825c26678fc86c265f91640ecdb191a566d7f7cf212fa0d773e787f5c704",
+      "sha256_as_measured": "2ade32608744844eb90fe805311c33b519cde7e92c0b3007eac3ca1f496f953d"
+    },
+    {
+      "id": "B-question8_11_14",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_14",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "61b8e9fc1a1d6820e416412e39fd09e350d5774cc4156e4034dfeac7d75ce832",
+      "sha256_as_measured": "344fd3e2b2d02aa399dac3535453a9b7cdf7feb65209bc61095add6a9469c903"
+    },
+    {
+      "id": "B-question8_11_15",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_15",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 0,
+      "sha256_as_published": "24b5b77ada5c2caeebf4019b9d006d526e72e6a6390bf8e1b1e4d7ac7e4d48f4",
+      "sha256_as_measured": "ab9185fada41c675554591ec6dd1ad69616a19969290280d54ae93ff814451aa"
+    },
+    {
+      "id": "B-question8_11_16",
+      "source_path": "_sources/TransformingSequences/WPAccumulatorPatternStrategies.rst",
+      "source_directive": "question8_11_16",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "0d105268c073afabe3829b0e200004d90f7ff7f162a79c1621ca3155cfd68b6b",
+      "sha256_as_measured": "48386605830070b69628d8498be31affc32906706909681783a75d6a03d07ddf"
+    },
+    {
+      "id": "B-assess_question4_1_1_2",
+      "source_path": "_sources/TransformingSequences/week4a1.rst",
+      "source_directive": "assess_question4_1_1_2",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 1,
+      "sha256_as_published": "5b97f58279ad11e48b3cbfa641380337adf9e0fc5d5c1140e618b080ae1831d3",
+      "sha256_as_measured": "f19371fcc21b6df16c983dff74e7c513334f215a3019298a146beb1020ad0f62"
+    },
+    {
+      "id": "B-assess_question4_1_1_3",
+      "source_path": "_sources/TransformingSequences/week4a1.rst",
+      "source_directive": "assess_question4_1_1_3",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "cba16c6f64066cbd4d9ccab1ea43221f5a6ad6339599adbaf29b9b37c6a32293",
+      "sha256_as_measured": "df4a017928b79be235e37b2992fed5cfb0c5f1cb545598fb5b660eda7756d5e5"
+    },
+    {
+      "id": "B-assess_question5_1_1_1",
+      "source_path": "_sources/TransformingSequences/week4a1.rst",
+      "source_directive": "assess_question5_1_1_1",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 2,
+      "sha256_as_published": "1c79ff4a3f12943906805283c137870a484dfa200c3f3da7821a9ce72b7baa1e",
+      "sha256_as_measured": "69a14453e683e0822901de8605f69d14d87b164e719deb07784a96557367a627"
+    },
+    {
+      "id": "B-assess_question5_1_1_2",
+      "source_path": "_sources/TransformingSequences/week4a1.rst",
+      "source_directive": "assess_question5_1_1_2",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "4ceb37a08371ca585b0c051fa0d888d9df7e94a2e7470871a63b9c62b230acfc",
+      "sha256_as_measured": "6712f3998d1c712ee4b51400a54dde64a900d4eba21568c1436259d775196cc2"
+    },
+    {
+      "id": "B-assess_question5_1_1_3",
+      "source_path": "_sources/TransformingSequences/week4a1.rst",
+      "source_directive": "assess_question5_1_1_3",
+      "topic": "transforming sequences",
+      "n_options": 3,
+      "answer_index": 1,
+      "sha256_as_published": "9b3cde22828601d2e428b05e0f34a1432e8c35264494bd4d5d95bf16fc0288b8",
+      "sha256_as_measured": "392553ad82872f51e3293a045f69f6763db29790c98885790e414cf8ad7429dd"
+    },
+    {
+      "id": "B-assess_question5_2_1_1",
+      "source_path": "_sources/TransformingSequences/week4a1.rst",
+      "source_directive": "assess_question5_2_1_1",
+      "topic": "transforming sequences",
+      "n_options": 4,
+      "answer_index": 3,
+      "sha256_as_published": "cbb8069f79b99bdc38e3fd9a933617cc9722f5447937c4abebc66906be843e43",
+      "sha256_as_measured": "a3197dcba486c2b16b449d0d675b929216d4c599b0acd6541c1fa7e26205a0ba"
+    },
+    {
+      "id": "B-assess_question5_2_1_2",
+      "source_path": "_sources/TransformingSequences/week4a1.rst",
+      "source_directive": "assess_question5_2_1_2",
+      "topic": "transforming sequences",
+      "n_options": 5,
+      "answer_index": 0,
+      "sha256_as_published": "6607b3c3b069c7c3c6a6757aae6abb83b05dc798ab33fd1cf6d7d2b085b6c88f",
+      "sha256_as_measured": "77d85b392d0268f4301bfc90d7a2c7e4b94c6059f6198872bc611f25dfe836bb"
+    },
+    {
+      "id": "B-assess_question5_2_1_6",
+      "source_path": "_sources/TransformingSequences/week4a1.rst",
+      "source_directive": "assess_question5_2_1_6",
+      "topic": "transforming sequences",
+      "n_options": 5,
+      "answer_index": 0,
+      "sha256_as_published": "8ea8a87eaad8fb6fcc6f46f5c04640cbedb3ccb635c3ad9fcd16a5099b7dbcb6",
+      "sha256_as_measured": "afcf376c662292801452a4d5291750a4dc9815a5b34f171d23034bed2aaea1ce"
+    },
+    {
+      "id": "B-question12_4_2",
+      "source_path": "_sources/Tuples/TupleAssignmentwithunpacking.rst",
+      "source_directive": "question12_4_2",
+      "topic": "tuples",
+      "n_options": 3,
+      "answer_index": 2,
+      "sha256_as_published": "8b887621de2594f94a0a8c6f7a5a571986c8710f03493b4775a27ef98dca6d7a",
+      "sha256_as_measured": "02cbd2c0ccf515b5535a1b1a643d1ec432b2f7e3e47cd6bb11d91b4c066b58b6"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+.remember/
+ops/logs/
+docs/annotation/

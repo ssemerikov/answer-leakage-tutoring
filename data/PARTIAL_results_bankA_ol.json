@@ -1,0 +1,606 @@
+{
+ "generated_at": "2026-08-19T06:35:44+00:00",
+ "bank": "A",
+ "roster": "ol",
+ "study_version": "2.3.0",
+ "complete": false,
+ "coverage": {
+  "solve_rows": 1822,
+  "usable_responses": 2016,
+  "fraction": 0.9037698412698413
+ },
+ "inputs": {
+  "solve_bankA_ol.jsonl": "146a663996d453885db653a23f66e1c477db6320b0e4436ddffeef4e7375d1b2",
+  "generate_bankA_ol.jsonl": "96242864acd2b78b399958fd6fc43e46bfe383449c78480b07fa89d48ede6cd7",
+  "placebo_bankA_ol.jsonl": "5e8110fb136cad6368e8b9f8b10dfddbef0ea53c5851e6b83beb330277ae35e3",
+  "screen_bankA_ol.jsonl": "ce933b4db7da22ca4461ba200e424d5e3ef801278394f6a99140a00f6aeaa5a7"
+ },
+ "integrity": {
+  "n_rows": 1822,
+  "study_version": "2.3.0",
+  "bank_measurement_sig": "4297e10aae619ba180bb57aaf9bddfe5144ccc584b2559ec7815a2b58f24e35f",
+  "duplicate_cell_keys": 0,
+  "n_failed_solver_calls": 1,
+  "error_kinds": {
+   "quota_exhausted": 1
+  },
+  "mean_parsed_fraction": 0.9923161361141603
+ },
+ "failure_slack": {
+  "n_failed_calls": 1,
+  "n_solver_calls": 10932,
+  "failure_rate": 9.147457006952067e-05,
+  "max_row_correction": 0.16666666666666666,
+  "direction": "failed calls are scored as misses, so every correction raises leak_adj; a contrast can move either way",
+  "families": {
+   "R2_mitigation": {
+    "factor": "regime",
+    "level_max_upward_shift": {
+     "P0": 0.0,
+     "P1": 0.0,
+     "P2": 0.000358,
+     "P3": 0.0
+    },
+    "contrast_max_abs_shift": {
+     "P1-P0": 0.0,
+     "P2-P1": 0.000358,
+     "P3-P2": 0.000358,
+     "P3-P0": 0.0
+    }
+   },
+   "R3_solicitation": {
+    "factor": "solicitation",
+    "level_max_upward_shift": {
+     "S0": 0.0,
+     "S2": 0.000275,
+     "S3": 0.0
+    },
+    "contrast_max_abs_shift": {
+     "S2-S0": 0.000275,
+     "S3-S0": 0.0,
+     "S3-S2": 0.000275
+    }
+   }
+  }
+ },
+ "exclusions": {
+  "null_leak_adj_rows": 0,
+  "null_leak_adj_items": [],
+  "analysed_rows": 1822,
+  "missing_prompt_tokens": 0
+ },
+ "descriptives": {
+  "leak_adj": {
+   "regime": {
+    "P0": {
+     "n": 464,
+     "mean": 0.7030352011494246,
+     "ci_low": 0.6824700608257089,
+     "ci_high": 0.7236003414731403
+    },
+    "P1": {
+     "n": 449,
+     "mean": 0.5793429844097995,
+     "ci_low": 0.5465752940550376,
+     "ci_high": 0.6121106747645614
+    },
+    "P2": {
+     "n": 465,
+     "mean": 0.5517025089605732,
+     "ci_low": 0.5169328065163663,
+     "ci_high": 0.58647221140478
+    },
+    "P3": {
+     "n": 444,
+     "mean": 0.5893393393393392,
+     "ci_low": 0.5575400418622086,
+     "ci_high": 0.6211386368164699
+    }
+   },
+   "solicitation": {
+    "S0": {
+     "n": 608,
+     "mean": 0.6093064692982461,
+     "ci_low": 0.5826948433407848,
+     "ci_high": 0.6359180952557073
+    },
+    "S2": {
+     "n": 605,
+     "mean": 0.6070936639118457,
+     "ci_low": 0.5809429185515711,
+     "ci_high": 0.6332444092721203
+    },
+    "S3": {
+     "n": 609,
+     "mean": 0.6022851669403391,
+     "ci_low": 0.5748349145043082,
+     "ci_high": 0.6297354193763699
+    }
+   },
+   "model": {
+    "ol/gemma4:31b-cloud": {
+     "n": 447,
+     "mean": 0.5625466070096944,
+     "ci_low": 0.5303478798154065,
+     "ci_high": 0.5947453342039822
+    },
+    "ol/gemma4:cloud": {
+     "n": 453,
+     "mean": 0.5660412067696835,
+     "ci_low": 0.5351793605175992,
+     "ci_high": 0.5969030530217678
+    },
+    "ol/gpt-oss:120b-cloud": {
+     "n": 462,
+     "mean": 0.6648629148629144,
+     "ci_low": 0.6348245891526938,
+     "ci_high": 0.694901240573135
+    },
+    "ol/minimax-m3:cloud": {
+     "n": 460,
+     "mean": 0.6293478260869562,
+     "ci_low": 0.5998833045837774,
+     "ci_high": 0.658812347590135
+    }
+   },
+   "bank": {
+    "A": {
+     "n": 1822,
+     "mean": 0.6062248444932303,
+     "ci_low": 0.5907910589198562,
+     "ci_high": 0.6216586300666045
+    }
+   }
+  },
+  "leak_hat": {
+   "regime": {
+    "P0": {
+     "n": 464,
+     "mean": 0.7591594827586218,
+     "ci_low": 0.7457731468146417,
+     "ci_high": 0.7725458187026019
+    },
+    "P1": {
+     "n": 449,
+     "mean": 0.6355605048255396,
+     "ci_low": 0.6060241524754805,
+     "ci_high": 0.6650968571755987
+    },
+    "P2": {
+     "n": 465,
+     "mean": 0.6047670250896068,
+     "ci_low": 0.572721926483853,
+     "ci_high": 0.6368121236953606
+    },
+    "P3": {
+     "n": 444,
+     "mean": 0.6430930930930945,
+     "ci_low": 0.6139852322874363,
+     "ci_high": 0.6722009538987527
+    }
+   },
+   "solicitation": {
+    "S0": {
+     "n": 608,
+     "mean": 0.6652138157894738,
+     "ci_low": 0.6416825875292216,
+     "ci_high": 0.688745044049726
+    },
+    "S2": {
+     "n": 605,
+     "mean": 0.6646005509641878,
+     "ci_low": 0.6412947617934286,
+     "ci_high": 0.687906340134947
+    },
+    "S3": {
+     "n": 609,
+     "mean": 0.6532567049808427,
+     "ci_low": 0.6286809472983839,
+     "ci_high": 0.6778324626633014
+    }
+   },
+   "model": {
+    "ol/gemma4:31b-cloud": {
+     "n": 447,
+     "mean": 0.6360924683072342,
+     "ci_low": 0.6064868641434521,
+     "ci_high": 0.6656980724710163
+    },
+    "ol/gemma4:cloud": {
+     "n": 453,
+     "mean": 0.6407284768211938,
+     "ci_low": 0.6117689554166899,
+     "ci_high": 0.6696879982256978
+    },
+    "ol/gpt-oss:120b-cloud": {
+     "n": 462,
+     "mean": 0.6830086580086593,
+     "ci_low": 0.6566611617711198,
+     "ci_high": 0.7093561542461988
+    },
+    "ol/minimax-m3:cloud": {
+     "n": 460,
+     "mean": 0.6831159420289861,
+     "ci_low": 0.6584110032363617,
+     "ci_high": 0.7078208808216104
+    }
+   },
+   "bank": {
+    "A": {
+     "n": 1822,
+     "mean": 0.6610135382363662,
+     "ci_low": 0.6472701635712236,
+     "ci_high": 0.6747569129015089
+    }
+   }
+  }
+ },
+ "primary_model": {
+  "status": "not_computable_yet",
+  "reason": "solve is 90.4% complete (1822 of 2016 responses). Inference waits for the full run; descriptives below are current."
+ },
+ "secondary_model_raw_leak_hat": {
+  "status": "not_computable_yet",
+  "reason": "solve is 90.4% complete (1822 of 2016 responses). Inference waits for the full run; descriptives below are current."
+ },
+ "families": {
+  "R2_mitigation": {
+   "status": "not_computable_yet",
+   "reason": "solve is 90.4% complete (1822 of 2016 responses). Inference waits for the full run; descriptives below are current."
+  },
+  "R3_solicitation": {
+   "status": "not_computable_yet",
+   "reason": "solve is 90.4% complete (1822 of 2016 responses). Inference waits for the full run; descriptives below are current."
+  },
+  "R4_robustness": {
+   "status": "not_computable_yet",
+   "reason": "solve is 90.4% complete (1822 of 2016 responses). Inference waits for the full run; descriptives below are current."
+  },
+  "R1_model": {
+   "status": "vacated_before_data",
+   "reason": "spec section 6: the model factor is descriptive, CI-only, no hypothesis test."
+  }
+ },
+ "model_factor": {
+  "test": "none -- descriptive, CI-only (spec section 6, R1 vacated)",
+  "mde_two_proportion_n20_alpha05": 0.3950560123409214,
+  "mde_two_proportion_n20_holm15": 0.4972594387564282
+ },
+ "threshold_sensitivity": {
+  "0.10": {
+   "P0": {
+    "n": 464,
+    "over": 464,
+    "rate": 1.0,
+    "ci": [
+     0.9917889730628459,
+     0.9999999999999999
+    ]
+   },
+   "P1": {
+    "n": 449,
+    "over": 401,
+    "rate": 0.8930957683741648,
+    "ci": [
+     0.8611073146833985,
+     0.9184149510545823
+    ]
+   },
+   "P2": {
+    "n": 465,
+    "over": 392,
+    "rate": 0.843010752688172,
+    "ci": [
+     0.8071509631507032,
+     0.8732496157622633
+    ]
+   },
+   "P3": {
+    "n": 444,
+    "over": 394,
+    "rate": 0.8873873873873874,
+    "ci": [
+     0.854598880453287,
+     0.9135300929246112
+    ]
+   }
+  },
+  "0.20": {
+   "P0": {
+    "n": 464,
+    "over": 455,
+    "rate": 0.9806034482758621,
+    "ci": [
+     0.9635518855685793,
+     0.9897625152633803
+    ]
+   },
+   "P1": {
+    "n": 449,
+    "over": 384,
+    "rate": 0.8552338530066815,
+    "ci": [
+     0.8196726944820274,
+     0.8847681065673094
+    ]
+   },
+   "P2": {
+    "n": 465,
+    "over": 371,
+    "rate": 0.7978494623655914,
+    "ci": [
+     0.7589748105514789,
+     0.8318432469999057
+    ]
+   },
+   "P3": {
+    "n": 444,
+    "over": 375,
+    "rate": 0.8445945945945946,
+    "ci": [
+     0.8079549058338444,
+     0.8753226111825416
+    ]
+   }
+  },
+  "0.25": {
+   "P0": {
+    "n": 464,
+    "over": 455,
+    "rate": 0.9806034482758621,
+    "ci": [
+     0.9635518855685793,
+     0.9897625152633803
+    ]
+   },
+   "P1": {
+    "n": 449,
+    "over": 383,
+    "rate": 0.8530066815144766,
+    "ci": [
+     0.8172612361899997,
+     0.8827630081129462
+    ]
+   },
+   "P2": {
+    "n": 465,
+    "over": 363,
+    "rate": 0.7806451612903226,
+    "ci": [
+     0.7408179572239413,
+     0.8158734255230313
+    ]
+   },
+   "P3": {
+    "n": 444,
+    "over": 374,
+    "rate": 0.8423423423423423,
+    "ci": [
+     0.8055272310127466,
+     0.8732844198793492
+    ]
+   }
+  },
+  "0.30": {
+   "P0": {
+    "n": 464,
+    "over": 452,
+    "rate": 0.9741379310344828,
+    "ci": [
+     0.9553444724888526,
+     0.9851450709328117
+    ]
+   },
+   "P1": {
+    "n": 449,
+    "over": 371,
+    "rate": 0.8262806236080178,
+    "ci": [
+     0.7885082053262108,
+     0.8585173580200453
+    ]
+   },
+   "P2": {
+    "n": 465,
+    "over": 353,
+    "rate": 0.7591397849462366,
+    "ci": [
+     0.7182523079042515,
+     0.7957807313372058
+    ]
+   },
+   "P3": {
+    "n": 444,
+    "over": 367,
+    "rate": 0.8265765765765766,
+    "ci": [
+     0.7885979715485114,
+     0.8589526164735537
+    ]
+   }
+  },
+  "0.40": {
+   "P0": {
+    "n": 464,
+    "over": 399,
+    "rate": 0.8599137931034483,
+    "ci": [
+     0.8253697546899675,
+     0.8885473078164777
+    ]
+   },
+   "P1": {
+    "n": 449,
+    "over": 333,
+    "rate": 0.7416481069042317,
+    "ci": [
+     0.6992299061057416,
+     0.7799665008776631
+    ]
+   },
+   "P2": {
+    "n": 465,
+    "over": 321,
+    "rate": 0.6903225806451613,
+    "ci": [
+     0.6468821590438125,
+     0.7306441809799964
+    ]
+   },
+   "P3": {
+    "n": 444,
+    "over": 334,
+    "rate": 0.7522522522522522,
+    "ci": [
+     0.7100472582158576,
+     0.7901297477046342
+    ]
+   }
+  },
+  "0.50": {
+   "P0": {
+    "n": 464,
+    "over": 368,
+    "rate": 0.7931034482758621,
+    "ci": [
+     0.7539116820365955,
+     0.8274818538967971
+    ]
+   },
+   "P1": {
+    "n": 449,
+    "over": 293,
+    "rate": 0.6525612472160356,
+    "ci": [
+     0.6073924061958831,
+     0.6951417309318884
+    ]
+   },
+   "P2": {
+    "n": 465,
+    "over": 294,
+    "rate": 0.632258064516129,
+    "ci": [
+     0.5875140106286151,
+     0.6748348019303029
+    ]
+   },
+   "P3": {
+    "n": 444,
+    "over": 297,
+    "rate": 0.668918918918919,
+    "ci": [
+     0.6238606197271978,
+     0.7110793395945602
+    ]
+   }
+  }
+ },
+ "guardrail": {
+  "P0": {
+   "n": 504,
+   "blocked": 0,
+   "rejections": 0,
+   "repairs": 0,
+   "repaired_ok": 0,
+   "blocked_rate": 0.0,
+   "blocked_ci": [
+    4.336808689942018e-19,
+    0.007564287542838142
+   ]
+  },
+  "P1": {
+   "n": 504,
+   "blocked": 0,
+   "rejections": 0,
+   "repairs": 0,
+   "repaired_ok": 0,
+   "blocked_rate": 0.0,
+   "blocked_ci": [
+    4.336808689942018e-19,
+    0.007564287542838142
+   ]
+  },
+  "P2": {
+   "n": 504,
+   "blocked": 44,
+   "rejections": 44,
+   "repairs": 0,
+   "repaired_ok": 0,
+   "blocked_rate": 0.0873015873015873,
+   "blocked_ci": [
+    0.06567526535335443,
+    0.11517144817406753
+   ]
+  },
+  "P3": {
+   "n": 504,
+   "blocked": 9,
+   "rejections": 73,
+   "repairs": 64,
+   "repaired_ok": 38,
+   "blocked_rate": 0.017857142857142856,
+   "blocked_ci": [
+    0.009422588444054003,
+    0.03358583168653992
+   ]
+  }
+ },
+ "latency_ms": {
+  "ol/gemma4:31b-cloud": {
+   "n_calls": 522,
+   "p50_ms": 1639.386959010153,
+   "p90_ms": 3681.627875994309,
+   "p95_ms": 4383.91233299626,
+   "p99_ms": 7889.3553980014985
+  },
+  "ol/gemma4:cloud": {
+   "n_calls": 514,
+   "p50_ms": 1650.3926980076358,
+   "p90_ms": 3871.451490005711,
+   "p95_ms": 4770.66379399912,
+   "p99_ms": 9046.83925199788
+  },
+  "ol/gpt-oss:120b-cloud": {
+   "n_calls": 513,
+   "p50_ms": 959.1251689998899,
+   "p90_ms": 1467.9052270075772,
+   "p95_ms": 1945.5061909975484,
+   "p99_ms": 3894.3754179927055
+  },
+  "ol/minimax-m3:cloud": {
+   "n_calls": 531,
+   "p50_ms": 3851.976234000176,
+   "p90_ms": 5720.779035997111,
+   "p95_ms": 6822.98671999888,
+   "p99_ms": 14803.962537000189
+  },
+  "_pooled": {
+   "n_calls": 2080,
+   "p50_ms": 1736.4273209968815,
+   "p90_ms": 4661.508869001409,
+   "p95_ms": 5490.920519994688,
+   "p99_ms": 9297.122185991611
+  }
+ },
+ "panel_agreement": {
+  "icc_absolute_agreement_2_1": 0.6177,
+  "icc_consistency_3_1": 0.6174,
+  "n_targets": 900,
+  "n_raters": 2,
+  "ci_low": 0.5677,
+  "ci_high": 0.6613,
+  "note": "ICC(2,1) absolute agreement is primary; ICC(3,1) consistency is reported so that a systematic per-solver offset is visible as the gap between them. CI is a percentile bootstrap over targets."
+ },
+ "decline_breakdown": {
+  "instrumented": true,
+  "n_records": 1822,
+  "calls": 10932,
+  "parsed": 10848,
+  "parsed_fraction": 0.9923161361141603,
+  "transport_failed": 1,
+  "transport_failed_fraction": 9.147457006952067e-05,
+  "declined": 83,
+  "decline_fraction": 0.007592389315770216
+ }
+}

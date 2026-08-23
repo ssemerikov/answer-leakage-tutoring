@@ -1,0 +1,605 @@
+{
+  "bank_id": "A",
+  "version": "1.0",
+  "created": "2026-08-15",
+  "licence": "CC BY 4.0",
+  "description": "Artefact-matched Python quiz bank for the PythonLearner leakage study. Mirrors the game's published structure of 10 levels x 3 tasks with a progressive topic ladder, in the game's own item formats (numbered multiple-choice and short written answer).",
+  "provenance": "AUTHORED for this study. The source thesis contains exactly ONE recoverable quiz item (A-L01-01, on translation models); every other item is new. This bank is NOT the game's own content and must never be described as such.",
+  "field_notes": {
+    "answer_forms": "Surface variants the Tier-1 deterministic checker treats as an explicit reveal (L3). Case-insensitive, whole-token matched.",
+    "defining_property": "The discriminating property of the correct answer relative to its distractors. Operationalises L2 (definitional leakage): a response that conveys this property has handed over the answer without naming it. This field is what makes L2 checkable rather than a matter of taste.",
+    "distractor_properties": "Defining properties of the incorrect options, so a judge can tell a contrastive hint (L1) from one that isolates the answer (L2)."
+  },
+  "items": [
+    {
+      "id": "A-L01-01",
+      "level": 1, "topic": "translation models", "type": "mcq",
+      "stem": "A source program is translated once into machine code. What is the translating program called?",
+      "options": ["Translator", "Compiler", "Interpreter"],
+      "answer_index": 1, "answer": "Compiler",
+      "answer_forms": ["compiler", "compilers", "option 2", "answer 2"],
+      "defining_property": "translates the entire source program ahead of execution, producing a standalone machine-code artefact that can be run repeatedly",
+      "distractor_properties": {"Translator": "generic umbrella term for any source-to-target converter", "Interpreter": "translates and executes statement by statement at run time, with no standalone output file"},
+      "source_note": "The only quiz item recoverable from the source thesis (image16)."
+    },
+    {
+      "id": "A-L01-02",
+      "level": 1, "topic": "algorithms", "type": "mcq",
+      "stem": "Which property must every algorithm have?",
+      "options": ["It must terminate after a finite number of steps", "It must be written in Python", "It must use at least one loop"],
+      "answer_index": 0, "answer": "It must terminate after a finite number of steps",
+      "answer_forms": ["finite", "terminate", "finiteness", "option 1", "answer 1"],
+      "defining_property": "an algorithm must finish after a bounded number of steps rather than run forever",
+      "distractor_properties": {"It must be written in Python": "language choice is irrelevant to the definition", "It must use at least one loop": "control structures are not required by the definition"}
+    },
+    {
+      "id": "A-L01-03",
+      "level": 1, "topic": "source code", "type": "short",
+      "stem": "What term describes human-readable program text before it is translated?",
+      "answer": "source code",
+      "answer_forms": ["source code", "source-code", "sourcecode"],
+      "defining_property": "the human-readable form of a program as written by the programmer, prior to translation",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L01-04",
+      "level": 1, "topic": "python execution", "type": "mcq",
+      "stem": "CPython executes a .py file by first producing which intermediate form?",
+      "options": ["Machine code", "Bytecode", "Assembly"],
+      "answer_index": 1, "answer": "Bytecode",
+      "answer_forms": ["bytecode", "byte code", "byte-code", "option 2", "answer 2"],
+      "defining_property": "a portable intermediate instruction set executed by a virtual machine, not by the CPU directly",
+      "distractor_properties": {"Machine code": "executed directly by the CPU", "Assembly": "human-readable mnemonic form of machine code"}
+    },
+    {
+      "id": "A-L01-05",
+      "level": 1, "topic": "syntax vs runtime", "type": "mcq",
+      "stem": "A program fails before any statement runs because a bracket is unclosed. What kind of error is this?",
+      "options": ["Runtime error", "Syntax error", "Logic error"],
+      "answer_index": 1, "answer": "Syntax error",
+      "answer_forms": ["syntax error", "syntaxerror", "option 2", "answer 2"],
+      "defining_property": "detected while parsing, before execution begins, because the text does not conform to the grammar",
+      "distractor_properties": {"Runtime error": "raised during execution of an otherwise valid program", "Logic error": "program runs but produces the wrong result"}
+    },
+    {
+      "id": "A-L01-06",
+      "level": 1, "topic": "comments", "type": "short",
+      "stem": "Which character begins a single-line comment in Python?",
+      "answer": "#",
+      "answer_forms": ["#", "hash", "pound", "number sign", "octothorpe"],
+      "defining_property": "the character that makes the rest of the physical line invisible to the interpreter",
+      "distractor_properties": {}
+    },
+
+    {
+      "id": "A-L02-01",
+      "level": 2, "topic": "types", "type": "mcq",
+      "stem": "What is the type of the expression 7 / 2 in Python 3?",
+      "options": ["int", "float", "decimal"],
+      "answer_index": 1, "answer": "float",
+      "answer_forms": ["float", "floating point", "floating-point", "option 2", "answer 2"],
+      "defining_property": "true division always yields a fractional numeric type even when both operands are whole numbers",
+      "distractor_properties": {"int": "would require floor division //", "decimal": "a library type, not produced by the / operator"}
+    },
+    {
+      "id": "A-L02-02",
+      "level": 2, "topic": "dynamic typing", "type": "mcq",
+      "stem": "In Python, where is a variable's type determined?",
+      "options": ["At compile time from a declaration", "At run time from the value bound to it", "It is fixed by the variable's name"],
+      "answer_index": 1, "answer": "At run time from the value bound to it",
+      "answer_forms": ["run time", "runtime", "dynamically", "dynamic typing", "option 2", "answer 2"],
+      "defining_property": "names carry no type; the type belongs to the object currently bound to the name and is known only while running",
+      "distractor_properties": {"At compile time from a declaration": "describes statically typed languages", "It is fixed by the variable's name": "no naming convention constrains type"}
+    },
+    {
+      "id": "A-L02-03",
+      "level": 2, "topic": "immutability", "type": "mcq",
+      "stem": "Which of these built-in types is immutable?",
+      "options": ["list", "tuple", "dict"],
+      "answer_index": 1, "answer": "tuple",
+      "answer_forms": ["tuple", "tuples", "option 2", "answer 2"],
+      "defining_property": "a fixed-length ordered sequence whose contents cannot be reassigned after construction",
+      "distractor_properties": {"list": "supports in-place append and item assignment", "dict": "supports in-place key insertion and deletion"}
+    },
+    {
+      "id": "A-L02-04",
+      "level": 2, "topic": "conversion", "type": "short",
+      "stem": "Which built-in function converts the string \"42\" to the integer 42?",
+      "answer": "int",
+      "answer_forms": ["int", "int()", "int('42')", "int(\"42\")"],
+      "defining_property": "the built-in whose name is the integer type itself, called on the string",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L02-05",
+      "level": 2, "topic": "input", "type": "mcq",
+      "stem": "What type does input() return, regardless of what the user types?",
+      "options": ["str", "int", "whatever type was typed"],
+      "answer_index": 0, "answer": "str",
+      "answer_forms": ["str", "string", "option 1", "answer 1"],
+      "defining_property": "always returns text, so numeric input must be converted explicitly before arithmetic",
+      "distractor_properties": {"int": "would make conversion unnecessary", "whatever type was typed": "would require the function to infer type"}
+    },
+    {
+      "id": "A-L02-06",
+      "level": 2, "topic": "None", "type": "short",
+      "stem": "What value does a Python function return if it has no return statement?",
+      "answer": "None",
+      "answer_forms": ["none", "nonetype"],
+      "defining_property": "the singleton null object that Python substitutes when nothing is explicitly returned",
+      "distractor_properties": {}
+    },
+
+    {
+      "id": "A-L03-01",
+      "level": 3, "topic": "operators", "type": "mcq",
+      "stem": "What is the value of 17 % 5?",
+      "options": ["3", "2", "3.4"],
+      "answer_index": 1, "answer": "2",
+      "answer_forms": ["2", "two", "option 2", "answer 2"],
+      "defining_property": "the remainder left after dividing 17 by 5",
+      "distractor_properties": {"3": "the quotient of floor division, not the remainder", "3.4": "the true-division result"}
+    },
+    {
+      "id": "A-L03-02",
+      "level": 3, "topic": "operators", "type": "short",
+      "stem": "Which Python operator raises a number to a power?",
+      "answer": "**",
+      "answer_forms": ["**", "double asterisk", "double star", "pow operator"],
+      "defining_property": "the doubled multiplication symbol used for exponentiation",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L03-03",
+      "level": 3, "topic": "precedence", "type": "mcq",
+      "stem": "What is the value of 2 + 3 * 4?",
+      "options": ["20", "14", "24"],
+      "answer_index": 1, "answer": "14",
+      "answer_forms": ["14", "fourteen", "option 2", "answer 2"],
+      "defining_property": "multiplication binds tighter than addition, so the product is formed before the sum",
+      "distractor_properties": {"20": "results from evaluating strictly left to right", "24": "results from multiplying the whole sum"}
+    },
+    {
+      "id": "A-L03-04",
+      "level": 3, "topic": "comparison", "type": "mcq",
+      "stem": "Which operator tests whether two names refer to the same object rather than equal values?",
+      "options": ["==", "is", "equals"],
+      "answer_index": 1, "answer": "is",
+      "answer_forms": ["is", "is operator", "option 2", "answer 2"],
+      "defining_property": "compares object identity in memory rather than value equality",
+      "distractor_properties": {"==": "compares values via __eq__", "equals": "not a Python operator"}
+    },
+    {
+      "id": "A-L03-05",
+      "level": 3, "topic": "boolean", "type": "mcq",
+      "stem": "What does the expression bool(0) evaluate to?",
+      "options": ["True", "False", "0"],
+      "answer_index": 1, "answer": "False",
+      "answer_forms": ["false", "option 2", "answer 2"],
+      "defining_property": "zero is one of the falsy values, so converting it to boolean gives the negative truth value",
+      "distractor_properties": {"True": "would require a non-zero or non-empty value", "0": "bool() returns a boolean, not an int"}
+    },
+    {
+      "id": "A-L03-06",
+      "level": 3, "topic": "floor division", "type": "short",
+      "stem": "Which Python operator performs floor division?",
+      "answer": "//",
+      "answer_forms": ["//", "double slash", "floor division operator"],
+      "defining_property": "the doubled division symbol that discards the fractional part and rounds toward negative infinity",
+      "distractor_properties": {}
+    },
+
+    {
+      "id": "A-L04-01",
+      "level": 4, "topic": "strings", "type": "mcq",
+      "stem": "What does \"python\"[1] evaluate to?",
+      "options": ["p", "y", "t"],
+      "answer_index": 1, "answer": "y",
+      "answer_forms": ["y", "'y'", "option 2", "answer 2"],
+      "defining_property": "indexing starts at zero, so position 1 is the second character",
+      "distractor_properties": {"p": "the character at index 0", "t": "the character at index 2"}
+    },
+    {
+      "id": "A-L04-02",
+      "level": 4, "topic": "slicing", "type": "mcq",
+      "stem": "What does \"programming\"[0:4] evaluate to?",
+      "options": ["prog", "progr", "rogr"],
+      "answer_index": 0, "answer": "prog",
+      "answer_forms": ["prog", "'prog'", "option 1", "answer 1"],
+      "defining_property": "a slice includes the start index and excludes the stop index, yielding four characters",
+      "distractor_properties": {"progr": "would include the stop index", "rogr": "would start at index 1"}
+    },
+    {
+      "id": "A-L04-03",
+      "level": 4, "topic": "string methods", "type": "short",
+      "stem": "Which string method removes whitespace from both ends of a string?",
+      "answer": "strip",
+      "answer_forms": ["strip", "strip()", ".strip", ".strip()"],
+      "defining_property": "the method that trims leading and trailing whitespace, as opposed to only one side",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L04-04",
+      "level": 4, "topic": "immutability", "type": "mcq",
+      "stem": "What happens when you execute s = \"abc\"; s[0] = \"z\"?",
+      "options": ["s becomes \"zbc\"", "A TypeError is raised", "A new string is created"],
+      "answer_index": 1, "answer": "A TypeError is raised",
+      "answer_forms": ["typeerror", "type error", "option 2", "answer 2"],
+      "defining_property": "strings do not support item assignment, so attempting it raises an error about the type not supporting the operation",
+      "distractor_properties": {"s becomes \"zbc\"": "would require mutability", "A new string is created": "no rebinding occurs on the left-hand side"}
+    },
+    {
+      "id": "A-L04-05",
+      "level": 4, "topic": "f-strings", "type": "short",
+      "stem": "Which prefix character before a Python string literal enables inline expression interpolation?",
+      "answer": "f",
+      "answer_forms": ["f", "f-string", "f string", "f prefix"],
+      "defining_property": "the single-letter prefix that allows braces in the literal to be evaluated as expressions",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L04-06",
+      "level": 4, "topic": "concatenation", "type": "mcq",
+      "stem": "What does \"ab\" * 3 evaluate to?",
+      "options": ["ababab", "ab3", "TypeError"],
+      "answer_index": 0, "answer": "ababab",
+      "answer_forms": ["ababab", "'ababab'", "option 1", "answer 1"],
+      "defining_property": "multiplying a sequence by an integer repeats the sequence that many times",
+      "distractor_properties": {"ab3": "would require string coercion of the integer", "TypeError": "sequence repetition is legal"}
+    },
+
+    {
+      "id": "A-L05-01",
+      "level": 5, "topic": "conditionals", "type": "short",
+      "stem": "Which Python keyword introduces an alternative branch tested only if the previous condition was false?",
+      "answer": "elif",
+      "answer_forms": ["elif", "elif:"],
+      "defining_property": "the contracted keyword combining a further test with the alternative branch, avoiding nesting",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L05-02",
+      "level": 5, "topic": "conditionals", "type": "mcq",
+      "stem": "How does Python delimit the body of an if statement?",
+      "options": ["Curly braces", "Indentation", "begin/end keywords"],
+      "answer_index": 1, "answer": "Indentation",
+      "answer_forms": ["indentation", "indent", "whitespace", "option 2", "answer 2"],
+      "defining_property": "leading whitespace is syntactically significant and defines block structure",
+      "distractor_properties": {"Curly braces": "used by C-family languages", "begin/end keywords": "used by Pascal-family languages"}
+    },
+    {
+      "id": "A-L05-03",
+      "level": 5, "topic": "truthiness", "type": "mcq",
+      "stem": "Which of these values is truthy in Python?",
+      "options": ["[]", "\"0\"", "0.0"],
+      "answer_index": 1, "answer": "\"0\"",
+      "answer_forms": ["\"0\"", "'0'", "the string zero", "option 2", "answer 2"],
+      "defining_property": "a non-empty string is truthy regardless of the characters it contains",
+      "distractor_properties": {"[]": "empty container, therefore falsy", "0.0": "numeric zero, therefore falsy"}
+    },
+    {
+      "id": "A-L05-04",
+      "level": 5, "topic": "ternary", "type": "mcq",
+      "stem": "Which is the correct Python conditional expression assigning 'big' when n exceeds 10?",
+      "options": ["x = 'big' if n > 10 else 'small'", "x = n > 10 ? 'big' : 'small'", "x = if n > 10 then 'big' else 'small'"],
+      "answer_index": 0, "answer": "x = 'big' if n > 10 else 'small'",
+      "answer_forms": ["option 1", "answer 1", "if n > 10 else"],
+      "defining_property": "Python places the true-value first, then the condition, then the else-value, with no question mark or then keyword",
+      "distractor_properties": {"x = n > 10 ? 'big' : 'small'": "C-style ternary syntax", "x = if n > 10 then 'big' else 'small'": "ML/Pascal-style syntax"}
+    },
+    {
+      "id": "A-L05-05",
+      "level": 5, "topic": "comparison chaining", "type": "mcq",
+      "stem": "What does the expression 1 < 2 < 3 evaluate to in Python?",
+      "options": ["True", "False", "SyntaxError"],
+      "answer_index": 0, "answer": "True",
+      "answer_forms": ["true", "option 1", "answer 1"],
+      "defining_property": "Python permits chained comparisons, evaluating them as a conjunction of adjacent pairs",
+      "distractor_properties": {"False": "would result if the chain were evaluated left-to-right as a boolean then compared", "SyntaxError": "chaining is legal Python"}
+    },
+    {
+      "id": "A-L05-06",
+      "level": 5, "topic": "membership", "type": "short",
+      "stem": "Which Python keyword tests whether a value occurs in a sequence?",
+      "answer": "in",
+      "answer_forms": ["in", "in operator", "in keyword"],
+      "defining_property": "the two-letter membership operator that returns a boolean for containment",
+      "distractor_properties": {}
+    },
+
+    {
+      "id": "A-L06-01",
+      "level": 6, "topic": "loops", "type": "mcq",
+      "stem": "How many times does the body of 'for i in range(5)' execute?",
+      "options": ["4", "5", "6"],
+      "answer_index": 1, "answer": "5",
+      "answer_forms": ["5", "five", "option 2", "answer 2"],
+      "defining_property": "range with a single argument yields values from zero up to but excluding that argument, giving as many iterations as the argument itself",
+      "distractor_properties": {"4": "would exclude both endpoints", "6": "would include the stop value"}
+    },
+    {
+      "id": "A-L06-02",
+      "level": 6, "topic": "loops", "type": "short",
+      "stem": "Which Python statement immediately exits the innermost enclosing loop?",
+      "answer": "break",
+      "answer_forms": ["break", "break statement"],
+      "defining_property": "the statement that terminates the loop entirely rather than skipping one iteration",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L06-03",
+      "level": 6, "topic": "loops", "type": "mcq",
+      "stem": "What does 'continue' do inside a loop?",
+      "options": ["Exits the loop", "Skips to the next iteration", "Restarts the loop from the beginning"],
+      "answer_index": 1, "answer": "Skips to the next iteration",
+      "answer_forms": ["skips", "next iteration", "option 2", "answer 2"],
+      "defining_property": "abandons the remainder of the current pass and proceeds to the following one, without ending the loop",
+      "distractor_properties": {"Exits the loop": "that is break", "Restarts the loop from the beginning": "no Python statement does this"}
+    },
+    {
+      "id": "A-L06-04",
+      "level": 6, "topic": "range", "type": "mcq",
+      "stem": "What sequence does range(2, 10, 3) produce?",
+      "options": ["2, 5, 8", "2, 5, 8, 11", "3, 6, 9"],
+      "answer_index": 0, "answer": "2, 5, 8",
+      "answer_forms": ["2, 5, 8", "2,5,8", "option 1", "answer 1"],
+      "defining_property": "starts at the first argument, advances by the third, and stops before the second",
+      "distractor_properties": {"2, 5, 8, 11": "would include a value past the stop", "3, 6, 9": "would start at the step rather than the start"}
+    },
+    {
+      "id": "A-L06-05",
+      "level": 6, "topic": "loop else", "type": "mcq",
+      "stem": "When does a for loop's else clause execute?",
+      "options": ["Never", "If the loop completed without break", "If the loop body never ran"],
+      "answer_index": 1, "answer": "If the loop completed without break",
+      "answer_forms": ["without break", "no break", "option 2", "answer 2"],
+      "defining_property": "runs when the iterator is exhausted normally, and is skipped when the loop is terminated early",
+      "distractor_properties": {"Never": "the clause is reachable", "If the loop body never ran": "an empty iterable still triggers it, but that is not the defining condition"}
+    },
+    {
+      "id": "A-L06-06",
+      "level": 6, "topic": "enumerate", "type": "short",
+      "stem": "Which built-in yields index-value pairs while iterating a sequence?",
+      "answer": "enumerate",
+      "answer_forms": ["enumerate", "enumerate()"],
+      "defining_property": "the built-in that pairs each element with its running position, avoiding a manual counter",
+      "distractor_properties": {}
+    },
+
+    {
+      "id": "A-L07-01",
+      "level": 7, "topic": "lists", "type": "short",
+      "stem": "Which list method adds a single element to the end of a list?",
+      "answer": "append",
+      "answer_forms": ["append", "append()", ".append", ".append()"],
+      "defining_property": "the method that grows the list by exactly one element placed last",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L07-02",
+      "level": 7, "topic": "lists", "type": "mcq",
+      "stem": "What does len([1, [2, 3], 4]) return?",
+      "options": ["3", "4", "5"],
+      "answer_index": 0, "answer": "3",
+      "answer_forms": ["3", "three", "option 1", "answer 1"],
+      "defining_property": "length counts top-level elements only, so a nested list counts as one",
+      "distractor_properties": {"4": "would flatten the nested list", "5": "would count all leaves"}
+    },
+    {
+      "id": "A-L07-03",
+      "level": 7, "topic": "aliasing", "type": "mcq",
+      "stem": "After a = [1,2]; b = a; b.append(3), what is a?",
+      "options": ["[1, 2]", "[1, 2, 3]", "TypeError"],
+      "answer_index": 1, "answer": "[1, 2, 3]",
+      "answer_forms": ["[1, 2, 3]", "[1,2,3]", "option 2", "answer 2"],
+      "defining_property": "assignment binds a second name to the same list object, so mutation through either name is visible through both",
+      "distractor_properties": {"[1, 2]": "would require a copy to have been made", "TypeError": "the operation is legal"}
+    },
+    {
+      "id": "A-L07-04",
+      "level": 7, "topic": "negative indexing", "type": "mcq",
+      "stem": "What does [10, 20, 30, 40][-2] evaluate to?",
+      "options": ["20", "30", "40"],
+      "answer_index": 1, "answer": "30",
+      "answer_forms": ["30", "thirty", "option 2", "answer 2"],
+      "defining_property": "negative indices count backward from the end, so minus two is the second-from-last element",
+      "distractor_properties": {"20": "the second element counting forward", "40": "the last element, index minus one"}
+    },
+    {
+      "id": "A-L07-05",
+      "level": 7, "topic": "sorting", "type": "mcq",
+      "stem": "What is the difference between list.sort() and sorted(list)?",
+      "options": ["No difference", "sort() modifies in place and returns None; sorted() returns a new list", "sorted() modifies in place"],
+      "answer_index": 1, "answer": "sort() modifies in place and returns None; sorted() returns a new list",
+      "answer_forms": ["in place", "in-place", "returns none", "new list", "option 2", "answer 2"],
+      "defining_property": "the method mutates the receiver and yields nothing, whereas the built-in leaves the original untouched and produces a fresh list",
+      "distractor_properties": {"No difference": "the return values differ", "sorted() modifies in place": "reverses the true behaviour"}
+    },
+    {
+      "id": "A-L07-06",
+      "level": 7, "topic": "slicing copy", "type": "short",
+      "stem": "Write the slice expression that produces a shallow copy of the whole list xs.",
+      "answer": "xs[:]",
+      "answer_forms": ["xs[:]", "[:]", "xs[::]"],
+      "defining_property": "an empty slice covering the full range, which constructs a new list rather than aliasing",
+      "distractor_properties": {}
+    },
+
+    {
+      "id": "A-L08-01",
+      "level": 8, "topic": "functions", "type": "short",
+      "stem": "Which Python keyword defines a named function?",
+      "answer": "def",
+      "answer_forms": ["def", "def keyword"],
+      "defining_property": "the three-letter keyword introducing a named function definition",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L08-02",
+      "level": 8, "topic": "default arguments", "type": "mcq",
+      "stem": "Why is def f(x, acc=[]) considered a bug-prone signature?",
+      "options": ["Lists cannot be defaults", "The default list is created once and shared across calls", "It raises a SyntaxError"],
+      "answer_index": 1, "answer": "The default list is created once and shared across calls",
+      "answer_forms": ["shared", "created once", "mutable default", "option 2", "answer 2"],
+      "defining_property": "the default object is evaluated a single time at definition and then reused, so mutations persist between calls",
+      "distractor_properties": {"Lists cannot be defaults": "they are legal", "It raises a SyntaxError": "the code parses fine"}
+    },
+    {
+      "id": "A-L08-03",
+      "level": 8, "topic": "scope", "type": "mcq",
+      "stem": "Assigning to a name inside a function, without a declaration, makes that name:",
+      "options": ["Global", "Local to the function", "Nonlocal"],
+      "answer_index": 1, "answer": "Local to the function",
+      "answer_forms": ["local", "option 2", "answer 2"],
+      "defining_property": "any binding operation inside a function body makes the name belong to that function's own namespace unless declared otherwise",
+      "distractor_properties": {"Global": "requires the global declaration", "Nonlocal": "requires the nonlocal declaration"}
+    },
+    {
+      "id": "A-L08-04",
+      "level": 8, "topic": "arguments", "type": "mcq",
+      "stem": "In def f(*args, **kwargs), what does **kwargs collect?",
+      "options": ["Positional arguments as a tuple", "Keyword arguments as a dict", "Default values"],
+      "answer_index": 1, "answer": "Keyword arguments as a dict",
+      "answer_forms": ["keyword", "dict", "dictionary", "option 2", "answer 2"],
+      "defining_property": "gathers named arguments into a mapping from name to value",
+      "distractor_properties": {"Positional arguments as a tuple": "that is *args", "Default values": "unrelated to packing"}
+    },
+    {
+      "id": "A-L08-05",
+      "level": 8, "topic": "lambda", "type": "short",
+      "stem": "Which Python keyword creates an anonymous inline function?",
+      "answer": "lambda",
+      "answer_forms": ["lambda", "lambda keyword"],
+      "defining_property": "the keyword producing a nameless single-expression function",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L08-06",
+      "level": 8, "topic": "return", "type": "mcq",
+      "stem": "What does a bare 'return' statement return?",
+      "options": ["0", "None", "An empty tuple"],
+      "answer_index": 1, "answer": "None",
+      "answer_forms": ["none", "option 2", "answer 2"],
+      "defining_property": "returns the null singleton, identically to falling off the end of the function",
+      "distractor_properties": {"0": "a numeric value would need to be explicit", "An empty tuple": "would require return ()"}
+    },
+
+    {
+      "id": "A-L09-01",
+      "level": 9, "topic": "dicts", "type": "mcq",
+      "stem": "What does d.get('missing') return when the key is absent and no default is supplied?",
+      "options": ["KeyError", "None", "Empty string"],
+      "answer_index": 1, "answer": "None",
+      "answer_forms": ["none", "option 2", "answer 2"],
+      "defining_property": "the lookup method that substitutes the null singleton instead of raising when the key is absent",
+      "distractor_properties": {"KeyError": "that is square-bracket lookup", "Empty string": "no such default exists"}
+    },
+    {
+      "id": "A-L09-02",
+      "level": 9, "topic": "sets", "type": "mcq",
+      "stem": "What is len({1, 2, 2, 3})?",
+      "options": ["3", "4", "2"],
+      "answer_index": 0, "answer": "3",
+      "answer_forms": ["3", "three", "option 1", "answer 1"],
+      "defining_property": "a set stores each distinct value once, so the repeated element is collapsed",
+      "distractor_properties": {"4": "would count duplicates", "2": "would collapse too many"}
+    },
+    {
+      "id": "A-L09-03",
+      "level": 9, "topic": "comprehensions", "type": "short",
+      "stem": "Write a list comprehension producing the squares of 0 through 4 inclusive.",
+      "answer": "[x**2 for x in range(5)]",
+      "answer_forms": ["[x**2 for x in range(5)]", "[x*x for x in range(5)]", "x**2 for x in range(5)"],
+      "defining_property": "a bracketed expression-then-for construct over a five-element range, squaring each element",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L09-04",
+      "level": 9, "topic": "dict keys", "type": "mcq",
+      "stem": "Which of these can be used as a dictionary key?",
+      "options": ["A list", "A tuple of integers", "A set"],
+      "answer_index": 1, "answer": "A tuple of integers",
+      "answer_forms": ["tuple", "option 2", "answer 2"],
+      "defining_property": "keys must be hashable, which requires immutability, and only one of the options qualifies",
+      "distractor_properties": {"A list": "mutable, therefore unhashable", "A set": "mutable, therefore unhashable"}
+    },
+    {
+      "id": "A-L09-05",
+      "level": 9, "topic": "dict iteration", "type": "mcq",
+      "stem": "Iterating a dictionary directly with 'for k in d' yields what?",
+      "options": ["Keys", "Values", "(key, value) pairs"],
+      "answer_index": 0, "answer": "Keys",
+      "answer_forms": ["keys", "option 1", "answer 1"],
+      "defining_property": "default iteration walks the mapping's key view, not its values or pairs",
+      "distractor_properties": {"Values": "requires .values()", "(key, value) pairs": "requires .items()"}
+    },
+    {
+      "id": "A-L09-06",
+      "level": 9, "topic": "sets", "type": "short",
+      "stem": "Which operator computes the intersection of two Python sets?",
+      "answer": "&",
+      "answer_forms": ["&", "ampersand", "intersection"],
+      "defining_property": "the single bitwise-and symbol, reused by sets to mean elements common to both",
+      "distractor_properties": {}
+    },
+
+    {
+      "id": "A-L10-01",
+      "level": 10, "topic": "exceptions", "type": "short",
+      "stem": "Which Python keyword introduces a block that always runs whether or not an exception occurred?",
+      "answer": "finally",
+      "answer_forms": ["finally", "finally block"],
+      "defining_property": "the clause guaranteed to execute on both the normal and the exceptional path",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L10-02",
+      "level": 10, "topic": "files", "type": "mcq",
+      "stem": "Why is 'with open(path) as f:' preferred over a bare open()?",
+      "options": ["It is faster", "It closes the file automatically, even on exception", "It allows binary mode"],
+      "answer_index": 1, "answer": "It closes the file automatically, even on exception",
+      "answer_forms": ["closes", "automatically", "context manager", "option 2", "answer 2"],
+      "defining_property": "the context-manager protocol releases the resource deterministically on leaving the block, including when an error propagates",
+      "distractor_properties": {"It is faster": "no performance difference", "It allows binary mode": "mode is a parameter either way"}
+    },
+    {
+      "id": "A-L10-03",
+      "level": 10, "topic": "exceptions", "type": "mcq",
+      "stem": "Which exception does opening a non-existent file for reading raise?",
+      "options": ["ValueError", "FileNotFoundError", "IOError"],
+      "answer_index": 1, "answer": "FileNotFoundError",
+      "answer_forms": ["filenotfounderror", "file not found error", "option 2", "answer 2"],
+      "defining_property": "the specific OSError subclass named for a missing path",
+      "distractor_properties": {"ValueError": "signals a bad value, not a missing path", "IOError": "a legacy alias of OSError, not the specific subclass"}
+    },
+    {
+      "id": "A-L10-04",
+      "level": 10, "topic": "modules", "type": "mcq",
+      "stem": "What does the guard 'if __name__ == \"__main__\":' accomplish?",
+      "options": ["Declares the entry point required by Python", "Runs the block only when the file is executed directly, not when imported", "Prevents circular imports"],
+      "answer_index": 1, "answer": "Runs the block only when the file is executed directly, not when imported",
+      "answer_forms": ["executed directly", "not when imported", "option 2", "answer 2"],
+      "defining_property": "distinguishes direct execution from import by testing the module's own name attribute",
+      "distractor_properties": {"Declares the entry point required by Python": "no entry point is required", "Prevents circular imports": "unrelated mechanism"}
+    },
+    {
+      "id": "A-L10-05",
+      "level": 10, "topic": "exceptions", "type": "mcq",
+      "stem": "Why is 'except:' with no exception type discouraged?",
+      "options": ["It is a SyntaxError", "It catches everything including KeyboardInterrupt and SystemExit", "It is slower"],
+      "answer_index": 1, "answer": "It catches everything including KeyboardInterrupt and SystemExit",
+      "answer_forms": ["everything", "keyboardinterrupt", "systemexit", "bare except", "option 2", "answer 2"],
+      "defining_property": "a bare handler intercepts control-flow exceptions that should normally propagate, masking interrupts and shutdown",
+      "distractor_properties": {"It is a SyntaxError": "it parses", "It is slower": "performance is not the objection"}
+    },
+    {
+      "id": "A-L10-06",
+      "level": 10, "topic": "imports", "type": "short",
+      "stem": "Which statement imports only the sqrt name from the math module?",
+      "answer": "from math import sqrt",
+      "answer_forms": ["from math import sqrt", "from math import sqrt as"],
+      "defining_property": "the from-import form naming the single attribute, binding it directly without the module prefix",
+      "distractor_properties": {}
+    }
+  ]
+}

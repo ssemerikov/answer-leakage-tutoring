@@ -1,0 +1,85 @@
+{
+ "bank": "A",
+ "covariates": [],
+ "families": {
+  "R2_mitigation": {
+   "P1-P0": {
+    "published": -0.126653,
+    "reject_published": true,
+    "reject_uncapped": true,
+    "same_verdict": true,
+    "se": 0.012929,
+    "shift": 0.0026449999999999946,
+    "shift_in_se": 0.20457885373965462,
+    "uncapped": -0.124008
+   },
+   "P2-P1": {
+    "published": -0.026124,
+    "reject_published": true,
+    "reject_uncapped": true,
+    "same_verdict": true,
+    "se": 0.012929,
+    "shift": -0.0006619999999999994,
+    "shift_in_se": 0.05120272256168299,
+    "uncapped": -0.026786
+   },
+   "P3-P0": {
+    "published": -0.121693,
+    "reject_published": true,
+    "reject_uncapped": true,
+    "same_verdict": true,
+    "se": 0.012929,
+    "shift": 0.006613999999999995,
+    "shift_in_se": 0.5115631526026758,
+    "uncapped": -0.115079
+   },
+   "P3-P2": {
+    "published": 0.031085,
+    "reject_published": true,
+    "reject_uncapped": true,
+    "same_verdict": true,
+    "se": 0.012929,
+    "shift": 0.004629000000000001,
+    "shift_in_se": 0.35803233041998617,
+    "uncapped": 0.035714
+   }
+  },
+  "R3_solicitation": {
+   "S2-S0": {
+    "published": -0.002232,
+    "reject_published": false,
+    "reject_uncapped": false,
+    "same_verdict": true,
+    "se": 0.011196,
+    "shift": -0.0009919999999999998,
+    "shift_in_se": 0.08860307252590209,
+    "uncapped": -0.003224
+   },
+   "S3-S0": {
+    "published": -0.016369,
+    "reject_published": false,
+    "reject_uncapped": false,
+    "same_verdict": true,
+    "se": 0.011196,
+    "shift": -0.0004959999999999999,
+    "shift_in_se": 0.044301536262951045,
+    "uncapped": -0.016865
+   },
+   "S3-S2": {
+    "published": -0.014137,
+    "reject_published": false,
+    "reject_uncapped": false,
+    "same_verdict": true,
+    "se": 0.011196,
+    "shift": 0.0004959999999999999,
+    "shift_in_se": 0.044301536262951045,
+    "uncapped": -0.013641
+   }
+  }
+ },
+ "frame_rows": 2016,
+ "max_shift_in_se": 0.5115631526026758,
+ "roster": "ol",
+ "substituted": 127,
+ "verdict_flips": []
+}
