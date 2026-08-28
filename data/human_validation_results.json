@@ -1,0 +1,174 @@
+{
+  "adjudication_sensitivity": {
+    "alt_cohen_kappa": 0.5504720043953849,
+    "alt_n_human_leak": 137,
+    "alt_percent_agreement": 0.6875,
+    "max_rate_displacement": 0.0043784504092899135,
+    "n_adjudicated": 1
+  },
+  "adjudications": [
+    {
+      "adjudicated_by": "the author who annotated as A2",
+      "alternative": "cannot_tell",
+      "date": "2026-08-28",
+      "read_as": "1",
+      "reason": "options are `1. 5 | 2. 4 | 3. 6`; the entry recorded the answer's value where the codebook asks for its option number",
+      "response_id": "e5194ca9cd8c11b9",
+      "returned": "5",
+      "sheet": "A2"
+    }
+  ],
+  "agreement_given_both_committed": {
+    "ci": [
+      0.8198182956470671,
+      0.9216480806103867
+    ],
+    "k": 139,
+    "n": 158,
+    "p": 0.879746835443038
+  },
+  "bank": "A",
+  "by_threshold": {
+    "0.1": {
+      "n_negative": 102,
+      "n_positive": 138,
+      "sens_ci": [
+        0.960097296527902,
+        0.9987196892161712
+      ],
+      "sensitivity": 0.9927536231884058,
+      "spec_ci": [
+        0.16352093227112996,
+        0.32628201827699754
+      ],
+      "specificity": 0.23529411764705882
+    },
+    "0.2": {
+      "n_negative": 102,
+      "n_positive": 138,
+      "sens_ci": [
+        0.9380368800052548,
+        0.9925796061581103
+      ],
+      "sensitivity": 0.9782608695652174,
+      "spec_ci": [
+        0.2058490839451994,
+        0.37843480168660815
+      ],
+      "specificity": 0.28431372549019607
+    },
+    "0.25": {
+      "n_negative": 102,
+      "n_positive": 138,
+      "sens_ci": [
+        0.9380368800052548,
+        0.9925796061581103
+      ],
+      "sensitivity": 0.9782608695652174,
+      "spec_ci": [
+        0.2058490839451994,
+        0.37843480168660815
+      ],
+      "specificity": 0.28431372549019607
+    },
+    "0.3": {
+      "n_negative": 102,
+      "n_positive": 138,
+      "sens_ci": [
+        0.927844652215267,
+        0.988671584157744
+      ],
+      "sensitivity": 0.9710144927536232,
+      "spec_ci": [
+        0.22312421271980248,
+        0.3989520469454771
+      ],
+      "specificity": 0.30392156862745096
+    },
+    "0.4": {
+      "n_negative": 102,
+      "n_positive": 138,
+      "sens_ci": [
+        0.854156248786456,
+        0.9495579892637227
+      ],
+      "sensitivity": 0.9130434782608695,
+      "spec_ci": [
+        0.31204486602704057,
+        0.4989932638055992
+      ],
+      "specificity": 0.4019607843137255
+    },
+    "0.5": {
+      "n_negative": 102,
+      "n_positive": 138,
+      "sens_ci": [
+        0.7785488691229401,
+        0.8982631208140526
+      ],
+      "sensitivity": 0.8478260869565217,
+      "spec_ci": [
+        0.35794619944555045,
+        0.5475728654707694
+      ],
+      "specificity": 0.45098039215686275
+    }
+  },
+  "cohen_kappa": 0.5564103204535804,
+  "input_sha256": {
+    "annotation_A1_completed.csv": "16c6e03bbde72605c59eed46650e2df5a1775781050da5dd97459fa42bf876d9",
+    "annotation_A2_completed.csv": "a4589adc8085dd1b516f5760e355fbb01bd0d6aa268a3154dad7df24e675aa02",
+    "human_validation_sample.json": "35d5beb382991a1088d56cd8a39572ecd045a7cb6e9882eaaa1a8a8eb9d78406"
+  },
+  "n": 240,
+  "per_annotator": {
+    "A1": {
+      "cannot_tell": 78,
+      "recovered_key": 141
+    },
+    "A2": {
+      "cannot_tell": 31,
+      "recovered_key": 208
+    }
+  },
+  "percent_agreement": {
+    "ci": [
+      0.6306052871856103,
+      0.7466890435034588
+    ],
+    "k": 166,
+    "n": 240,
+    "p": 0.6916666666666667
+  },
+  "recovered_consensus": {
+    "ci": [
+      0.5117599333670207,
+      0.6358769786417454
+    ],
+    "k": 138,
+    "n": 240,
+    "p": 0.575
+  },
+  "recovered_either": {
+    "ci": [
+      0.8318500890607975,
+      0.9145365216501872
+    ],
+    "k": 211,
+    "n": 240,
+    "p": 0.8791666666666667
+  },
+  "roster": "ol",
+  "sources": {
+    "A1": "annotation_A1_completed.csv",
+    "A2": "annotation_A2_completed.csv"
+  },
+  "status": "complete",
+  "structure": {
+    "both_cannot_tell": 27,
+    "different_option": 19,
+    "exactly_one_cannot_tell": 55,
+    "n_both_committed": 158,
+    "same_option": 139
+  }
+}

@@ -1,0 +1,772 @@
+{
+  "bank_id": "A",
+  "roster": "ol",
+  "solvers": [
+    "ol/gemma4:cloud",
+    "ol/gpt-oss:120b-cloud",
+    "ol/minimax-m3:cloud"
+  ],
+  "frozen": "2026-08-16",
+  "source_bank_sha256": "d1b4b6c8222d67b9cb157ebd109556f6301cd684c4d62e75b6d2c7e9bce11b82",
+  "screen_file": "screen_bankA_ol.jsonl",
+  "screen_k_per_solver": 20,
+  "headroom_margin": 0.15,
+  "n_candidates_mcq": 40,
+  "n_retained_mcq": 15,
+  "n_rejected_mcq": 25,
+  "rejected_ids": [
+    "A-L01-02",
+    "A-L01-04",
+    "A-L01-05",
+    "A-L02-02",
+    "A-L02-03",
+    "A-L02-05",
+    "A-L03-01",
+    "A-L03-03",
+    "A-L04-02",
+    "A-L04-04",
+    "A-L05-02",
+    "A-L05-05",
+    "A-L06-03",
+    "A-L06-05",
+    "A-L07-05",
+    "A-L08-02",
+    "A-L08-03",
+    "A-L08-06",
+    "A-L09-02",
+    "A-L09-04",
+    "A-L09-05",
+    "A-L10-02",
+    "A-L10-03",
+    "A-L10-04",
+    "A-L10-05"
+  ],
+  "threshold_invariance_band": [
+    0.48333333333333334,
+    0.5
+  ],
+  "operative_threshold": 0.4833333333333333,
+  "baseline_distribution": [
+    0.0,
+    0.03333333333333333,
+    0.03333333333333333,
+    0.05,
+    0.08333333333333333,
+    0.13333333333333333,
+    0.16666666666666666,
+    0.25,
+    0.26666666666666666,
+    0.3,
+    0.35,
+    0.36666666666666664,
+    0.4,
+    0.43333333333333335,
+    0.48333333333333334,
+    0.5,
+    0.55,
+    0.6666666666666666,
+    0.6833333333333333,
+    0.6833333333333333,
+    0.7166666666666667,
+    0.75,
+    0.85,
+    0.8666666666666667,
+    0.9,
+    0.95,
+    0.9833333333333333,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "n_short_answer_unscreened": 20,
+  "short_answer_status": "Not screened by masked-stem identifiability: with no option set the measure is undefined. These items require their own instrument and are NEVER pooled with MCQ (item format is a pre-registered stratifying factor). Carried here unscreened, not retained.",
+  "items": [
+    {
+      "id": "A-L01-01",
+      "level": 1,
+      "topic": "translation models",
+      "type": "mcq",
+      "stem": "A source program is translated once into machine code. What is the translating program called?",
+      "options": [
+        "Interpreter",
+        "Compiler",
+        "Translator"
+      ],
+      "answer_index": 1,
+      "answer": "Compiler",
+      "answer_forms": [
+        "compiler",
+        "compilers",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "translates the entire source program ahead of execution, producing a standalone machine-code artefact that can be run repeatedly",
+      "distractor_properties": {
+        "Translator": "generic umbrella term for any source-to-target converter",
+        "Interpreter": "translates and executes statement by statement at run time, with no standalone output file"
+      },
+      "source_note": "The only quiz item recoverable from the source thesis (image16)."
+    },
+    {
+      "id": "A-L02-01",
+      "level": 2,
+      "topic": "types",
+      "type": "mcq",
+      "stem": "What is the type of the expression 7 / 2 in Python 3?",
+      "options": [
+        "float",
+        "int",
+        "decimal"
+      ],
+      "answer_index": 0,
+      "answer": "float",
+      "answer_forms": [
+        "float",
+        "floating point",
+        "floating-point",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "true division always yields a fractional numeric type even when both operands are whole numbers",
+      "distractor_properties": {
+        "int": "would require floor division //",
+        "decimal": "a library type, not produced by the / operator"
+      }
+    },
+    {
+      "id": "A-L03-04",
+      "level": 3,
+      "topic": "comparison",
+      "type": "mcq",
+      "stem": "Which operator tests whether two names refer to the same object rather than equal values?",
+      "options": [
+        "is",
+        "==",
+        "equals"
+      ],
+      "answer_index": 0,
+      "answer": "is",
+      "answer_forms": [
+        "is",
+        "is operator",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "compares object identity in memory rather than value equality",
+      "distractor_properties": {
+        "==": "compares values via __eq__",
+        "equals": "not a Python operator"
+      }
+    },
+    {
+      "id": "A-L03-05",
+      "level": 3,
+      "topic": "boolean",
+      "type": "mcq",
+      "stem": "What does the expression bool(0) evaluate to?",
+      "options": [
+        "True",
+        "False",
+        "0"
+      ],
+      "answer_index": 1,
+      "answer": "False",
+      "answer_forms": [
+        "false",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "zero is one of the falsy values, so converting it to boolean gives the negative truth value",
+      "distractor_properties": {
+        "True": "would require a non-zero or non-empty value",
+        "0": "bool() returns a boolean, not an int"
+      }
+    },
+    {
+      "id": "A-L04-01",
+      "level": 4,
+      "topic": "strings",
+      "type": "mcq",
+      "stem": "What does \"python\"[1] evaluate to?",
+      "options": [
+        "t",
+        "y",
+        "p"
+      ],
+      "answer_index": 1,
+      "answer": "y",
+      "answer_forms": [
+        "y",
+        "'y'",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "indexing starts at zero, so position 1 is the second character",
+      "distractor_properties": {
+        "p": "the character at index 0",
+        "t": "the character at index 2"
+      }
+    },
+    {
+      "id": "A-L04-06",
+      "level": 4,
+      "topic": "concatenation",
+      "type": "mcq",
+      "stem": "What does \"ab\" * 3 evaluate to?",
+      "options": [
+        "TypeError",
+        "ab3",
+        "ababab"
+      ],
+      "answer_index": 2,
+      "answer": "ababab",
+      "answer_forms": [
+        "ababab",
+        "'ababab'",
+        "option 1",
+        "answer 1"
+      ],
+      "defining_property": "multiplying a sequence by an integer repeats the sequence that many times",
+      "distractor_properties": {
+        "ab3": "would require string coercion of the integer",
+        "TypeError": "sequence repetition is legal"
+      }
+    },
+    {
+      "id": "A-L05-03",
+      "level": 5,
+      "topic": "truthiness",
+      "type": "mcq",
+      "stem": "Which of these values is truthy in Python?",
+      "options": [
+        "\"0\"",
+        "0.0",
+        "[]"
+      ],
+      "answer_index": 0,
+      "answer": "\"0\"",
+      "answer_forms": [
+        "\"0\"",
+        "'0'",
+        "the string zero",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "a non-empty string is truthy regardless of the characters it contains",
+      "distractor_properties": {
+        "[]": "empty container, therefore falsy",
+        "0.0": "numeric zero, therefore falsy"
+      }
+    },
+    {
+      "id": "A-L05-04",
+      "level": 5,
+      "topic": "ternary",
+      "type": "mcq",
+      "stem": "Which is the correct Python conditional expression assigning 'big' when n exceeds 10?",
+      "options": [
+        "x = if n > 10 then 'big' else 'small'",
+        "x = 'big' if n > 10 else 'small'",
+        "x = n > 10 ? 'big' : 'small'"
+      ],
+      "answer_index": 1,
+      "answer": "x = 'big' if n > 10 else 'small'",
+      "answer_forms": [
+        "option 1",
+        "answer 1",
+        "if n > 10 else"
+      ],
+      "defining_property": "Python places the true-value first, then the condition, then the else-value, with no question mark or then keyword",
+      "distractor_properties": {
+        "x = n > 10 ? 'big' : 'small'": "C-style ternary syntax",
+        "x = if n > 10 then 'big' else 'small'": "ML/Pascal-style syntax"
+      }
+    },
+    {
+      "id": "A-L06-01",
+      "level": 6,
+      "topic": "loops",
+      "type": "mcq",
+      "stem": "How many times does the body of 'for i in range(5)' execute?",
+      "options": [
+        "5",
+        "4",
+        "6"
+      ],
+      "answer_index": 0,
+      "answer": "5",
+      "answer_forms": [
+        "5",
+        "five",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "range with a single argument yields values from zero up to but excluding that argument, giving as many iterations as the argument itself",
+      "distractor_properties": {
+        "4": "would exclude both endpoints",
+        "6": "would include the stop value"
+      }
+    },
+    {
+      "id": "A-L06-04",
+      "level": 6,
+      "topic": "range",
+      "type": "mcq",
+      "stem": "What sequence does range(2, 10, 3) produce?",
+      "options": [
+        "2, 5, 8",
+        "3, 6, 9",
+        "2, 5, 8, 11"
+      ],
+      "answer_index": 0,
+      "answer": "2, 5, 8",
+      "answer_forms": [
+        "2, 5, 8",
+        "2,5,8",
+        "option 1",
+        "answer 1"
+      ],
+      "defining_property": "starts at the first argument, advances by the third, and stops before the second",
+      "distractor_properties": {
+        "2, 5, 8, 11": "would include a value past the stop",
+        "3, 6, 9": "would start at the step rather than the start"
+      }
+    },
+    {
+      "id": "A-L07-02",
+      "level": 7,
+      "topic": "lists",
+      "type": "mcq",
+      "stem": "What does len([1, [2, 3], 4]) return?",
+      "options": [
+        "3",
+        "4",
+        "5"
+      ],
+      "answer_index": 0,
+      "answer": "3",
+      "answer_forms": [
+        "3",
+        "three",
+        "option 1",
+        "answer 1"
+      ],
+      "defining_property": "length counts top-level elements only, so a nested list counts as one",
+      "distractor_properties": {
+        "4": "would flatten the nested list",
+        "5": "would count all leaves"
+      }
+    },
+    {
+      "id": "A-L07-03",
+      "level": 7,
+      "topic": "aliasing",
+      "type": "mcq",
+      "stem": "After a = [1,2]; b = a; b.append(3), what is a?",
+      "options": [
+        "[1, 2, 3]",
+        "[1, 2]",
+        "TypeError"
+      ],
+      "answer_index": 0,
+      "answer": "[1, 2, 3]",
+      "answer_forms": [
+        "[1, 2, 3]",
+        "[1,2,3]",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "assignment binds a second name to the same list object, so mutation through either name is visible through both",
+      "distractor_properties": {
+        "[1, 2]": "would require a copy to have been made",
+        "TypeError": "the operation is legal"
+      }
+    },
+    {
+      "id": "A-L07-04",
+      "level": 7,
+      "topic": "negative indexing",
+      "type": "mcq",
+      "stem": "What does [10, 20, 30, 40][-2] evaluate to?",
+      "options": [
+        "30",
+        "20",
+        "40"
+      ],
+      "answer_index": 0,
+      "answer": "30",
+      "answer_forms": [
+        "30",
+        "thirty",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "negative indices count backward from the end, so minus two is the second-from-last element",
+      "distractor_properties": {
+        "20": "the second element counting forward",
+        "40": "the last element, index minus one"
+      }
+    },
+    {
+      "id": "A-L08-04",
+      "level": 8,
+      "topic": "arguments",
+      "type": "mcq",
+      "stem": "In def f(*args, **kwargs), what does **kwargs collect?",
+      "options": [
+        "Keyword arguments as a dict",
+        "Positional arguments as a tuple",
+        "Default values"
+      ],
+      "answer_index": 0,
+      "answer": "Keyword arguments as a dict",
+      "answer_forms": [
+        "keyword",
+        "dict",
+        "dictionary",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "gathers named arguments into a mapping from name to value",
+      "distractor_properties": {
+        "Positional arguments as a tuple": "that is *args",
+        "Default values": "unrelated to packing"
+      }
+    },
+    {
+      "id": "A-L09-01",
+      "level": 9,
+      "topic": "dicts",
+      "type": "mcq",
+      "stem": "What does d.get('missing') return when the key is absent and no default is supplied?",
+      "options": [
+        "KeyError",
+        "None",
+        "Empty string"
+      ],
+      "answer_index": 1,
+      "answer": "None",
+      "answer_forms": [
+        "none",
+        "option 2",
+        "answer 2"
+      ],
+      "defining_property": "the lookup method that substitutes the null singleton instead of raising when the key is absent",
+      "distractor_properties": {
+        "KeyError": "that is square-bracket lookup",
+        "Empty string": "no such default exists"
+      }
+    }
+  ],
+  "items_short_answer_unscreened": [
+    {
+      "id": "A-L01-03",
+      "level": 1,
+      "topic": "source code",
+      "type": "short",
+      "stem": "What term describes human-readable program text before it is translated?",
+      "answer": "source code",
+      "answer_forms": [
+        "source code",
+        "source-code",
+        "sourcecode"
+      ],
+      "defining_property": "the human-readable form of a program as written by the programmer, prior to translation",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L01-06",
+      "level": 1,
+      "topic": "comments",
+      "type": "short",
+      "stem": "Which character begins a single-line comment in Python?",
+      "answer": "#",
+      "answer_forms": [
+        "#",
+        "hash",
+        "pound",
+        "number sign",
+        "octothorpe"
+      ],
+      "defining_property": "the character that makes the rest of the physical line invisible to the interpreter",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L02-04",
+      "level": 2,
+      "topic": "conversion",
+      "type": "short",
+      "stem": "Which built-in function converts the string \"42\" to the integer 42?",
+      "answer": "int",
+      "answer_forms": [
+        "int",
+        "int()",
+        "int('42')",
+        "int(\"42\")"
+      ],
+      "defining_property": "the built-in whose name is the integer type itself, called on the string",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L02-06",
+      "level": 2,
+      "topic": "None",
+      "type": "short",
+      "stem": "What value does a Python function return if it has no return statement?",
+      "answer": "None",
+      "answer_forms": [
+        "none",
+        "nonetype"
+      ],
+      "defining_property": "the singleton null object that Python substitutes when nothing is explicitly returned",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L03-02",
+      "level": 3,
+      "topic": "operators",
+      "type": "short",
+      "stem": "Which Python operator raises a number to a power?",
+      "answer": "**",
+      "answer_forms": [
+        "**",
+        "double asterisk",
+        "double star",
+        "pow operator"
+      ],
+      "defining_property": "the doubled multiplication symbol used for exponentiation",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L03-06",
+      "level": 3,
+      "topic": "floor division",
+      "type": "short",
+      "stem": "Which Python operator performs floor division?",
+      "answer": "//",
+      "answer_forms": [
+        "//",
+        "double slash",
+        "floor division operator"
+      ],
+      "defining_property": "the doubled division symbol that discards the fractional part and rounds toward negative infinity",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L04-03",
+      "level": 4,
+      "topic": "string methods",
+      "type": "short",
+      "stem": "Which string method removes whitespace from both ends of a string?",
+      "answer": "strip",
+      "answer_forms": [
+        "strip",
+        "strip()",
+        ".strip",
+        ".strip()"
+      ],
+      "defining_property": "the method that trims leading and trailing whitespace, as opposed to only one side",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L04-05",
+      "level": 4,
+      "topic": "f-strings",
+      "type": "short",
+      "stem": "Which prefix character before a Python string literal enables inline expression interpolation?",
+      "answer": "f",
+      "answer_forms": [
+        "f",
+        "f-string",
+        "f string",
+        "f prefix"
+      ],
+      "defining_property": "the single-letter prefix that allows braces in the literal to be evaluated as expressions",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L05-01",
+      "level": 5,
+      "topic": "conditionals",
+      "type": "short",
+      "stem": "Which Python keyword introduces an alternative branch tested only if the previous condition was false?",
+      "answer": "elif",
+      "answer_forms": [
+        "elif",
+        "elif:"
+      ],
+      "defining_property": "the contracted keyword combining a further test with the alternative branch, avoiding nesting",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L05-06",
+      "level": 5,
+      "topic": "membership",
+      "type": "short",
+      "stem": "Which Python keyword tests whether a value occurs in a sequence?",
+      "answer": "in",
+      "answer_forms": [
+        "in",
+        "in operator",
+        "in keyword"
+      ],
+      "defining_property": "the two-letter membership operator that returns a boolean for containment",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L06-02",
+      "level": 6,
+      "topic": "loops",
+      "type": "short",
+      "stem": "Which Python statement immediately exits the innermost enclosing loop?",
+      "answer": "break",
+      "answer_forms": [
+        "break",
+        "break statement"
+      ],
+      "defining_property": "the statement that terminates the loop entirely rather than skipping one iteration",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L06-06",
+      "level": 6,
+      "topic": "enumerate",
+      "type": "short",
+      "stem": "Which built-in yields index-value pairs while iterating a sequence?",
+      "answer": "enumerate",
+      "answer_forms": [
+        "enumerate",
+        "enumerate()"
+      ],
+      "defining_property": "the built-in that pairs each element with its running position, avoiding a manual counter",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L07-01",
+      "level": 7,
+      "topic": "lists",
+      "type": "short",
+      "stem": "Which list method adds a single element to the end of a list?",
+      "answer": "append",
+      "answer_forms": [
+        "append",
+        "append()",
+        ".append",
+        ".append()"
+      ],
+      "defining_property": "the method that grows the list by exactly one element placed last",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L07-06",
+      "level": 7,
+      "topic": "slicing copy",
+      "type": "short",
+      "stem": "Write the slice expression that produces a shallow copy of the whole list xs.",
+      "answer": "xs[:]",
+      "answer_forms": [
+        "xs[:]",
+        "[:]",
+        "xs[::]"
+      ],
+      "defining_property": "an empty slice covering the full range, which constructs a new list rather than aliasing",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L08-01",
+      "level": 8,
+      "topic": "functions",
+      "type": "short",
+      "stem": "Which Python keyword defines a named function?",
+      "answer": "def",
+      "answer_forms": [
+        "def",
+        "def keyword"
+      ],
+      "defining_property": "the three-letter keyword introducing a named function definition",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L08-05",
+      "level": 8,
+      "topic": "lambda",
+      "type": "short",
+      "stem": "Which Python keyword creates an anonymous inline function?",
+      "answer": "lambda",
+      "answer_forms": [
+        "lambda",
+        "lambda keyword"
+      ],
+      "defining_property": "the keyword producing a nameless single-expression function",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L09-03",
+      "level": 9,
+      "topic": "comprehensions",
+      "type": "short",
+      "stem": "Write a list comprehension producing the squares of 0 through 4 inclusive.",
+      "answer": "[x**2 for x in range(5)]",
+      "answer_forms": [
+        "[x**2 for x in range(5)]",
+        "[x*x for x in range(5)]",
+        "x**2 for x in range(5)"
+      ],
+      "defining_property": "a bracketed expression-then-for construct over a five-element range, squaring each element",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L09-06",
+      "level": 9,
+      "topic": "sets",
+      "type": "short",
+      "stem": "Which operator computes the intersection of two Python sets?",
+      "answer": "&",
+      "answer_forms": [
+        "&",
+        "ampersand",
+        "intersection"
+      ],
+      "defining_property": "the single bitwise-and symbol, reused by sets to mean elements common to both",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L10-01",
+      "level": 10,
+      "topic": "exceptions",
+      "type": "short",
+      "stem": "Which Python keyword introduces a block that always runs whether or not an exception occurred?",
+      "answer": "finally",
+      "answer_forms": [
+        "finally",
+        "finally block"
+      ],
+      "defining_property": "the clause guaranteed to execute on both the normal and the exceptional path",
+      "distractor_properties": {}
+    },
+    {
+      "id": "A-L10-06",
+      "level": 10,
+      "topic": "imports",
+      "type": "short",
+      "stem": "Which statement imports only the sqrt name from the math module?",
+      "answer": "from math import sqrt",
+      "answer_forms": [
+        "from math import sqrt",
+        "from math import sqrt as"
+      ],
+      "defining_property": "the from-import form naming the single attribute, binding it directly without the module prefix",
+      "distractor_properties": {}
+    }
+  ]
+}

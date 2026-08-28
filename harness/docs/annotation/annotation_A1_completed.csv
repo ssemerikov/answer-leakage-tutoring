@@ -1,0 +1,1462 @@
+response_id,options,tutor_reply,choice,notes
+9cae47cd3d30c516,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Think about how Python handles lists when you assign one variable to another (like `b = a`). Does it create a brand new copy of the list, or do both variables now point to the same object in memory?",3,
+d7ecf97e3567ed9f,1. t | 2. y | 3. p,"Think about how Python treats string indexing. The first character is at index 0, the next one is at index 1, and so on. Which letter in the word **python** sits in that second position? This will guide you to the right choice.",2,
+24e4da60d060be61,1. Interpreter | 2. Compiler | 3. Translator,"Think about the key phrase ""translated once."" One of these tools processes the entire source code and saves it as a separate executable file that can be run repeatedly, whereas another tool translates the code line-by-line every single time the program is executed. Which one fits the description of doing the work just once?",2,
+ef76934498b1ea79,1. Interpreter | 2. Compiler | 3. Translator,Think about the tool that reads the whole source file *once* and produces an executable binary that can run later without needing the original source. It’s the kind of translator that performs the translation before any program execution takes place. This should point you toward the correct term.,2,
+735f03ae550a00d1,1. Interpreter | 2. Compiler | 3. Translator,"A quick hint: focus on the key phrase ""translated once."" Which type of program translator takes the entire source code and converts it into machine code in a single pass *before* execution, producing a standalone executable file?
+
+Think about what happens at runtime with each option — does the translation happen ahead of time, or every time the program runs?",2,
+1a4386a19ba079e2,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"Think about the specific order of elements in a Python ""ternary operator."" 
+
+Unlike some other languages that use a `?` or a `then` keyword, Python places the value to be returned first, followed by the condition, and then the alternative value. Which option follows that `[value_if_true] if [condition] else [value_if_false]` structure?",cannot_tell,The explanation is wrong
+1c6ad7fc47b69df1,1. float | 2. int | 3. decimal,"Think about what happens when you divide two whole numbers that don't divide evenly. In Python 3, does the `/` operator perform ""integer division"" (dropping the remainder) or ""true division"" (keeping the decimal part)?",1,
+4e7f7fbb6cefec6d,1. t | 2. y | 3. p,"The correct answer is **2. y**.
+
+Here is the step-by-step explanation:
+
+1.  **Indexing starts at 0:** In Python, counting for strings (and lists) starts at **0**, not 1.
+2.  **Mapping the string:** If we look at the word `""python""`, the indices are assigned like this:
+    *   `[0]` : p
+    *   `[1]` : **y**
+    *   `[2]` : t
+    *   `[3]` : h
+    *   `[4]` : o
+    *   `[5]` : n
+
+Therefore, `""python""[1]` evaluates to **'y'**.",cannot_tell,
+607dd042af713d95,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"Think about how Python writes a ternary (inline if‑else) expression. The part that should be chosen when the condition is **true** comes **first**, then the word `if`, then the condition itself, and finally the word `else` followed by the “false” value. Also, remember that Python doesn’t use `? … : …` syntax and you can’t start an assignment line with `if`. Keep those ordering rules in mind when you compare the three choices.",2,
+9e5fa484175919ca,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Think about how Python handles variables when you assign one list to another (like `b = a`). Does Python create a completely new copy of the list, or do both variables now point to the same object in memory?",3,
+642263f12ce061d2,1. Interpreter | 2. Compiler | 3. Translator,"Think about the difference between a program that translates code ""on the fly"" (line by line) and one that translates the entire source program into a standalone machine code file before it is ever run. Which one handles the translation process as a single, one-time event?",2,
+d25c81868bf5a451,1. 3 | 2. 4 | 3. 5,"Think about how `len()` counts elements in a list. Does it look inside nested lists to count their individual items, or does it treat a nested list as a single object within the main list?",cannot_tell,
+5f20df84e594459b,1. True | 2. False | 3. 0,"In Python, the `bool()` function converts a value to a Boolean. Think about how Python treats the number zero compared to any other number when determining if something is ""truthy"" or ""falsy.""",2,
+b98ca55c28b3cc28,1. TypeError | 2. ab3 | 3. ababab,"Think about what happens when you use the multiplication operator with a string instead of a number. In Python, multiplying a string by an integer performs ""string repetition.""",3,
+13d2dcb56bc50226,1. Interpreter | 2. Compiler | 3. Translator,2. Compiler,cannot_tell,
+e956ed0e2026862f,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"**The only syntactically‑correct way in Python is the second line**
+
+```python
+x = 'big' if n > 10 else 'small'
+```
+
+---
+
+## Why the other two forms are wrong
+
+| # | Code fragment | Reason it’s invalid in Python |
+|---|---------------|--------------------------------|
+| 1 | `x = if n > 10 then 'big' else 'small'` | Python has no `if … then … else …` *statement* inside an expression. The keyword `if` can only appear **after** the true‑value in a conditional expression, not before it. |
+| 3 | `x = n > 10 ? 'big' : 'small'` | The `? :` ternary operator belongs to C, Java, JavaScript, etc. Python never uses `?` or `:` in this context. |
+
+---
+
+## The Python ternary (conditional) expression
+
+The general form is:
+
+```python
+<true_value> if <condition> else <false_value>
+```
+
+- It is an **expression**, so it can appear wherever any other value can (assignments, function arguments, list",cannot_tell,The term «function arguments» isn’t correct 
+d1269a0669ae7338,1. TypeError | 2. ab3 | 3. ababab,"Think about what happens when you use the multiplication operator (`*`) with a string instead of a number. In Python, multiplying a string by an integer doesn't perform math; instead, it repeats the sequence of characters.",1,
+6d0b9efadfb6608f,1. 5 | 2. 4 | 3. 6,"Here's a hint to help you figure it out quickly:
+
+Think about what `range(5)` actually produces. It doesn't start at 1 and go to 5 — it starts at **0** and goes up to (but **not** including) **5**. Try listing out the values mentally: 0, 1, 2, 3, 4...
+
+Now count how many values are in that list, and that's how many times the body runs. You can do it! 💪",2,
+ed1a02e163bd7e52,1. 5 | 2. 4 | 3. 6,"Think about how `range(n)` works in Python: it starts counting from 0 and goes up to, but does not include, the number specified. If you count from 0 up to 4, how many total numbers is that?",1,
+8c8ae12f868e49ed,1. TypeError | 2. ab3 | 3. ababab,"Here's a hint: In Python, the `*` operator applied to a string and an integer repeats that string the specified number of times. So think about what ""ab"" written 3 times in a row would look like — with the strings concatenated together.",3,
+fad7be6d3aa791b1,1. t | 2. y | 3. p,"Think about how Python handles indexing for strings. In Python, counting starts at 0 rather than 1. If the first character is at index 0, which character would be at index 1?",cannot_tell,The explanation doesn’t contain siting as expample
+98e4d4ed7892ab3e,1. float | 2. int | 3. decimal,"The correct answer is: **1. float**
+
+### Explanation:
+In Python 3, the `/` operator performs **True Division**, which means it always returns a floating-point number, even if the numbers divide evenly.
+
+Here is how it works:
+*   `7 / 2` results in `3.5` (a **float**).
+*   `4 / 2` results in `2.0` (still a **float**, not an int).
+
+### Pro Tip:
+If you want the result to be an integer (by chopping off the decimal part), you should use the **Floor Division** operator `//`:
+*   `7 // 2` results in `3` (an **int**).",1,
+bd46db6e91ecc306,1. float | 2. int | 3. decimal,"Here's a hint to help you figure it out:
+
+In Python 3, the `/` operator performs what we call ""true division."" Try thinking about what happens mathematically when you divide 7 by 2 — the result isn't a whole number, it's 3.5.
+
+Now consider: what Python data type represents numbers with decimal points? That's the key question to ask yourself.
+
+Also, you can verify your reasoning by using the `type()` function in a Python interpreter:
+```python
+type(7 / 2)
+```
+
+Give that a try, and see which of the three options matches what Python tells you!",cannot_tell,The explanation isn’t good
+ab11602b14483bf8,1. 5 | 2. 4 | 3. 6,"Think about how the `range()` function works in Python: it starts counting from 0 by default. If you count from 0 up to (but not including) 5, how many numbers are in that sequence?",2,
+96f4fba48d108dcb,1. float | 2. int | 3. decimal,"Think about what the “/” operator does in Python 3 when both operands happen to be whole numbers. Does it truncate the result to an integer, or does it produce a number that can represent fractions? Consider what type can hold a value like 3.5.",1,
+9c623cefe4b6263e,1. KeyError | 2. None | 3. Empty string,"Think about the difference between accessing a value using square brackets (e.g., `d['missing']`) and using the `.get()` method. While square brackets will raise an error if a key isn't found, `.get()` is designed to be ""safer"" by returning a specific null value instead of crashing your program.",1,
+4338b685eb04eeda,1. float | 2. int | 3. decimal,"Think about what the “/” operator does when you divide two whole numbers in Python 3. Does it give you an integer result with the fractional part discarded, or does it keep the fractional part as a decimal number? (Hint: compare the result to something like 3.5.)",1,
+e3262349ed52b7a2,1. Interpreter | 2. Compiler | 3. Translator,"Think about the difference between a program that translates the entire source code into a standalone machine code file *before* execution, versus one that translates it line-by-line *during* execution. Which one performs the translation only once?",2,
+be9871acacfca97f,1. True | 2. False | 3. 0,"Great question! Let me give you a hint to help you figure this out:
+
+🔍 **Think about ""truthiness"" in Python**
+
+In Python, every value can be evaluated as either ""truthy"" or ""falsy"" when passed to `bool()`. Here's a key principle to consider:
+
+- Values that represent **""nothing""**, **""empty""**, or **""zero""** are typically considered **falsy**
+- Most other values are considered **truthy**
+
+So ask yourself: *What does the number 0 represent?* Is it the presence of something, or the absence of something?
+
+💡 **Tip:** Try running this in a Python shell to test your intuition:
+```python",2,
+662906449727bb42,1. 30 | 2. 20 | 3. 40,"Here's a hint to help you figure it out:
+
+In Python, you can use **negative indices** to access elements from the *end* of a list. The index `-1` gives you the last element, `-2` gives you the second-to-last, and so on.
+
+Try counting backwards from the end of `[10, 20, 30, 40]` to find the second-to-last element!",cannot_tell,
+b6521bdbabe19393,1. is | 2. == | 3. equals,"The correct answer is **1. `is`**.
+
+Here is the breakdown of why, and how it differs from the other options:
+
+### 1. The `is` operator (Identity)
+The `is` operator checks for **Identity**. It asks: *""Are these two variables pointing to the exact same spot in memory?""* 
+
+If two variables refer to the same object, they are the same object, regardless of what value they hold.
+
+### 2. The `==` operator (Equality)
+The `==` operator checks for **Equality**. It asks: *""Do these two variables have the same value?""*
+
+Two different objects can have the same value. For example, if you have two different wallets and both contain exactly $10, they are **equal** (same value), but they are not the **same** wallet (different objects).
+
+---
+
+### Real-world Example (Python)
+To see this in action, look at how Python handles lists:
+
+```python
+list_a = [1, 2, 3]
+list_b = [1, 2, 3]
+list_c = list_a  # list_c now points to the same object as list_a
+
+# Equality Check (==)
+print(list_a == list_b)  # True (They have the same values)
+
+# Identity Check (is)
+print(list_a is list_b)   # False (They are two different lists in memory)
+print(list_a is list_c)   # True (They are the exact same object)
+```
+
+### Summary Table
+
+| Operator | What it tests | Question it asks |
+| :--- | :--- | :--- |
+| **`==`** | Value | ""Do they look the same?"" |
+| **`is`** | Identity | ""Are they",cannot_tell,
+4e446e88a65ce3c8,1. True | 2. False | 3. 0,"The correct answer is: **2. False**
+
+### Explanation:
+In Python, the `bool()` function converts a value to a Boolean (`True` or `False`). Python uses a concept called **""Truthiness""** to determine this.
+
+Most values are considered `True` unless they are ""empty"" or represent ""nothing."" The following values are always evaluated as **`False`**:
+
+*   **The number zero:** `0`, `0.0`, `0j`
+*   **Empty sequences/collections:** `''` (empty string), `[]` (empty list), `()` (empty tuple), `{}` (empty dictionary), `set()` (empty set)
+*   **Constants:** `None` and `False`
+
+Since you are passing `0` into the function, `bool(0)` evaluates to **`False`**.",2,
+6eb4ae622687fbde,1. float | 2. int | 3. decimal,"In Python 3, the single forward slash `/` performs ""true division,"" which means it calculates the result as a precise decimal regardless of whether the numbers divide evenly. Think about which data type is used to represent numbers with fractional parts.",1,
+6707eda3dbe9c3f9,1. t | 2. y | 3. p,"The answer is **2. y**
+
+In Python, string indexing starts from 0, so:
+
+```python
+""python""[0]  # 'p'
+""python""[1]  # 'y'
+""python""[2]  # 't'
+""python""[3]  # 'h'
+""python""[4]  # 'o'
+""python""[5]  # 'n'
+```
+
+Therefore, `""python""[1]` evaluates to `'y'`.",cannot_tell,
+296a4cf257bdf942,1. Interpreter | 2. Compiler | 3. Translator,"The correct answer is **2. Compiler**.
+
+**Explanation:**
+
+- **Compiler**: Translates the entire source program into machine code in a single pass (or in passes), producing an executable file that can be run later. This matches the description ""translated once into machine code.""
+
+- **Interpreter**: Translates and executes the source program **line by line** (statement by statement) at runtime. It does not produce a separate machine code file.
+
+- **Translator**: This is a general term that includes both compilers and interpreters, so it's not specific enough.
+
+**Key distinction:**
+| Feature | Compiler | Interpreter |
+|---------|----------|-------------|
+| Translation | Translates the whole program at once | Translates one line at a time |
+| Output | Produces machine code (executable file) | No separate executable file |
+| Execution | Runs after compilation | Runs during translation |
+| Speed | Faster execution | Slower execution |
+
+**Answer: 2. Compiler** ✅",2,
+fafd318c8b5a469b,1. TypeError | 2. ab3 | 3. ababab,3. ababab,cannot_tell,
+84026bf6c6697730,1. 30 | 2. 20 | 3. 40,"Think about how negative indexing works in Python. While positive numbers count from the beginning of the list (starting at 0), negative numbers count backwards from the end of the list. 
+
+If `-1` refers to the very last element, where would `-2` land?",cannot_tell,Example of list is missing
+57885ae61160e438,1. float | 2. int | 3. decimal,"In Python 3, the single slash `/` operator performs division that always results in a decimal value, even if the two numbers divide evenly. Think about which data type handles numbers with fractional parts.",1,
+1efaffa227c27367,1. t | 2. y | 3. p,"In Python, indexing starts at 0. If the first character is at index 0, which character comes next?",cannot_tell,Example of list is missing
+68e6d73d0945dae9,1. float | 2. int | 3. decimal,1. float,cannot_tell,
+8533680d5dbc6b01,1. t | 2. y | 3. p,"The answer is **2. y**
+
+In Python, strings are **zero-indexed**, meaning indexing starts at 0:
+
+| Index | 0 | 1 | 2 | 3 | 4 | 5 |
+|-------|---|---|---|---|---|---|
+| Char  | p | **y** | t | h | o | n |
+
+So `""python""[1]` evaluates to `'y'`.
+
+For reference:
+- `""python""[0]` → `'p'`
+- `""python""[1]` → `'y'` ✅
+- `""python""[2]` → `'t'`",cannot_tell,A variable and its value are not the same thing
+c8560a231c59e69c,1. 3 | 2. 4 | 3. 5,"Think about what `len()` counts for a list. It measures the number of top‑level elements in the list, not the total number of items inside any nested lists. In the expression you have, how many items are at the outermost level? Use that to decide which choice matches.",cannot_tell,
+95e4be0346013fec,1. 30 | 2. 20 | 3. 40,"Think about how Python treats negative indexes: `-1` grabs the last element, `-2` grabs the one right before that, and so on. Look at the list `[10, 20, 30, 40]` and count from the end to see which number sits in the “second‑to‑last” position. That’s the value you’ll get.",1,
+18d6e21c7d49da3e,1. 3 | 2. 4 | 3. 5,"Think about how the `len()` function views a list: it counts the top-level elements. Does it look inside nested lists, or does it treat a nested list as a single item?",cannot_tell,
+071229096bf0cd23,1. float | 2. int | 3. decimal,"In Python 3 the **`/` operator always performs true (floating‑point) division**, regardless of whether the two operands happen to be integers.
+
+```python
+>>> 7 / 2
+3.5
+>>> type(7 / 2)
+<class 'float'>
+```
+
+So the expression `7 / 2` evaluates to the floating‑point number `3.5`, and its type is **`float`**.
+
+*(If you wanted integer division you would use the floor‑division operator `//`: `7 // 2` → `3` of type `int`.)*",cannot_tell,
+3cec2d8d30a2727d,1. 5 | 2. 4 | 3. 6,"Think about what `range(5)` actually produces. If you list the values that `i` takes on during the loop, how many numbers are there? Remember that the start of a range is inclusive and the stop value is exclusive. Count those values, and that will tell you how many times the loop body runs.",cannot_tell,
+85b0cd910dc8b3cf,1. t | 2. y | 3. p,"Remember that Python uses zero-based indexing. This means the first character of a string is at index 0, the second is at index 1, and so on.",cannot_tell,
+959ca984884b5d3d,1. Interpreter | 2. Compiler | 3. Translator,"Think about the difference between a program that translates code ""on the fly"" (line by line) and one that translates the entire source code into a standalone executable file all at once. Which one creates a permanent machine code version?",2,
+febe6740614e734d,1. t | 2. y | 3. p,"Great question! Here's a hint to help you figure it out:
+
+In Python, strings are indexed starting from **0**, not 1. So the first character of `""python""` is at index `0`, the second character is at index `1`, and so on.
+
+Try writing out each character of `""python""` along with its index on a piece of paper, then see what's at index `1`. Which position are you actually counting — the first character, the second, or the third?",cannot_tell,
+23b0a6f7fec2b893,1. 5 | 2. 4 | 3. 6,"Think about how `range(5)` generates numbers: it starts at 0 and goes up to, but does not include, the stop value. If you count from 0 to 4, how many numbers is that in total?",1,
+4e013af322aa2fea,1. is | 2. == | 3. equals,"Think about the keyword that lets you check whether two variables actually point to the very same object in memory, rather than just having the same value. It’s the one that’s often used when you want to know if two names are *identical* objects.",2,
+5d62376659a1d5dc,1. float | 2. int | 3. decimal,"In Python 3, the single forward slash `/` operator is designed for ""true division,"" which ensures that the result accounts for any fractional parts, regardless of whether the inputs are whole numbers. Think about what kind of data type is used to represent numbers with decimal points.",1,
+f29c3c967c6ccc51,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Think about how Python handles lists when you assign one variable to another using the `=` operator. Does `b = a` create a brand new copy of the list, or do both variables now point to the same object in memory?",cannot_tell,
+7032e37ba8bef948,1. 5 | 2. 4 | 3. 6,"Think about what `range(5)` actually produces. It starts at 0 by default and stops **right before** the number 5. List out the sequence of values that the loop variable `i` will take, and then count how many times the loop body runs for those values. That count is the answer you need.",1,
+dc115170a50b1fba,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"Think about the specific syntax Python uses for ""ternary operators"" (one-line if-else statements). 
+
+Unlike some other languages that use symbols like `?` or keywords like `then`, Python follows a more natural language pattern: it places the **value if true** first, followed by the **condition**, and ends with the **value if false**.",2,
+3cef6a7ea5a7001c,1. 5 | 2. 4 | 3. 6,"Here's a hint to help you figure it out:
+
+Think about what `range(5)` actually produces. A common mistake is assuming `range(5)` means 1 through 5. Instead, ask yourself:
+- Does `range(n)` start at 0 or 1?
+- What is the last number it produces?
+- How many numbers are in total?
+
+Try this in your head (or in a Python REPL): what would `list(range(5))` show you? Counting the items in that list will give you the number of times the loop body runs.",1,
+026398bd2ae5668a,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"I cannot give you the answer directly, but here is a hint: 
+
+Python's conditional expression (often called a ""ternary operator"") follows a specific order: it starts with the **value if true**, followed by the **condition**, and ends with the **value if false**.",2,
+29f86ce0e2f3a144,1. 3 | 2. 4 | 3. 5,"Think about what **elements** are actually stored directly inside the outer list. `len` counts only those top‑level items—it doesn’t look inside a nested list to count its contents. Count how many separate items the outer list contains, and that will be the value returned.",cannot_tell,A list is missing
+27797c8538dfb4ee,1. 3 | 2. 4 | 3. 5,"The `len()` function counts the number of top-level elements in a list. Think about how many items are directly inside the outer brackets, regardless of whether those items are single numbers or other lists.",cannot_tell,A list is missing
+15102405b7a32585,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Think about what `b = a` actually does in Python. It doesn’t copy the list; instead, both variables point to the same mutable object. Then consider what the `append` method does to that object. How does that affect the value you see when you later look at `a`?",cannot_tell,
+8c736cc98a1d714b,"1. 2, 5, 8 | 2. 3, 6, 9 | 3. 2, 5, 8, 11","Think about how `range(start, stop, step)` works:
+
+- It **includes** the starting value.
+- It repeatedly adds the step size.
+- It stops **before** it reaches the stop value (the stop value itself isn’t included).
+
+So begin with 2, keep adding 3, and stop as soon as the next number would be 10 or larger. What numbers do you get?",3,
+16b8898178eec1ad,1. 5 | 2. 4 | 3. 6,"Here's a hint: `range(5)` generates the values 0, 1, 2, 3, 4 — count how many numbers are in that sequence! That count is how many times the loop body runs.",1,
+dd168320b59d84a0,1. 30 | 2. 20 | 3. 40,"Think about how negative indexing works in Python. While positive numbers count forward from the start (starting at 0), negative numbers count backward from the end of the list. 
+
+If `-1` refers to the very last element, what element would `-2` point to?",cannot_tell,
+4316b3617c1d7640,1. 3 | 2. 4 | 3. 5,Think about what `len()` actually counts. Look at the outer list and just count the items that sit directly inside it—don’t worry about what’s inside any inner lists. How many top‑level entries are there?,cannot_tell,
+454b8e3805311591,1. KeyError | 2. None | 3. Empty string,"Think about what the `dict.get()` method does when you don’t pass a second argument. If the key isn’t in the dictionary, does it raise an exception, or does it return a special value automatically? Recall the default behavior of `get` compared to using the indexing operator (`[]`).",1,
+fb5d613893f763f6,1. float | 2. int | 3. decimal,"In Python 3, the expression `7 / 2` evaluates to `3.5`, which is a **float**.
+
+**Answer: 1. float**
+
+**Explanation:**
+
+In Python 3, the `/` operator performs **true division**, which always returns a float, even when dividing two integers:
+
+```python
+>>> 7 / 2
+3.5
+>>> type(7 / 2)
+<class 'float'>
+```
+
+**Note:** If you want integer division (which discards the fractional part), you should use the `//` operator:
+
+```python
+>>> 7 // 2
+3
+>>> type(7 // 2)
+<class 'int'>
+```
+
+This is a key difference from Python 2, where `/` between two integers performed integer division. In Python 3, `//` is used for floor division, and `/` is reserved for true division that always returns a float.",1,
+2b04d14ba9e3b20c,1. is | 2. == | 3. equals,"Think about the difference between **identity** and **equality**. 
+
+One operator checks if two things have the same *value* (like two different books that are the same title), while the other checks if they are literally the *exact same instance* in memory (the same physical copy of the book). Which operator is used specifically for identity?",2,
+bd83af0bce5c6093,1. 3 | 2. 4 | 3. 5,"Think about what `len` counts: it looks only at the items that are *directly* inside the outer brackets. Write out the contents of the list exactly as they appear at the top level, and then count how many separate entries there are. (Remember that a sub‑list like `[2, 3]` counts as just **one** item, not two.) This will tell you which number to choose.",cannot_tell,
+e5194ca9cd8c11b9,1. 5 | 2. 4 | 3. 6,"Think about how `range(n)` works in Python: it starts counting from 0 and goes up to, but does not include, the number specified. If you count from 0, 1, 2, 3, and 4, how many numbers is that in total?",1,
+89e2291078f1c56d,"1. 2, 5, 8 | 2. 3, 6, 9 | 3. 2, 5, 8, 11","Think about the three numbers inside the parentheses: the first is where the sequence **starts**, the second is the **limit** (where it stops just before reaching), and the third is the **step** (how much is added each time).
+
+Try starting at 2 and adding 3 repeatedly. Remember to stop as soon as the next number would be 10 or greater!",3,
+2d838a7a7f4df693,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"Think about what happens when you call a function like `f(color='red', size=10)`. The names (like `color` and `size`) and their corresponding values have to be gathered somewhere. In a function definition that includes `**kwargs`, those named arguments are collected into a single object. What type of object lets you map each name to its value? Use that to deduce what `**kwargs` contains.",1,
+50566179b2c36fe7,1. Interpreter | 2. Compiler | 3. Translator,"Think about the difference between a program that translates code line-by-line every time it runs, and one that translates the entire program into a standalone file of machine code just once. Which one creates a finished product that can be executed independently?",2,
+882fcf410d804b0a,1. KeyError | 2. None | 3. Empty string,"# Python Dictionary `get()` Method Behavior
+
+The correct answer is **2. None**
+
+## Explanation
+
+When you call `dict.get(key)` without specifying a default value and the key is not present in the dictionary, Python returns `None` rather than raising an error.
+
+## Examples
+
+```python
+d = {'name': 'Alice', 'age': 30}
+
+# Key exists - returns the value
+print(d.get('name'))      # Output: Alice
+
+# Key missing, no default - returns None
+print(d.get('missing'))   # Output: None
+
+# Key missing, with default - returns the default
+print(d.get('missing', 'default_value'))  # Output: default_value
+```
+
+## Why This Is Useful
+
+This is a key difference between the two access methods:
+
+| Method | Missing Key Behavior |
+|--------|---------------------|
+| `d['missing']` | Raises `KeyError` |
+| `d.get('missing')` | Returns `None` |
+| `d.get('missing', default)` | Returns `default` |
+
+## Practical Use Case
+
+```python
+# Safe way to count occurrences
+counts = {}
+for item in items:
+    counts[item] = counts.get(item, 0) + 1
+
+# Safe way to access nested data
+user = {'profile': {'name': 'Bob'}}
+email = user.get('profile', {}).get('email', 'no email')
+```
+
+The `get()` method is preferred when you're not sure a key exists, as it prevents your program from crashing with a `Key",2,
+cacf431da24a6016,1. 30 | 2. 20 | 3. 40,"Think about what a negative index means in a Python list. A value of ‑1 refers to the very last element, ‑2 refers to the one just before that, and so on. Look at the list `[10, 20, 30, 40]` and identify which element sits one position before the last one. That will be the result of the expression.",2,
+b18b70c25effb9f1,1. True | 2. False | 3. 0,[blocked by guardrail],cannot_tell,
+65d495e361a058aa,1. 3 | 2. 4 | 3. 5,"The answer is **1. 3**
+
+In Python, `len()` returns the number of top-level elements in a list, not the total count of nested elements. The list `[1, [2, 3], 4]` has three top-level elements:
+
+1. `1` — an integer
+2. `[2, 3]` — a nested list (counted as **one** element)
+3. `4` — an integer
+
+Even though the nested list `[2, 3]` contains two items of its own, it's treated as a single element when calling `len()` on the outer list.
+
+```python
+>>> len([1, [2, 3], 4])
+3
+```
+
+💡 If you wanted to count **all** elements including those in nested lists, you'd need to flatten the list first (e.g., using recursion or `itertools.chain.from_iterable`).",3,
+fdcb04924ba85560,1. is | 2. == | 3. equals,"Here's a hint to help you reason through this:
+
+Think about the difference between **identity** and **equality**:
+- Two different objects can hold the **same value** (e.g., two separate lists both containing `[1, 2, 3]`).
+- But ""referring to the same object"" means both names point to the **exact same spot in memory** — not just equal contents.
+
+In Python, one of these operators is specifically designed to check that ""same spot in memory"" relationship, while another only checks whether the *contents* match. And one of the options isn't even a valid Python operator — it's from other languages like Java or C#.
+
+Consider what each option actually does in Python before choosing!",2,
+ed3ab61206df92fd,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,1. Keyword arguments as a dict,cannot_tell,
+26ceafd3eeb27e0f,"1. 2, 5, 8 | 2. 3, 6, 9 | 3. 2, 5, 8, 11","`range(start, stop, step)` generates numbers beginning at **start**, adding **step** each time, **up to but not including** **stop**.
+
+- **start = 2**
+- **stop  = 10** (the value 10 itself is never produced)
+- **step  = 3**
+
+So the sequence is:
+
+1. Start at 2 → 2  
+2. Add 3 → 5 (still < 10)  
+3. Add 3 → 8 (still < 10)  
+4. Add 3 → 11 (now ≥ 10, so we stop)
+
+Thus the range contains only `2, 5, 8`.
+
+```python
+>>> list(range(2, 10, 3))
+[2, 5, 8]
+```
+
+**Correct choice:** **1. 2, 5, 8**.",1,
+58dff630133b9bb6,"1. 2, 5, 8 | 2. 3, 6, 9 | 3. 2, 5, 8, 11","I can't just give you the answer, but here's a quick hint to get there fast:
+
+Think of `range(start, stop, step)` as: start at 2, keep adding 3, but **stop before** reaching 10. Walk through it in your head: 2... then 5... then 8... would the next one (11) be included?
+
+That should take you only a few seconds. 🙂",1,
+554ca7d757f71572,1. 3 | 2. 4 | 3. 5,"Think about how the `len()` function treats a list that contains another list inside it. Does it count every individual element inside the nested list, or does it just count the nested list as one single item?",cannot_tell,
+78fc004482895cf9,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"The correct answer is **Option 2**: `x = 'big' if n > 10 else 'small'`
+
+## Explanation
+
+Python's **conditional expression** (sometimes called a ""ternary operator"" in other languages) follows this pattern:
+
+```python
+value_if_true if condition else value_if_false
+```
+
+So the proper syntax is:
+
+```python
+n = 15
+x = 'big' if n > 10 else 'small'
+print(x)  # Output: 'big'
+
+n = 5
+x = 'big' if n > 10 else 'small'
+print(x)  # Output: 'small'
+```
+
+## Why the others are wrong
+
+**Option 1** — `x = if n > 10 then 'big' else 'small'`
+This mixes keywords from different languages (`if...then` is valid in languages like Pascal, Ruby, or Bash), but it's **not valid Python**.
+
+**Option 3** — `x = n > 10 ? 'big' : 'small'`
+This uses the C-style ternary operator (`? :`), which works in C,",2,
+228ec1050463bdfb,"1. 2, 5, 8 | 2. 3, 6, 9 | 3. 2, 5, 8, 11","`range(start, stop, step)` generates numbers beginning with **start**, adding **step** each time, and stops **before** it reaches the **stop** value.
+
+- `start = 2`
+- `stop  = 10` (the stop value is *not* included)
+- `step  = 3`
+
+So the sequence is:
+
+1. Start with 2  
+2. Add 3 → 5 (still < 10)  
+3. Add 3 → 8 (still < 10)  
+4. Add 3 → 11 (now ≥ 10, so stop)
+
+Thus the numbers produced are **2, 5, 8**.
+
+```python
+list(range(2, 10, 3))
+# Output: [2, 5, 8]
+```
+
+**Correct choice:** **1. 2, 5, 8**.",1,
+ea3b0ae2a255e770,1. TypeError | 2. ab3 | 3. ababab,"Here's a hint to help you figure this out:
+
+Think about what the `*` operator does when applied to a string in Python. It's not the same as adding strings together (concatenation). Instead, the `*` operator has a special behavior when one operand is a string and the other is an integer — it **repeats** the string a certain number of times.
+
+Ask yourself:
+- How many times would `""ab""` be repeated if multiplied by 3?
+- What would one repetition look like? Two? Three?
+
+You can even try it out in a Python interpreter to test your reasoning! 🐍",3,
+d13bd21ace1d0786,1. float | 2. int | 3. decimal,"Think about what the `/` operator does in Python 3 when it divides two whole numbers. Does it keep the result as an integer, or does it automatically produce a number with a decimal point? That distinction will tell you which type the expression evaluates to.",1,
+54094b5e6d6cf375,1. float | 2. int | 3. decimal,"Think about what happens when you divide two numbers that don't divide evenly. In Python 3, the standard division operator `/` is designed to provide the most precise result possible, even if the result has a remainder.",1,
+08c97b6ac47d96e2,1. float | 2. int | 3. decimal,"Think about what happens when you divide two numbers that don't divide evenly. In Python 3, does the `/` operator perform integer division (truncating the remainder) or does it provide a precise result with a decimal point?",1,
+fe48bb29febd3006,1. Interpreter | 2. Compiler | 3. Translator,"Think about the tool that takes the whole source file, produces a stand‑alone executable, and then you can run that executable many times without invoking the tool again. It’s the opposite of a program that reads and executes the source line‑by‑line each time you run it. What do you call that one‑time “ahead‑of‑time” translation step?",2,
+c171651a05e521ca,1. KeyError | 2. None | 3. Empty string,"Think about the difference between using square brackets `d['missing']` and the `.get()` method. While square brackets raise an error when a key is missing, `.get()` is designed to be a ""safe"" way to access data. What does Python typically return when a function or method has no specific value to give back?",3,
+d3ab10d38550b5e1,1. True | 2. False | 3. 0,"Think about how Python treats numbers when converting them to booleans. In Python, is the number zero typically considered ""truthy"" or ""falsy""?",2,
+2034500df12e54a3,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"Think about the order of the elements in a Python ""ternary operator."" In Python, the value you want to assign if the condition is true typically comes first, followed by the `if` keyword, the condition itself, and finally the `else` value.",2,
+524f4a11f859f582,1. Interpreter | 2. Compiler | 3. Translator,"The correct answer is **2. Compiler**.
+
+Here is the breakdown of why that is the correct choice and why the others are incorrect:
+
+### Why it is a Compiler
+A **compiler** takes the entire source code and translates it into machine code (often creating an `.exe` or a binary file) **all at once**. Once this process is finished, the machine code can be run as many times as you like without needing the compiler again. This matches your description: *""translated once into machine code.""*
+
+---
+
+### Why the other options are incorrect:
+
+**1. Interpreter**
+An interpreter does **not** translate the program ""once."" Instead, it translates the code line-by-line *every single time* the program is run. If you run the program 10 times, the interpreter translates it 10 times. It never produces a standalone machine code file.
+
+**3. Translator**
+""Translator"" is a **general category**, not a specific type of program. Both compilers and interpreters are types of translators. Because the question asks for the specific program that translates code ""once"" into machine code, ""Compiler"" is the precise technical answer.
+
+### Summary Comparison
+| Feature | Compiler | Interpreter |
+| :--- | :--- | :--- |
+| **Timing** | Translates all at once before running | Translates line-by-line during execution |
+| **Output** | Creates a separate machine code file | No separate file created |
+| **Speed** | Faster to execute (already translated) | Slower to execute (translates on the fly) |",2,
+ce09d0eb739426ee,1. float | 2. int | 3. decimal,"Think about what happens when you divide two integers in Python 3, even if the result could be a whole number. Does the `/` operator always produce a whole number, or does it allow for fractional parts?",1,
+d174ed8024b6b410,"1. 2, 5, 8 | 2. 3, 6, 9 | 3. 2, 5, 8, 11","Think about how `range(start, stop, step)` works:
+
+- It **starts** at the first number you give.
+- Then it **adds** the step size each time.
+- It stops **before** it reaches the stop value (the stop value itself is not included).
+
+So begin at 2, keep adding 3, and stop when the next value would be ≥ 10. What numbers do you get?",1,
+83600013c37c2741,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"Here's a revised hint — sorry if the previous one was too revealing!
+
+Consider the relationship between the two parameters:
+
+- `*args` collects arguments passed *by position* (without names) into a collection.
+- `**kwargs` collects arguments passed with *names attached* (like `name=""Alice""`).
+
+Ask yourself:
+1. What information does each extra argument carry when you write something like `f(color=""red"", size=9)`? (The label matters — it tells you which value goes with which concept.)
+2. Given that positional ones become a *tuple* (an ordered, unlabeled sequence), what kind of collection would make sense for preserving those labels along with their values?",1,
+4f737c6ceb691b46,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Think about how Python handles variables when they are assigned to lists. When you write `b = a`, are you creating a completely new copy of the list, or are both variables pointing to the same object in memory?",3,
+ebdd7be7da06a525,1. 3 | 2. 4 | 3. 5,"Here's a hint to help you reason through this:
+
+Think about how the `len()` function works on a list — it counts the **top-level items** separated by commas, not the items inside any nested structures.
+
+Try counting the elements you can see separated by commas in `[1, [2, 3], 4]`. Remember, the `[2, 3]` part is a single item (a list itself) that lives inside the outer list.
+
+How many top-level items do you count?",1,
+18832e615b2021c2,1. float | 2. int | 3. decimal,"Here's a hint to help you figure it out:
+
+Think about what the **single forward slash (`/`)** operator does in Python 3 specifically. In Python 3, this operator performs ""true division"" — meaning it always returns a result that includes a decimal portion, even when the two numbers divide evenly.
+
+You can test this in the Python REPL by typing:
+```python
+type(7 / 2)
+```
+and also try:
+```python
+type(7 // 2)
+```
+
+The difference between those two results should help you see the key distinction. 🔍",cannot_tell,
+8abfffd8bebdf84f,1. 5 | 2. 4 | 3. 6,"Think about how `range(n)` works in Python: it starts counting from 0 and stops just before it reaches the number specified. If you count from 0 up to (but not including) 5, how many numbers are in that sequence?",cannot_tell,
+c5385e6e01f13f3b,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"Think about the order of the three parts in Python’s one‑line conditional (often called a “ternary” expression). In Python you first write the value you want when the condition is true, then the word `if`, then the condition itself, and finally `else` followed by the value for the false case. Which of the given choices follows that exact pattern?",2,
+7d974f39ef80f1ed,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,Think about what the double‑asterisk ( ** ) does when it appears in a function definition. It gathers any arguments that are passed using the *name=value* syntax. What Python data structure is naturally suited for looking up values by a name? This will point you to what that parameter ends up holding.,cannot_tell,
+a32978a60e04c3cf,1. float | 2. int | 3. decimal,"Think about what happens when you divide two whole numbers that don't divide evenly. Does Python 3 keep the result as a whole number, or does it provide a more precise value with a decimal point?",1,
+94b0ef481a9e0ea7,1. is | 2. == | 3. equals,"The correct answer is **1. is**.
+
+Here is a detailed breakdown of why, and the difference between the options provided:
+
+### 1. The `is` operator (Identity Operator)
+The `is` operator checks for **identity**. It tests whether two variables point to the exact same memory location (the same object).
+*   **Logic:** ""Are these two names referring to the same piece of data in memory?""
+
+### 2. The `==` operator (Equality Operator)
+The `==` operator checks for **equality**. It tests whether the values stored in the objects are the same, regardless of where they are stored in memory.
+*   **Logic:** ""Do these two objects have the same content?""
+
+---
+
+### Comparison Example
+To understand the difference, imagine you have two identical copies of the same book.
+*   **Equality (`==`):** If you compare the two books, they are **equal** because they have the same words and pages.
+*   **Identity (`is`):** If you ask if they are the **same** book, the answer is **no**. They are two separate physical objects that just happen to look the same.
+
+**Code Example (Python):**
+```python
+list_a = [1, 2, 3]
+list_b = [1, 2, 3]
+list_c = list_a
+
+# Equality test: Do they have the same values?
+print(list_a == list_b)  # True (the values are identical)
+
+# Identity test: Are they the same object in memory?
+print(list_a is list_b)  # False (they are two different lists in memory)
+
+# Identity test: Does list_c point to the same object as list_a?
+print(list_a is list_c)  # True (list_c",1,
+8cef501668d23d26,1. 30 | 2. 20 | 3. 40,1. 30,cannot_tell,
+3eab07ed10832748,1. t | 2. y | 3. p,"Think about how Python counts positions in a string. The first character is at index 0, the next is at index 1, and so on. Look at the characters of **""python""** in order and see which one sits at the second position (index 1). That will be the result of the expression.",2,
+87d88c7625d3499f,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"**Answer:**  
+
+**1. Keyword arguments as a dict**  
+
+---
+
+### Why?
+
+When you define a function like  
+
+```python
+def f(*args, **kwargs):
+    ...
+```
+
+- `*args` gathers **any extra positional arguments** that weren’t matched by explicit parameters. Inside the function, `args` is a **tuple**.  
+
+- `**kwargs` gathers **any extra keyword arguments** that weren’t matched by explicit parameters. Inside the function, `kwargs` is a **dictionary** whose keys are the argument names (strings) and whose values are the corresponding passed values.
+
+### Quick demo
+
+```python
+def show(*args, **kwargs):
+    print('args  ->', args)   # tuple
+    print('kwargs->', kwargs) # dict
+
+show(1, 2, a=10, b='hi')
+```
+
+**Output**
+
+```
+args  -> (1, 2)
+kwargs-> {'a': 10, 'b': 'hi'}
+```
+
+- `1` and `2` are collected in `args` (a tuple).  
+- `a=10` and `b='hi'` are collected in `kwargs` (a dict).
+
+### What it **doesn’t** collect
+
+- **Positional arguments** are not stored in `kwargs`; they go into `*args` (or match named parameters if you have them).  
+- **Default values** of the function’s formal parameters are not placed in `kwargs`. The defaults are applied **",cannot_tell,
+37e24066284462f3,1. True | 2. False | 3. 0,"In Python, the `bool()` function converts a value to a boolean. Think about how Python treats numbers in a logical context: which numbers are typically considered ""empty"" or ""off,"" and which are considered ""present"" or ""on""?",cannot_tell,
+69fec95ea1b07905,1. 3 | 2. 4 | 3. 5,"Here's a hint to help you think through this:
+
+Consider what `len()` actually does — it counts the **top-level elements** in a list, not the total number of items at every level of nesting.
+
+Try mentally ""peeling back"" the list: how many items can you see at the outermost level? Remember, a nested list (like `[2, 3]`) is itself treated as **one** element, no matter how many things are inside it.
+
+If you count the outer items — the first number, the inner list, and the last number — you should be able to figure out the answer.",cannot_tell,
+cee0767e8f3a6bf8,"1. 2, 5, 8 | 2. 3, 6, 9 | 3. 2, 5, 8, 11","Here's a hint to help you work through it:
+
+Remember that `range(start, stop, step)` has a few important rules:
+
+1. **The sequence begins at the `start` value** — in this case, that's the first number you should write down.
+2. **The `stop` value is *exclusive*** — meaning the sequence stops *before* it reaches that number. It does NOT include the stop value itself.
+3. **Each next number is the previous one plus the `step`**.
+
+So try writing it out step by step:
+- Start with 2.
+- Add 3 → what's next",1,
+d879f914651de933,1. t | 2. y | 3. p,"Here's a hint to help you figure it out:
+
+In Python, strings are indexed starting from **0**, not 1. So the first character is at index 0, the second character is at index 1, and so on.
+
+Try writing out the string ""python"" with index numbers above each letter, and then ask yourself: which character is at position 1?
+
+Also, remember that `""python""[0]` would give you `""p""` — what comes next? 😊",cannot_tell,
+02873bf250421bc6,1. 3 | 2. 4 | 3. 5,"Think about how the `len()` function counts elements in a list. Does it look inside nested lists (lists within lists), or does it simply count the items at the top level?",cannot_tell,
+32787d0b9ea1c28c,"1. 2, 5, 8 | 2. 3, 6, 9 | 3. 2, 5, 8, 11","Think about the three numbers inside the parentheses as: **(start, stop, step)**.
+
+The sequence begins at the **start** value and adds the **step** value repeatedly, but it must stop *before* it reaches or exceeds the **stop** value. Try tracing that pattern manually!",cannot_tell,
+d50b1ec29c9ce810,1. float | 2. int | 3. decimal,"The correct answer is **1. float**.
+
+Here is the detailed explanation:
+
+In Python 3, the `/` operator performs **True Division**. This means that even if both numbers are integers and divide evenly, Python will always return a floating-point number (a decimal).
+
+*   **7 / 2** results in **`3.5`** (a `float`).
+*   Even **4 / 2** results in **`2.0`** (a `float`).
+
+### Extra Tip: How to get an integer
+If you want the result to be an integer (by chopping off the decimal part), you should use the **Floor Division** operator, which is two forward slashes (`//`):
+
+*   **7 // 2** results in **`3`** (an `int`).",1,
+426aad34c4a39528,1. 30 | 2. 20 | 3. 40,"I can't give the answer directly, but here's a quick hint to help you figure it out:
+
+In Python, negative indices count **backwards from the end** of the list. For example:
+- `[-1]` would give you the **last** element (40)
+- `[-2]` would give you the **second-to-last** element
+
+Count back from the end of `[10, 20, 30, 40]` — what's in that second-to-last position? That'll lead you to the right choice in just a second.",1,
+1198d41801244e9b,1. KeyError | 2. None | 3. Empty string,"Think about the difference between accessing a value using square brackets (like `d['missing']`) versus using the `.get()` method. While square brackets will raise an error if a key isn't found, the `.get()` method is specifically designed to handle missing keys gracefully without crashing the program. What does Python typically return when a function or method has no specific value to provide?",2,
+6e22423ed58e08e1,"1. 2, 5, 8 | 2. 3, 6, 9 | 3. 2, 5, 8, 11","Think about what each argument to `range` means:
+
+1. The first number is where the sequence starts (and it **is included**).
+2. The second number is the limit that the sequence will **not** reach—once you would go past it, you stop.
+3. The third number tells you how much to add each time you move to the next element.
+
+Now, starting at the first value, keep adding the step size and stop before you would reach or exceed the second value. What numbers do you get?",1,
+250274d11fc30863,1. Interpreter | 2. Compiler | 3. Translator,"I can't give you the answer directly, but here's a hint to help you think it through:
+
+Consider these two key words:
+- **""Once""** — the translation happens a single time, producing a complete machine code file *before* the program runs.
+- Think about which tool produces a standalone executable from source code, rather than executing line-by-line.
+
+One option translates line-by-line at runtime, another does it all at once ahead of time, and the third is a generic umbrella term.
+
+Eliminate the option that's a general term rather than a specific tool. Between the remaining two, ask yourself: which one matches the ""translate once"" behavior described?
+
+Good luck! 🍀",2,
+593ef915413ab17a,1. TypeError | 2. ab3 | 3. ababab,"Think about what the `*` operator does when one of the operands is a string and the other is an integer. What value does the integer represent, and how does Python combine the string with itself that many times? (Hint: try a quick interactive example like `""x"" * 2` to see the pattern.)",cannot_tell,
+8f814b1fb467fc8d,1. TypeError | 2. ab3 | 3. ababab,"Great question! Let me help you reason through this.
+
+In Python, when you use the `*` operator with a string and an integer, it performs **string repetition**. Think of it like telling Python: ""take this string and repeat it this many times.""
+
+So if you wrote `""ab"" * 3`, Python would take the string `""ab""` and concatenate it with itself 3 times total.
+
+You can try this yourself in a Python REPL or notebook to verify! Just type:
+```python
+print(""ab"" * 3)
+```
+
+Take a guess based on how you think string repetition works — which option do you think it will be? 🤔",3,
+e21c4352bde6e331,1. 5 | 2. 4 | 3. 6,"`range(5)` produces a sequence of **five** numbers:
+
+```python
+0, 1, 2, 3, 4
+```
+
+A Python `for` loop iterates once for **each element** produced by the iterable. Therefore the loop body is executed once for each of those five values of `i`.
+
+```python
+for i in range(5):
+    # this block runs 5 times
+```
+
+So the correct answer is **1. 5**.
+
+*(If the loop were written as `for i in range(1,5):` the body would run 4 times (1, 2, 3, 4), but with `range(5)` it runs 5 times.)*",1,
+cecddf6cd3034dd0,1. TypeError | 2. ab3 | 3. ababab,"Think about what happens when you use the multiplication operator with a string in Python. Does it perform math, or does it repeat the sequence?",3,
+d95cd86daddeecce,1. 3 | 2. 4 | 3. 5,"Think about what the `len()` function actually counts. Does it look inside nested lists to count every individual element, or does it only count the items at the top level of the list?",cannot_tell,
+0654c54b19c5742f,1. is | 2. == | 3. equals,"Here's a hint to help you reason this out:
+
+- Think about the two key concepts in the question: **""same object""** vs **""equal values""**.
+- One operator checks whether two variables point to the exact same thing in memory (identity).
+- The other operator compares whether the *values* look the same, even if they're stored as separate objects.
+- Also, consider whether one of the options listed is even a valid Python operator at all — could that help you narrow it down?
+
+Try to think about what each of the three choices actually does in Python, and you'll find your answer! 🐍",cannot_tell,
+a04f4e1dd7cf806e,1. KeyError | 2. None | 3. Empty string,"Think about the signature of the dictionary’s `get` method. It takes two arguments: the key you’re looking for and an optional default value. If you don’t pass a second argument, what value does it fall back to? This will tell you what is returned when the key isn’t present.",cannot_tell,There are 2 questions here.
+275bacea44a9d925,1. is | 2. == | 3. equals,"Think about the difference between **identity** and **equality**. One operator checks if the *contents* of two variables are the same, while the other checks if they are actually the exact same piece of data stored at the same memory address.",cannot_tell,There are 2 questions here.
+5993bfcef417a716,1. float | 2. int | 3. decimal,1. float,1,
+2cb667bc725ad585,1. 3 | 2. 4 | 3. 5,"Think about what the `len()` function actually counts when it looks at a list. Does it count every single single item inside nested lists, or does it only count the elements at the top level of the main list?",cannot_tell,
+15a5c96f7129c2f5,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"I cannot give you the answer directly, but here is a hint to help you find it quickly:
+
+Python uses a specific ""ternary"" syntax that reads almost like an English sentence: **[value_if_true] if [condition] else [value_if_false]**. Look for the option that follows that specific order.",2,
+944ce348b19628c8,1. t | 2. y | 3. p,"In Python, indexing starts at 0. This means the first character is at index 0, and the second character is at index 1.",cannot_tell,
+95172e823726997c,1. KeyError | 2. None | 3. Empty string,"The correct answer is **2. None**.
+
+Here is a detailed explanation of why:
+
+### How `.get()` works
+The `.get()` method is specifically designed to handle missing keys **without** crashing your program. 
+
+*   **If the key exists:** It returns the value associated with that key.
+*   **If the key is absent:** It returns a default value. If you do not provide a custom default value in the parentheses, Python uses `None` as the automatic default.
+
+### Comparison: `d['missing']` vs `d.get('missing')`
+
+To understand why this is useful, compare it to the standard square-bracket lookup:
+
+```python
+d = {'name': 'Alice'}
+
+# 1. Using square brackets:
+# This will RAISE a KeyError and stop your program.
+print(d['missing'])  # Result: KeyError: 'missing'
+
+# 2. Using .get():
+# This will NOT crash; it simply returns None.
+print(d.get('missing'))  # Result: None
+```
+
+### Pro Tip: Providing your own default
+The reason `.get()` is so powerful is that you can specify what should be returned instead of `None` if the key is missing:
+
+```python
+d = {'name': 'Alice'}
+
+# Provide 'Unknown' as the second argument
+result = d.get('missing', 'Unknown')
+print(result)  # Result: 'Unknown'
+```",cannot_tell,
+7f6f1d54a9ab7209,1. Interpreter | 2. Compiler | 3. Translator,"Think about the stage where the entire source code is processed all at once, producing an executable file that can run later without needing the original code each time. What kind of tool performs that one‑time, whole‑program translation?",2,
+30a64b88e716b240,1. 30 | 2. 20 | 3. 40,"Here's a hint to help you figure this out:
+
+In Python, **negative indices** count from the *end* of the list, not the beginning. Think of it this way:
+
+- `-1` refers to the **last** element
+- `-2` refers to the **second-to-last** element
+- `-3` refers to the **third-to-last** element, and so on
+
+So, take your list `[10, 20, 30, 40]` and try to identify which element is in the second-to-last position. Once you find that element, you can match it to one of the options. 😊",1,The question does not contain the index of an item in the list.
+c20dacbcad44400a,1. t | 2. y | 3. p,"The correct answer is **2. y**.
+
+Here is the explanation:
+
+In Python, strings are **zero-indexed**. This means the counting starts at `0` rather than `1`.
+
+If you look at the string `""python""`:
+*   Index `[0]` is **p**
+*   Index `[1]` is **y**
+*   Index `[2]` is **t**
+*   Index `[3]` is **h**
+*   Index `[4]` is **o**
+*   Index `[5]` is **n**
+
+Therefore, `""python""[1]` evaluates to **'y'**.",cannot_tell,A variable and its value are not the same thing.
+6140aa89594a8c20,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","The answer is **1. [1, 2, 3]**
+
+Here's why:
+
+In Python, `b = a` does **not** create a copy of the list. Instead, both `a` and `b` become references (pointers) to the **same** list object in memory.
+
+```python
+a = [1, 2]
+b = a        # b and a point to the same list object
+b.append(3)  # mutates the shared object in place
+print(a)     # [1, 2, 3]
+```
+
+You can verify they reference the same object:
+
+```python
+print(a is b)  # True
+```
+
+### If you wanted `a` to stay `[1, 2]`
+
+You'd need to make a **copy** of the list, so the two variables refer to independent objects:
+
+```python
+a = [1, 2]
+b = a.copy()   # or: b = a[:]  or: b = list(a)
+b.append(3)
+print(a)  # [1, 2]
+print(b)  # [1, 2, 3]
+```
+
+### Key takeaway
+- `b = a` → shared reference (mutations affect both)
+- `b = a.copy()` → independent copy (mutations are isolated)
+
+This is a classic ""gotcha"" in Python.",1,
+1dc948380958c5ca,1. 3 | 2. 4 | 3. 5,"Think about what `len` counts for a list. It only looks at the items that are directly inside the outer brackets—not inside any nested lists. List the elements that appear at the top level of `[1, [2, 3], 4]` and count them. That count is what `len` will return.",1,
+e99951ab56d7bd38,1. 30 | 2. 20 | 3. 40,Think about how Python handles negative indexing — it counts backward from the end of the list. So `-1` gives you the last element. What element would you land on if you moved one step further back from the last position?,cannot_tell,penultimate place
+950bb598ec5e72e5,1. float | 2. int | 3. decimal,"Think about how the division operator “/” works in Python 3 compared to older versions. Does it always give you a whole‑number result when both operands are integers, or does it produce a number that can include a fractional part even when the inputs are whole numbers? That will tell you what type the result has.",1,
+7d23203827790816,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Here's a hint to help you reason through it:
+
+Think carefully about what `b = a` actually does in Python. Does it create a **new copy** of the list, or does it just give `b` another name that points to the **same list object** in memory?
+
+Then consider what `.append(3)` does — does it create a new list, or does it **mutate the existing one in place**?
+
+If `a` and `b` are two names for the *same* object, and you mutate that object through `b`, what would `a` see?",1,
+a66a7e37d403fa1a,1. Interpreter | 2. Compiler | 3. Translator,"Here's a hint to help you reason through this:
+
+Think about the key phrase **""translated once into machine code""** — this is a big clue!
+
+Consider how each option works:
+- One option translates the **entire** program at once, producing a separate machine code file that can be run later (like turning a recipe into a finished meal all at once).
+- Another option translates and executes the program **line by line**, each time it runs (like reading instructions one at a time and doing each step as you go).
+- The third option is just a general word for converting one language to another — not specific to how programs are processed.
+
+Ask yourself: which one matches the behavior of translating the **whole program once** before it ever runs? That should point you to your answer! 💡",2,
+ad742ab68b03533c,1. 5 | 2. 4 | 3. 6,"Think about what numbers `range(5)` actually produces. It starts at 0 and stops **before** it reaches 5. How many distinct values are yielded, and therefore how many times does the loop body run?",1,
+b80fa50e1f08fc24,1. 5 | 2. 4 | 3. 6,"Here's a hint to help you figure it out:
+
+Think about what `range(5)` actually produces. It doesn't start at 1 — it starts at **0** and goes up to, but **not including**, 5.
+
+So the values generated are: 0, 1, 2, 3, 4
+
+Now, count how many values are in that sequence. That's exactly how many times the loop body will run — once for each value of `i`.
+
+You can even test this yourself! Try running:
+```python
+count = 0
+for i in range(5):
+    count += 1
+print(count)
+```
+
+What number does it print? That should match your answer. 🐍",1,
+8c6b57ef403f4a76,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"Think about how Python handles ""ternary operators"" (one-line if-else statements). Unlike some other languages that use symbols like `?` or keywords like `then`, Python uses a specific order: the **value if true** comes first, followed by the **if condition**, and finally the **else value**.",2,
+aa8c31145de2eb7e,1. Interpreter | 2. Compiler | 3. Translator,"Think about the type of tool that takes the entire source program, processes it just once, and produces a standalone machine‑code version that can be run later without needing the original source. This is different from a tool that executes the source line‑by‑line as it reads it.",2,
+9a5297126a1283d7,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","1. [1, 2, 3]",1,
+3ae958f80bd6affc,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"I know you're in a hurry, but my role is to help you *learn*, not just hand you answers — so here's a quick hint that should get you there in seconds:
+
+Think about the **name** itself: `kw` + `args` = **k**ey**w**ord arguments. Now ask yourself — what Python data structure is specifically designed to hold **key-value pairs**? (Not a sequence like a tuple or list, but something with names mapped to values.)
+
+That same structure is also what `{key: value}` literals create.
+
+Compare that to `*args`, which uses a *single* asterisk and gives you a **tuple** — the structure for",cannot_tell,
+348322d8d21c5422,1. KeyError | 2. None | 3. Empty string,"Think about the primary difference between using square brackets `d['key']` and using the `.get()` method. While one is designed to raise an error when a key is missing, the `.get()` method is designed to handle missing keys gracefully by returning a specific ""null"" value.",2,
+9cb30da601f7a6cc,1. True | 2. False | 3. 0,"I understand you're busy, but I'm here to help you learn rather than just hand over answers. Here's a quick hint:
+
+In Python, `bool()` converts a value to a boolean. The integer `0` is considered ""falsy,"" meaning it converts to `False`. Any non-zero number would convert to `True`.
+
+Take a second to apply that — you'll get it! 🐍",cannot_tell,
+5f24ea50fc4c2097,1. 3 | 2. 4 | 3. 5,"The list `[1, [2, 3], 4]` has three top‑level elements:
+
+1. `1`  
+2. `[2, 3]` (the inner list counts as a **single** element)  
+3. `4`
+
+The `len()` function counts only these top‑level items, not the items inside the nested list. Therefore:
+
+```python
+len([1, [2, 3], 4])   # → 3
+```
+
+**Correct answer:** **1. 3**.",1,
+d85a9feaf8f15282,1. True | 2. False | 3. 0,"In Python, the `bool()` function converts a value to a boolean. Most values are considered ""truthy,"" but there are a few specific values—like empty containers or a certain number—that are considered ""falsy."" 
+
+Think about whether the number zero represents the presence of something or the absence of it.",2,
+fcb64036ed104c47,1. t | 2. y | 3. p,"The correct answer is **2. y**.
+
+Here is the explanation why:
+
+In Python, strings are **zero-indexed**. This means the counting starts at `0` rather than `1`.
+
+If you look at the string `""python""`:
+* Index `[0]` is **p**
+* Index `[1]` is **y**
+* Index `[2]` is **t**
+* Index `[3]` is **h**
+* Index `[4]` is **o**
+* Index `[5]` is **n**
+
+Therefore, `""python""[1]` evaluates to **'y'**.",2,
+81236c0d1945e385,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"The correct answer is: **1. Keyword arguments as a dict**.
+
+Here is a detailed breakdown of how it works:
+
+### What is `**kwargs`?
+`kwargs` stands for **""keyword arguments.""** When you put two asterisks (`**`) before a parameter name in a function definition, it tells Python to collect any named arguments passed to the function that aren't explicitly defined in the parameter list.
+
+These collected arguments are stored in a **dictionary**, where:
+*   The **key** is the name of the argument.
+*   The **value** is the value passed to that argument.
+
+---
+
+### Code Example
+Here is a simple example to show it in action:
+
+```python
+def my_function(*args, **kwargs):
+    print(f""args: {args}"")   # Collects positional arguments into a tuple
+    print(f""kwargs: {kwargs}"") # Collects keyword arguments into a dictionary
+
+# Calling the function with both types of arguments
+my_function(1, 2, 3, name=""Alice"", age=25, city=""New York"")
+```
+
+**Output:**
+```text
+args: (1, 2, 3)
+kwargs: {'name': 'Alice', 'age': 25, 'city': 'New York'}
+```
+
+### Comparison of `*args` vs `**kwargs`
+
+| Feature | `*args` | `**kwargs` |
+| :--- | :--- | :--- |
+| **Full Name** | Positional Arguments | Keyword Arguments |
+| **Symbol** | Single asterisk (`*`) | Double asterisk (`**`) |
+| **Data Type** | **Tuple** | **Dictionary** |
+| **Example Call** | `my_func(1, 2, 3)` | `my_func(a=1, b=",cannot_tell,options 1 and 2 are correct
+817a93d83a7f943a,1. float | 2. int | 3. decimal,"The correct answer is **1. float**.
+
+Here is the detailed explanation:
+
+In Python 3, the `/` operator performs **True Division**. This means that regardless of whether the numbers are integers or not, the result will always be a floating-point number (a decimal) if there is a remainder or if the division is performed.
+
+Even if you divide two numbers that result in a whole number (e.g., `4 / 2`), Python 3 will still return a float (`2.0`).
+
+### Quick Comparison:
+If you want a different result, Python provides a second division operator:
+
+*   **True Division (`/`):** `7 / 2` $\rightarrow$ `3.5` (Type: **float**)
+*   **Floor Division (`//`):** `7 // 2` $\rightarrow$ `3` (Type: **int**) — *This chops off the decimal part.*
+
+**How to verify this in Python:**
+You can check the type of any expression using the `type()` function:
+
+```python
+print(type(7 / 2)) 
+# Output: <class 'float'>
+```",1,
+0e65602f786e707c,1. 3 | 2. 4 | 3. 5,"Think about what `len()` actually counts when it looks at a list. Does it look inside nested lists to count every single single element, or does it only count the top-level items?",cannot_tell,List not provided
+97089311ef20ed88,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"The correct answer is **1. Keyword arguments as a dict**.
+
+Here is the detailed breakdown of why:
+
+### What is `**kwargs`?
+`kwargs` stands for **""keyword arguments.""** When you put two asterisks (`**`) before a parameter name in a function definition, it tells Python: *""Collect any named arguments that weren't explicitly defined in the function signature and put them into a dictionary.""*
+
+### Example in action:
+```python
+def f(*args, **kwargs):
+    print(f""args: {args}"")
+    print(f""kwargs: {kwargs}"")
+
+# Calling the function
+f(1, 2, 3, name=""Alice"", age=25, city=""New York"")
+```
+
+**Output:**
+```text
+args: (1, 2, 3)
+kwargs: {'name': 'Alice', 'age': 25, 'city': 'New York'}
+```
+
+### Why the other options are wrong:
+
+*   **Option 2 (Positional arguments as a tuple):** This is what `*args` (with a single asterisk) does. In the example above, `(1, 2, 3)` was collected by `*args`.
+*   **Option 3 (Default values):** Default values are defined in the function signature (e.g., `def f(name=""Guest""):`). While `**kwargs` can *receive* values that happen to be defaults in another part of your program, its purpose is to collect **arbitrary** named arguments passed during the function call.
+
+### Summary Table
+| Syntax | Name | Collects... | Data Type |
+| :--- | :--- | :--- | :--- |
+| `*args` | Positional Arguments | Values passed without names | **Tuple** |
+| `**kwargs` | Keyword Arguments |",cannot_tell,options 1 and 2 are correct
+84b4d7e76fd2802e,1. 3 | 2. 4 | 3. 5,3,cannot_tell,No explanation available.
+9d32347718f40ace,1. 30 | 2. 20 | 3. 40,"In Python, when a negative index is used, it counts backward from the end of the list. Think of -1 as the very last element; where would -2 land?",cannot_tell,List missing
+558b6205cd915e19,1. TypeError | 2. ab3 | 3. ababab,"In Python, when you use the multiplication operator (`*`) with a string and an integer, it performs a process called ""string repetition."" Think about what happens when you tell Python to repeat a sequence of characters a specific number of times.",3,
+97661b61a4e7d966,1. KeyError | 2. None | 3. Empty string,"Think about the difference between using square brackets (like `d['missing']`) and using the `.get()` method. While square brackets will crash your program if a key is missing, `.get()` is designed to be ""safe"" by returning a specific placeholder value instead of raising an error.",2,
+b4ebe0cae8bc573e,1. KeyError | 2. None | 3. Empty string,2. None,2,
+5537deef44e245de,1. True | 2. False | 3. 0,"Here's a hint to guide your reasoning:
+
+Think about what `bool()` actually does — it doesn't return the *value itself*, it returns a boolean keyword (one of two possible outcomes).
+
+Now, the key question: In Python, is the number `0` considered ""truthy"" or ""falsy""?
+
+A useful way to think about it: Python treats `0` similarly to other ""absence of value"" concepts. For example, if you ran `bool("""")` (empty string) or `bool([])` (empty list), you'd get a specific boolean keyword. The integer `0` is conceptually in the same family.
+
+Once you decide which category `0` belongs to, you'll know which of the two boolean keywords `bool()` will return. Note that the answer is **not** the number `0` itself — the function converts it to a different type entirely.",2,
+1ca46e3481ab172e,1. KeyError | 2. None | 3. Empty string,"Think about the difference between accessing a value using square brackets `d['missing']` versus using the `.get()` method. While one triggers an error when a key is missing, the `.get()` method is designed to handle missing keys gracefully by returning a specific ""null"" value.",2,
+012a7067ab63bd9e,1. Interpreter | 2. Compiler | 3. Translator,"Here's a hint to help you reason through this:
+
+Focus on the key phrase **""translated once.""** Think about which type of program takes your entire source code, translates it all at once, and produces a separate machine code file (an executable) that you can run later without needing the original source.
+
+Compare that to the other option, which translates and runs the program line-by-line, each time you execute it — the translation happens over and over, not just once.
+
+Also, the third option is a very general term that could describe *any* program that converts one language to another — it's not specific enough for this context.
+
+So, ask yourself: which specific tool performs a **one-time, complete translation** of the whole source program into machine",2,
+2730d5991af323b9,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"I know you're busy, but since this is a quiz, I can only offer a hint rather than the answer.
+
+Think about Python's specific syntax for conditional (ternary) expressions. Python doesn't use `then`, and it doesn't borrow C/Java's `? :` symbols. Instead, Python's conditional expression is written in the order: *value-if-true*, then the `if` keyword with the condition, then `else`, then the *value-if-false*. Compare that order against the three options and you'll spot which one matches.",2,
+17eaca986355e961,1. Interpreter | 2. Compiler | 3. Translator,"The correct answer is **2. Compiler**.
+
+Here is the breakdown of why it is a Compiler and why the other options are incorrect:
+
+### 1. Why it is a Compiler
+A **Compiler** takes the entire source code of a program and translates it into machine code (an executable file, like an `.exe` on Windows) **all at once**. Once this translation is finished, the resulting machine code can be run as many times as you want without needing the compiler again.
+
+*   **Key phrase in your question:** *""Translated once""* $\rightarrow$ This is the hallmark of compilation.
+
+---
+
+### Why the other options are wrong:
+
+**1. Interpreter**
+An interpreter does not translate the program ""once"" into a standalone machine code file. Instead, it reads the source code **line-by-line** and executes it immediately. Every time you run the program, the interpreter must translate it again. It never creates a separate machine code file.
+
+**3. Translator**
+""Translator"" is a **general category**, not a specific type of program. Both compilers and interpreters are types of translators. Because the question asks for the specific program that translates the code *once* into machine code, ""Compiler"" is the precise answer.
+
+### Summary Comparison Table
+
+| Feature | Compiler | Interpreter |
+| :--- | :--- | :--- |
+| **Translation Timing** | Translates the whole program **once** before running. | Translates line-by-line **every time** it runs. |
+| **Output** | Creates an executable machine code file. | Does not create a separate file. |
+| **Speed** | Fast execution (since it's already machine code). | Slower execution (translation happens during runtime). |",2,
+2e65139e8a9c61b3,1. 5 | 2. 4 | 3. 6,"Think about how `range(n)` works in Python: it starts counting from 0 and stops just *before* it reaches the specified number. If you count from 0 up to (but not including) 5, how many numbers are in that sequence?",1,
+3e8c484651c418a9,1. True | 2. False | 3. 0,"In Python, the `bool()` function converts a value to a boolean. Most values are considered ""truthy,"" but certain values—like zero or empty containers—are specifically defined as ""falsy.""",1,
+2d65f5d8fc8bb105,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"Think about the name ""kwargs""—it is shorthand for ""keyword arguments."" Now, consider which Python data structure is designed to store pairs of keys and values.",cannot_tell,
+177ffca313e8681e,1. TypeError | 2. ab3 | 3. ababab,3. ababab,3,
+7266d9e406c6e19e,1. True | 2. False | 3. 0,[blocked by guardrail],1,
+d3c90f74968a29f9,1. is | 2. == | 3. equals,"Think about the difference between testing **“what something is”** versus testing **“what something equals.”** One of the operators is used when you want to know if two variables actually point to the exact same object in memory (for example, checking if a variable is `None`). This operator is a single word, not a symbol. Consider which one fits that description.",1,
+87ebb9df6b2d119b,1. 5 | 2. 4 | 3. 6,"Think about how `range(n)` works: it starts counting from 0 and stops just before it reaches the specified number. If you count from 0 up to (but not including) 5, how many numbers are in that sequence?",1,
+fc3503e828141be7,1. 30 | 2. 20 | 3. 40,1,cannot_tell,No annotation available
+1576a35b8c62c3f4,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',2. `x = 'big' if n > 10 else 'small'`,2,
+2f4e985e8f10c1bb,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","The correct answer is **1. [1, 2, 3]**.
+
+Here is the detailed explanation of why this happens:
+
+### 1. Lists are Mutable Objects
+In Python, lists are **mutable**, meaning they can be changed after they are created.
+
+### 2. Assignment creates a Reference, not a Copy
+When you write `b = a`, you are **not** creating a second, independent list. Instead, you are creating a new reference (`b`) that points to the **same object in memory** as `a`. 
+
+Think of it like this: the list `[1, 2]` is a house, and `a` and `b` are two different keys to the same front door.
+
+### 3. The Step-by-Step Process
+*   `a = [1, 2]`: Python creates a list object in memory and assigns the label `a` to it.
+*   `b = a`: Python tells `b` to point to the exact same list object that `a` points to.
+*   `b.append(3)`: This modifies the list object itself. Since both `a` and `b` refer to this same object, the change is visible regardless of which variable you use to look at it.
+
+### How to actually copy a list
+If you wanted `b` to be a separate copy so that modifying `b` would not affect `a`, you would need to explicitly copy it using one of these methods:
+
+*   **Slicing:** `b = a[:]`
+*   **The `.copy()` method:** `b = a.copy()`
+*   **The `list()` constructor:** `b = list(a)`
+
+If you had used any of those methods, the answer would have been **[1, 2]**.",1,
+c84bce77179ea3e0,1. t | 2. y | 3. p,"Remember that Python uses zero-based indexing, meaning the first character is at position 0. If you move one step forward from the start, which character do you land on?",cannot_tell,
+fa52e4c11ea18b97,1. 5 | 2. 4 | 3. 6,"The correct answer is **1. 5**.
+
+Here is the simple breakdown of why:
+
+In Python, `range(n)` starts counting at **0** and stops **just before** it reaches the number specified.
+
+For `range(5)`, the values of `i` will be:
+1. `0`
+2. `1`
+3. `2`
+4. `3`
+5. `4`
+
+If you count those numbers, there are exactly **5** of them.
+
+**Pro Tip:** Whenever you see `range(n)`, the body of the loop will always execute exactly `n` times, regardless of where the starting number is.",1,
+04eb608a2d008e85,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Think about how Python handles lists when you assign one variable to another. When you write `b = a`, are you creating a brand new copy of the list, or are both variables now pointing to the same object in memory?",cannot_tell,
+f6e0482df490cc62,1. 3 | 2. 4 | 3. 5,"Think about how the `len()` function counts elements in a list. Does it look inside nested lists, or does it treat each top-level item as a single element regardless of what it contains?",cannot_tell,
+348c62a69b0e7ba8,1. 30 | 2. 20 | 3. 40,"In Python (and many other languages that support negative indexing), a negative index counts from the **end** of the sequence:
+
+| Index | Element |
+|-------|---------|
+| 0     | 10 |
+| 1     | 20 |
+| 2     | 30 |
+| 3     | 40 |
+| -1    | 40 (last element) |
+| -2    | 30 (second‑last element) |
+| -3    | 20 |
+| -4    | 10 |
+
+So `[-2]` picks the second‑last item of the list `[10, 20, 30, 40]`, which is **30**.
+
+**Answer: 1. 30**.",1,
+8e0d1ddd68db2e16,1. is | 2. == | 3. equals,**is**,1,
+5f26f8c76edebebc,1. t | 2. y | 3. p,"Remember that in Python, indexing starts at 0. This means the first character of a string is at index 0, the second is at index 1, and so on.",cannot_tell,
+e82d1e2e15c799ba,1. 30 | 2. 20 | 3. 40,"The correct answer is **1. 30**.
+
+Here is the simple explanation of why:
+
+In Python (and several other programming languages), you can use **negative indexing** to access elements from the end of a list. 
+
+*   `[-1]` refers to the **last** element.
+*   `[-2]` refers to the **second-to-last** element.
+*   `[-3]` refers to the third-to-last element, and so on.
+
+Looking at your list: `[10, 20, 30, 40]`
+*   `40` is at index `-1`
+*   `30` is at index **`-2`**
+*   `20` is at index `-3`
+*   `10` is at index `-4`
+
+Therefore, `[10, 20, 30, 40][-2]` evaluates to **30**.",1,
+28abc56b1d475cb5,1. 5 | 2. 4 | 3. 6,Think about what `range(5)` actually produces. It starts at 0 and stops **just before** the number 5. How many distinct values does that give you? The loop body runs once for each of those values. Use that count to decide which option matches.,1,
+d3c8ae19440aa488,1. t | 2. y | 3. p,"Remember that Python uses **zero-based indexing**. This means the first character of a string is at index 0. If you move one position forward from there, which character are you landing on?",cannot_tell,
+9d2033b396099c49,1. KeyError | 2. None | 3. Empty string,"Think about the difference between accessing a value using square brackets `d['key']` versus using the `.get()` method. While square brackets will raise an error if the key is missing, the `.get()` method is specifically designed to handle missing keys gracefully by returning a specific placeholder value.",2,
+4f66ba9277a8e90a,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',Think about the order of the three parts in Python’s one‑line conditional (the ternary) expression. It always reads **“value‑if‑true if condition else value‑if‑false.”** Compare each option to that pattern and see which one matches it exactly.,2,
+c38c0afd661da49e,1. 30 | 2. 20 | 3. 40,"Think about how Python handles negative indices. While positive numbers count forward from the start of the list (starting at 0), negative numbers count backward from the end. What element would you land on if you started at the very end and moved back two positions?",cannot_tell,
+ee6dd79ad64a3d65,1. Interpreter | 2. Compiler | 3. Translator,"The answer is **2. Compiler**
+
+A **compiler** translates the entire source program into machine code (or object code) in one pass (or multiple passes during compilation), producing an executable file that can be run multiple times without re-translation.
+
+Here's why the other options don't fit:
+
+- **Interpreter**: Translates and executes the program *line by line* (or statement by statement) each time the program runs. It does not produce a separate machine code file.
+- **Translator**: This is a *general* term that could refer to any program that converts from one language to another — including both compilers and interpreters. It's not the specific term used in this context.
+
+The key clue in the question is **""translated once""** — that's the hallmark of a compiler. Once compiled, the resulting machine code can be executed repeatedly without needing to re-translate the source.",2,
+33bb0f72554edc11,1. KeyError | 2. None | 3. Empty string,"Think about what the `dict.get()` method does when you don’t provide a second argument. It looks up the key, and if the key isn’t found it returns a special “fallback” value that the method supplies automatically. What value does Python use as that default fallback?",2,
+14f789c252219ae7,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"Let me give you a better hint:
+
+Think about what's different between the two collectors in the signature:
+- `*args` grabs arguments passed *by position* (without names) → it groups them into something you can loop through in order.
+- `**kwargs` grabs arguments passed *by name* (like `f(x=1, y=2)`) →",cannot_tell,
+7c4c498efddf7791,1. 30 | 2. 20 | 3. 40,"Think about how Python handles a negative index. A negative number counts backward from the **end** of the list instead of the beginning. So `-1` would give you the last element, `-2` gives you the one just before that, and so on. Apply that rule to the list `[10, 20, 30, 40]` and see which value you land on.",cannot_tell,
+9c8017b2dc5c5698,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"Think about the order of elements in a Python ""ternary"" operator. In Python, you typically state the value you want if the condition is true *first*, followed by the `if` keyword and the condition, and finally the `else` value.",2,
+29406b0a5655708b,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Think about how Python handles lists when you use the equals sign (`=`). Does `b = a` create a brand new copy of the list, or does it simply create a new name that points to the same object in memory?",cannot_tell,
+43f972bfdcaba023,1. KeyError | 2. None | 3. Empty string,2. None,2,
+e453eb2e6aede0af,1. t | 2. y | 3. p,"Think about how Python indexes characters in a string. The first character is at index 0, the second at index 1, and so on. Look at the word **python** and count the letters starting from zero—what character sits at position 1? That will be the result of `""python""[1]`.",2,
+f7c3accd60d90697,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Think about how Python handles lists when you assign one variable to another. Does `b = a` create a completely new copy of the list, or does `b` simply point to the same object in memory as `a`?",cannot_tell,
+de334c7563fa166d,1. 5 | 2. 4 | 3. 6,"Think about what `range(5)` actually produces. If you write `list(range(5))`, what numbers appear in that list? Count how many numbers are in the sequence, and remember that the loop body runs once for each element. That count is the number of times the body executes.",1,
+a5602fc4f44cdd5e,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"Great question! Let me give you some clues to reason through this:
+
+🔍 **Think about the symbols:**
+- `*args` uses a **single asterisk** `*` and captures extra positional arguments
+- `**kwargs` uses a **double asterisk** `**` — that extra `*` matters! What does it suggest about the *type* of arguments being captured?
+
+🔍 **Think about call syntax:**
+If you write `f(name=""Alice"", age=30)`, those are passed by *name* (keyword) rather than by *position*. Where do those names and values need to be stored together so they can be looked up by key? What Python data structure maps keys to values?
+
+🔍 **Quick experiment to try in your head (or REPL):**
+```python
+def f(**kwargs):
+    print(type(kwargs))
+    print(kwargs)
+
+f(x=1, y=2)
+```
+What do you think `type(kwargs)` will report, and what will it print?
+
+Also — notice that option 2 describes what `*args` (single asterisk) does, not `**kwargs`. That's a clue to rule it out! 
+
+What do you think now? 😊",1,
+341c2d2d5d17bb80,1. True | 2. False | 3. 0,"Think about how Python treats numbers when converting them to booleans. In Python, is there a difference in ""truthiness"" between the number zero and any other non-zero number?",1,
+f0790a7f56e512c8,1. True | 2. False | 3. 0,"Think about how Python handles ""truthiness."" In Python, certain values are considered inherently ""falsey"" when converted to a boolean, while most other values are considered ""truthy."" 
+
+Does the number zero typically represent a presence of value or the absence of it?",cannot_tell,
+d7482caef3b89540,"1. [1, 2, 3] | 2. [1, 2] | 3. TypeError","Think about how Python handles lists when you use the equals sign (`=`). When you write `b = a`, does Python create a completely new copy of the list, or does it create a new reference to the same object in memory?",cannot_tell,
+79fae7b9aa54dfb8,1. is | 2. == | 3. equals,"The correct answer is **`is`**.
+
+Here's a quick breakdown of each:
+
+1. **`is`** — Tests **identity**. Checks whether two names refer to the *same object in memory* (i.e., same `id()`). This is what your question is asking about.
+
+2. **`==`** — Tests **equality of values**. Two different objects with the same value will be `==` but not `is`.
+
+3. **`equals`** — Not a Python operator. (It exists as a method in Java, but not in Python.)
+
+### Quick example:
+
+```python
+a = [1, 2, 3]
+b = [1, 2, 3]   # same values, different object
+c = a           # same object as a
+
+print(a == b)   # True  → values are equal
+print(a is b)   # False → different objects in memory
+print(a is c)   # True  → c points to the same object as a
+```
+
+So whenever you need to ask *""are these two names pointing to literally the same thing?""*, reach for **`is`**. A very common use case is comparing with `None`:
+
+```python
+if x is None:
+    ...
+```",1,
+aa0586a918ad31c7,1. is | 2. == | 3. equals,"Here's a hint to help you reason through this:
+
+Think about the **two different things** you might want to compare:
+1. Do these two variables have the **same value**? (e.g., two different lists containing `[1, 2, 3]`)
+2. Are these two variables literally **pointing to the exact same object** in memory?
+
+The operator you choose depends on which question you're asking. Also, be careful — one of the options isn't actually a valid Python operator at all (it's a method used in other programming languages). 
+
+Consider what each symbol means in everyday English, and think about which one would logically suggest ""sameness of identity"" rather than ""sameness of value.""",2,
+e9508dfd95e26afe,1. 5 | 2. 4 | 3. 6,"Think about how `range(n)` works in Python: it starts counting at 0 and goes up to, but does not include, the number specified. If you count from 0 up to (but not including) 5, how many numbers are in that sequence?",1,
+3cc17d492d22d89f,1. 5 | 2. 4 | 3. 6,1. 5,1,
+d6446f8b90670d23,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"Here's a hint that focuses purely on guiding your reasoning:
+
+**Start with what you call functions with.** There are two ways to pass information to a function:
+
+- By position: `f(1, 2, 3)` — values in a specific order.
+- By name: `f(x=1, y=2, z=3)` — each value is *labeled*.
+
+**Now look at the two symbols in the function definition:**
+
+- `*args` uses **one** asterisk. Think about what *one* asterisk does elsewhere in Python (like when you build a list or unpack one).
+- `**kwargs` uses **two** asterisks. Think about what *two* asterisks does when you've seen them used elsewhere in Python.
+
+**Ask yourself:**
+- If `*args` (single asterisk) captures one way of passing arguments, what *complementary* way does `**kwargs` (double asterisk) capture?
+- Look at the *number of asterisks* and the *",cannot_tell,
+51b39a9f85a8954a,1. x = if n > 10 then 'big' else 'small' | 2. x = 'big' if n > 10 else 'small' | 3. x = n > 10 ? 'big' : 'small',"Think about the shape of Python’s one‑line conditional (often called a “ternary”) expression. It reads like:
+
+```
+<result‑when‑true> if <condition> else <result‑when‑false>
+```
+
+So the part that comes first is the value you want if the test succeeds, followed by the `if` keyword, then the test itself, and finally `else` with the fallback value. Which of the options follows that ordering and uses only Python syntax?",2,
+dc8a9460b2ffba40,1. True | 2. False | 3. 0,"The correct answer is **2. False**.
+
+Here is the breakdown of why:
+
+### 1. What `bool()` does
+The `bool()` function in Python converts a value into a Boolean (either `True` or `False`). This is known as ""truthiness"" and ""falsiness.""
+
+### 2. The Rule for Numbers
+In Python, the rule for numeric types (integers and floats) is very simple:
+*   **`0`** (zero) is always **`False`**.
+*   **Any other number** (1, -5, 3.14, etc.) is **`True`**.
+
+### Why it isn't the other options:
+*   **It's not `True`** because `0` is defined as the ""falsy"" value in Python.
+*   **It's not `0`** because the `bool()` function *must* return a Boolean type (`True` or `False`), not an integer.
+
+**Quick Example:**
+```python
+print(bool(0))    # Output: False
+print(bool(1))    # Output: True
+print(bool(-10))   # Output: True
+```",cannot_tell,
+39ad016efdd31da4,1. float | 2. int | 3. decimal,"Here's a hint to help you figure it out:
+
+Think about what the `/` operator does in Python 3. Unlike some other languages (and unlike Python 2!), the single forward slash performs **true division** — it always returns a result that includes the fractional part, even when the numbers divide evenly.
+
+Try this in your head or in a Python shell: what would `7 / 2` give you? Would it be exactly `3`, or would it be `3.5`? And what type in Python represents numbers with a decimal point?
+
+Also, contrast it with `//` (double slash), which is the *floor* division operator — that one *would* give you an `int`. The single `/` behaves differently.
+
+You can also think about it this way: Python 3 deliberately made this change so that `/` always behaves consistently regardless of whether the operands are whole numbers.",1,
+fa7647224a7132ee,1. 5 | 2. 4 | 3. 6,"Think about how `range(n)` works in Python: it starts counting from 0 and stops just *before* it reaches the number specified. If you count from 0 up to (but not including) 5, how many numbers do you have in total?",1,
+935e714a9917848e,1. Interpreter | 2. Compiler | 3. Translator,2. Compiler,2,
+72a6bc38e02f4ca1,1. t | 2. y | 3. p,"Remember that Python uses **zero-based indexing**. This means the first character of a string is at index 0, the second is at index 1, and so on.",cannot_tell,
+acbb93848036ca57,1. 5 | 2. 4 | 3. 6,"Here's a hint to help you figure it out:
+
+Think about what values `range(5)` actually produces. The key thing to remember about `range()` is that it starts at **0** and stops **before** the number you give it.
+
+Try writing out the values mentally:
+- It doesn't include 5
+- It starts at 0
+
+Now count how many numbers you get: 0, 1, 2, 3, 4 — how many is that?
+
+The loop body runs **once for each value** in the range, so your count of those numbers is your answer.",1,
+c085a26526001d9f,1. Interpreter | 2. Compiler | 3. Translator,"Think about the difference between doing something line-by-line (in real-time) versus processing the entire source code all at once to create a separate executable file. Which of these terms refers to that ""all-at-once"" conversion process?",2,
+2ea18414cc88a82f,1. 5 | 2. 4 | 3. 6,"Think about what `range(5)` actually produces. By default it starts at 0 and steps by 1, stopping **just before** the number you give. Write down the sequence of numbers that `range(5)` yields, and then count how many items are in that sequence. The loop body runs once for each item.",1,
+df5832a512f82387,1. float | 2. int | 3. decimal,"The correct answer is **1. float**.
+
+Here is the detailed explanation:
+
+### Why it is a `float`
+In Python 3, the single slash `/` is the **true division** operator. Regardless of whether the numbers are whole numbers (integers) or not, the result of a division using `/` is always returned as a floating-point number (a decimal).
+
+In your example:
+`7 / 2` equals `3.5`, which is a **float**.
+
+### How to get an `int` (Integer Division)
+If you want the result to be an integer (by chopping off the decimal part), you must use the **floor division** operator, which is the double slash `//`.
+
+*   `7 // 2` would equal `3` (Type: **int**)
+
+### Summary Table
+| Expression | Result | Type | Operator Name |
+| :--- | :--- | :--- | :--- |
+| `7 / 2` | `3.5` | **float** | True Division |
+| `7 // 2` | `3` | **int** | Floor Division |
+| `6 / 2` | `3.0` | **float** | True Division (still a float!) |",1,
+bbffca7ab6c0eeae,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"**`**kwargs` collects keyword arguments as a dictionary.**
+
+When you define a function like  
+
+```python
+def f(*args, **kwargs):
+    ...
+```
+
+- `*args` gathers any **extra positional arguments** that aren’t matched by named parameters into a **tuple**.
+- `**kwargs` gathers any **extra keyword arguments** (i.e., arguments passed by name) that aren’t matched by named parameters into a **dictionary** where the keys are the argument names and the values are the corresponding argument values.
+
+**What it does *not* do:**
+
+- It does **not** collect positional arguments (that’s what `*args` is for).
+- It does **not** collect default values. Default values are defined directly in the function signature (e.g., `def f(a=10, b=20): ...`) and are automatically supplied by Python when the caller omits those arguments.
+
+**Example**
+
+```python
+def f(*args, **kwargs):
+    print('positional args:', args)   # tuple
+    print('keyword args:', kwargs)    # dict
+
+f(1, 2, three=3, four=4)
+```
+
+Output:
+
+```
+positional args: (1, 2)
+keyword args: {'three': 3, 'four': 4}
+```
+
+So the correct choice from your list is:
+
+**1. Keyword",1,
+93949fb554d485e9,1. is | 2. == | 3. equals,"Think about what you’d use when you want to know if two variables are actually **the same object in memory**, not just that they have the same value. One of the options is a single‑word keyword often used for identity checks, while the other symbols are used for value comparison. Which one fits that description?",1,
+21119b51f1f0dc9e,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,1. Keyword arguments as a dict,1,
+df5ddde1665b75c9,1. 3 | 2. 4 | 3. 5,1. 3,1,
+7097d95b89913a93,1. 5 | 2. 4 | 3. 6,"Here's a hint to help you figure it out:
+
+Think about what values `range(5)` actually produces. In Python, `range(n)` generates a sequence of numbers starting from **0** and going up to, but **not including**, `n`.
+
+Try listing out the numbers yourself:
+- It starts at...
+- It goes up to (but not including)...
+
+Count how many numbers are in that sequence — that's exactly how many times the loop body will run. 
+
+Also, a common mistake is to assume `range(5)` means ""stops at 5, so 5 iterations including 5 itself"" — but remember, the stop value is **exclusive**!",1,
+1bfb2a1a123ea4a4,1. is | 2. == | 3. equals,"Think about the difference between checking if two variables point to the exact same object in memory versus simply having the same value. One of the operators is specifically used for identity tests, while the other compares values. Which one would you use if you wanted to confirm that two names are bound to the very same object?",1,
+d5a11f0cba5d68d6,1. 30 | 2. 20 | 3. 40,"Think about how Python handles negative indexes: `-1` refers to the last element of the list, `-2` refers to the one just before it, and so on. Take the list `[10, 20, 30, 40]` and count backward from the end to see which value `-2` points to. That will tell you which choice matches.",1,
+5410d014b288e677,1. t | 2. y | 3. p,2. y,2,
+11d5434c6e3a2422,1. t | 2. y | 3. p,"In Python, strings are indexed starting at **0**:
+
+```python
+s = ""python""
+```
+
+| Index | Character |
+|------|-----------|
+| 0    | 'p'       |
+| 1    | 'y'       |
+| 2    | 't'       |
+| 3    | 'h'       |
+| 4    | 'o'       |
+| 5    | 'n'       |
+
+So `""python""[1]` accesses the character at index 1, which is **'y'**.
+
+**Correct choice:** **2. y**",2,
+d52b973671defc0f,1. float | 2. int | 3. decimal,"Think about what happens when you divide two whole numbers that don't divide evenly. Does Python 3 truncate the result to a whole number, or does it keep the fractional part?",1,
+ad21d33ca21164df,1. float | 2. int | 3. decimal,"Even though you're in a hurry, I'll give you a quick hint: in Python 3, the `/` operator always performs **true division**, which means it returns a decimal-style number rather than a whole-number division result. Think about what that implies for the type.",1,
+a3b421d29c42ad8c,1. True | 2. False | 3. 0,"In Python, the `bool()` function converts a value to a Boolean. Think about how Python treats numerical values in a truthy or falsy context: does the number zero typically represent ""presence/truth"" or ""absence/emptiness""?",1,
+18c9d5c19d2772bb,1. KeyError | 2. None | 3. Empty string,"Think about the difference between using square brackets `d['missing']` and the `.get()` method. While square brackets will cause the program to crash with an error if the key isn't found, the `.get()` method is designed to be ""safe"" and return a specific placeholder value instead.",2,
+4a5656bafd261051,1. 3 | 2. 4 | 3. 5,"Think about how the `len()` function counts elements in a list. Does it look inside nested lists, or does it simply count the top-level items separated by commas?",cannot_tell,
+15a216cd87b2d139,1. t | 2. y | 3. p,[blocked by guardrail],cannot_tell,
+665e179b0743c0f8,1. KeyError | 2. None | 3. Empty string,"Think about the difference between using square brackets `d['missing']` and the `.get()` method. While one raises an error when a key is missing, the other is designed to handle missing keys gracefully by returning a specific ""null"" value by default.",2,
+7510b12af0de52f6,1. 5 | 2. 4 | 3. 6,"Think about how `range()` works in Python. It starts counting from 0 and goes up to, but does not include, the number specified in the parentheses. Try counting the numbers from 0 up to (but not including) 5!",1,
+a63d4101f9333827,1. 3 | 2. 4 | 3. 5,"The `len()` function counts the number of top-level elements within the list. Think about how many distinct items are separated by commas at the outermost level, regardless of whether those items are single numbers or other lists.",cannot_tell,
+bb2ccebbcd6b74fe,1. Interpreter | 2. Compiler | 3. Translator,"A hint: focus on the phrase **""translated once""** — which tool translates the entire source program into machine code in a single pass, producing a separate executable file? Compare how the other two options work instead.",2,
+65294065953f8f56,1. Interpreter | 2. Compiler | 3. Translator,Think about the difference between a program that translates the entire code all at once before execution versus one that translates it line-by-line while it is running. Which one creates a standalone machine code file?,2,
+eca1377a2f2553e9,1. Keyword arguments as a dict | 2. Positional arguments as a tuple | 3. Default values,"Take a quick look at what happens when you call `f(color=""red"", size=10)`:
+
+- Each argument has a **label** (like `""color""`) attached to a **value** (like `""red""`).
+- The double asterisk (`**`) signals that these labeled items get bundled together inside the function.
+
+Now ask yourself: **which of the three options describes a collection that stores label–value",1,
+39a5237b0e78af7c,1. Interpreter | 2. Compiler | 3. Translator,"Great question! Let me give you a hint to help you reason through it.
+
+Think about the key phrase in the question: **""translated once into machine code.""** This is a big clue! Ask yourself:
+
+- Which type of translation program reads the **entire source code at once** and converts it into machine code (or an equivalent) **before** the program runs?
+- Which type would translate the program **line-by-line**, one instruction at a time, while the program is running?
+
+Also, notice that one of the options is a very general term that could apply to *both* of the other two — so it's likely not the most precise answer here. You want the term that specifically describes translating a whole program **once** into machine code.
+
+Take a moment to consider the difference between these approaches, and you'll have your answer! 💡",2,
+3d535ed0fb875a84,1. float | 2. int | 3. decimal,"The correct answer is **1. float**.
+
+Here is the detailed explanation:
+
+In Python 3, the `/` operator performs **True Division**. This means that regardless of whether the numbers are integers or not, the result is always returned as a floating-point number (a decimal), even if the result is a whole number.
+
+If you run this code in a Python shell:
+```python
+result = 7 / 2
+print(type(result))
+```
+The output will be: `<class 'float'>` (and the value will be `3.5`).
+
+### Quick Tips for other division types:
+
+*   **Floor Division (`//`):** If you want the result to be an **int**, you use two slashes. This divides the numbers and chops off the decimal part (rounding down).
+    *   `7 // 2` results in `3` (Type: **int**)
+*   **Modulo (`%`):** If you want to find only the **remainder** of the division.
+    *   `7 % 2` results in `1` (Type: **int**)",1,
+c54febc545f9db58,1. float | 2. int | 3. decimal,1. float,1,

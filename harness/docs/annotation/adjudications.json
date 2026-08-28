@@ -1,0 +1,15 @@
+{
+  "note": "Cells changed after a sheet was returned. The raw return is preserved beside the corrected sheet; see ADJUDICATIONS.md. `alternative` is the other defensible reading, and human_validation.assemble() re-scores the whole sample under it so the manuscript can state what the adjudication was worth instead of asserting it did not matter.",
+  "adjudications": [
+    {
+      "sheet": "A2",
+      "response_id": "e5194ca9cd8c11b9",
+      "returned": "5",
+      "read_as": "1",
+      "alternative": "cannot_tell",
+      "adjudicated_by": "the author who annotated as A2",
+      "date": "2026-08-28",
+      "reason": "options are `1. 5 | 2. 4 | 3. 6`; the entry recorded the answer's value where the codebook asks for its option number"
+    }
+  ]
+}

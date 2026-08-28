@@ -1,5 +1,11 @@
+# Paths are written relative to THIS file. A pattern containing an internal
+# slash is anchored to the repository root, so `docs/annotation/` matched
+# nothing once the tree moved under `harness/` -- it read as "the annotator
+# sheets are withheld" and excluded nothing. The completed sheets ARE part of
+# this deposit (they carry no Bank B text: the validation sample is Bank A
+# only), so that line is gone rather than re-anchored.
 __pycache__/
 *.pyc
+.pytest_cache/
 .remember/
-ops/logs/
-docs/annotation/
+harness/ops/logs/

@@ -36,7 +36,9 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import statistics as st
+import subprocess
 import sys
 from pathlib import Path
 
@@ -54,6 +56,88 @@ RUNS = ROOT / "data" / "runs"
 # Inline `ROOT / "harness" / "banks" / ...` left the bank reads unpatchable, so
 # a test with a temporary runs directory silently read the REAL banks.
 BANKS = ROOT / "harness" / "banks"
+PDF = ROOT / "source" / "paper.pdf"
+
+# CEAI: "a concise and factual abstract which does not exceed 250 words".
+# Retrieved from the guide for authors via search -- ScienceDirect 403s a direct
+# fetch, so treat it as well supported rather than verified, and re-check at
+# submission. The action is unambiguous under either 250 or 300.
+ABSTRACT_LIMIT = 250
+
+
+def _letters(tok: str) -> str:
+    return re.sub(r"[^a-z]", "", tok.lower())
+
+
+def abstract_words(tex: str, pdf: Path = PDF) -> tuple[int | None, str]:
+    r"""Count the abstract as RENDERED, because there is only one rendering.
+
+    This number has been produced by hand four times across the life of the
+    manuscript -- 292, 265, 249 and 247 -- and every one of them came from a
+    fresh macro stripper written at the moment it was needed. They disagree for
+    a reason that is invisible unless you look: replacing `$` with a space turns
+    `($27$ items` into `( 27 items`, inventing a token, while deleting it turns
+    `\Delta` into nothing and destroys one. A stripper is a second
+    implementation of LaTeX and it will not agree with the first (4.33).
+
+    So the count is taken off the built PDF, which is what a reader sees and
+    what a paste into Editorial Manager carries. The abstract is located by
+    anchors DERIVED FROM THE SOURCE each run -- its own first and last three
+    words -- so a rewrite moves the anchors with it. Tokens are compared
+    letters-only, which makes `game's` and the PDF's `game’s` the same word.
+
+    Returns (count, note). A count of None is not a pass: it means the PDF is
+    missing or older than the source, so the question was not asked.
+    """
+    m = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", tex, re.S)
+    if not m:
+        return None, "no abstract environment in paper.tex"
+    body = "\n".join(l for l in m.group(1).splitlines()
+                     if not l.lstrip().startswith("%"))
+    src_toks = [t for t in _letters_seq(body) if t]
+    if len(src_toks) < 6:
+        return None, "abstract too short to anchor"
+    if not pdf.exists():
+        return None, f"no build at {pdf.name} -- run make"
+    if pdf.stat().st_mtime < PAPER.stat().st_mtime:
+        return None, f"{pdf.name} is older than paper.tex -- run make"
+
+    try:
+        out = subprocess.run(["pdftotext", "-f", "1", "-l", "1", str(pdf), "-"],
+                             capture_output=True, text=True, timeout=60)
+    except (OSError, subprocess.SubprocessError) as e:
+        return None, f"pdftotext unavailable ({e})"
+    if out.returncode != 0:
+        return None, "pdftotext failed on page 1"
+    page = out.stdout.replace("-\n", "").split()
+    keys = [_letters(t) for t in page]
+
+    def find(seq, start=0):
+        n = len(seq)
+        for i in range(start, len(keys) - n + 1):
+            if keys[i:i + n] == seq:
+                return i
+        return -1
+
+    head, tail = src_toks[:3], src_toks[-3:]
+    i = find(head)
+    if i < 0:
+        return None, "abstract head not found on page 1 of the PDF"
+    j = find(tail, i)
+    if j < 0:
+        return None, "abstract tail not found after its head"
+    return len(page[i:j + len(tail)]), "rendered, page 1"
+
+
+def _letters_seq(body: str) -> list[str]:
+    """Letters-only tokens of a LaTeX fragment, for ANCHORING only.
+
+    Deliberately crude: it has to find three words, not count them, so its
+    disagreements with the renderer do not reach the number.
+    """
+    s = re.sub(r"\\[a-zA-Z]+\*?", " ", body)
+    s = re.sub(r"[${}~\\]", " ", s)
+    return [_letters(t) for t in s.split()]
 
 
 def _load(name: str) -> list[dict] | None:
@@ -143,6 +227,12 @@ def _spell(n: int) -> str:
         return _UNITS[n]
     tens, unit = divmod(n, 10)
     return _TENS[tens] if unit == 0 else f"{_TENS[tens]}-{_UNITS[unit]}"
+
+
+def _verifier_audit(bank: str, roster: str = "ol") -> dict:
+    """One call into the audit tool, so the manuscript and the CLI agree."""
+    import verifier_audit as VA
+    return VA.audit(bank, roster, "stress", True)
 
 
 def checks() -> list[tuple[str, str | None, str]]:
@@ -1295,6 +1385,92 @@ def checks() -> list[tuple[str, str | None, str]]:
             out.append((f"bank BS {name} adj p", f"{c['p_adjusted']:.3f}",
                         "Holm-adjusted within R2"))
 
+    # ---- the deposit's licence scan (Data availability) ------------------------
+    # The manuscript states how much Bank B text the withheld logs carry. That
+    # figure came from a hand-run scan that could not see a multi-line stem, so
+    # it is now computed by the released script on every check.
+    try:
+        sys.path.insert(0, str(_C.ROOT / "harness" / "ops"))
+        import release_scan as _rs
+        logs = [ROOT / "data" / "runs" / "generate_bankBS_ol.jsonl",
+                ROOT / "data" / "runs" /
+                ("QUARANTINE_generate_bankBS_ol_generator_cap400_PARTIAL"
+                 "_clean_rows_kept_2026-08-20_a61f4004.jsonl")]
+        if all(p.exists() for p in logs):
+            prot = _rs.protected_strings()
+            union, total = set(), 0
+            for f in logs:
+                hay = _rs._norm(f.read_text(encoding="utf-8", errors="ignore"))
+                hit = {x for x in prot if _rs._norm(x) in hay}
+                union |= hit
+                total += sum(hay.count(_rs._norm(x)) for x in hit)
+            out.append(("withheld-log protected occurrences", f"${total}$",
+                        f"{len(union)} distinct option strings"))
+    except ImportError:
+        out.append(("withheld-log protected occurrences", None,
+                    "ops/release_scan.py not importable"))
+
+    # ---- Tier-3 human validation (sec:results-human) ---------------------------
+    # Read from the assembled artefact, never recomputed here (4.41). The
+    # adjudication counterfactual is checked too: the manuscript says the one
+    # re-read cell changes nothing, and a claim of that shape with nothing
+    # computing it is exactly the literal that goes stale unnoticed (4.46).
+    hv_p = ROOT / "data" / "human_validation_results.json"
+    if not hv_p.exists():
+        out.append(("human validation agreement", None,
+                    "run `python3 human_validation.py assemble`"))
+    else:
+        hv = json.loads(hv_p.read_text(encoding="utf-8"))
+        pa, gc = hv["percent_agreement"], hv["agreement_given_both_committed"]
+        cons, eith = hv["recovered_consensus"], hv["recovered_either"]
+        st_ = hv["structure"]
+        out += [
+            ("human validation n", f"${hv['n']}$", "sampled responses"),
+            ("labels collected", f"${2 * hv['n']}$", "two annotators x n"),
+            ("agreement count", f"${pa['k']}$", "responses both labelled alike"),
+            ("percent agreement", f"${100 * pa['p']:.1f}\\%$", "of 240"),
+            ("agreement CI", f"$[{pa['ci'][0]:.3f}, {pa['ci'][1]:.3f}]$",
+             "Wilson"),
+            ("cohen kappa", f"${hv['cohen_kappa']:.3f}$", "chance-corrected"),
+            ("both committed", f"${gc['n']}$", "neither said cannot_tell"),
+            ("same option", f"${gc['k']}$", "and agreed on which"),
+            ("conditional agreement", f"${100 * gc['p']:.1f}\\%$",
+             "given both committed"),
+            ("conditional agreement CI",
+             f"$[{gc['ci'][0]:.3f}, {gc['ci'][1]:.3f}]$", "Wilson"),
+            ("disagreements", f"${hv['n'] - pa['k']}$", "240 minus agreements"),
+            ("one-sided cannot_tell", f"${st_['exactly_one_cannot_tell']}$",
+             "of those disagreements"),
+            ("A1 cannot_tell", f"${hv['per_annotator']['A1']['cannot_tell']}$",
+             "declined"),
+            ("A2 cannot_tell", f"${hv['per_annotator']['A2']['cannot_tell']}$",
+             "declined"),
+            ("consensus recovered", f"${cons['k']}$", "both chose the key"),
+            ("consensus rate", f"${100 * cons['p']:.1f}\\%$", "of 240"),
+            ("consensus CI", f"$[{cons['ci'][0]:.3f}, {cons['ci'][1]:.3f}]$",
+             "Wilson"),
+            ("liberal recovered", f"${eith['k']}$", "either chose the key"),
+            ("liberal rate", f"${100 * eith['p']:.1f}\\%$", "of 240"),
+            ("liberal CI", f"$[{eith['ci'][0]:.3f}, {eith['ci'][1]:.3f}]$",
+             "Wilson"),
+        ]
+        for t in ("0.1", "0.25", "0.5"):
+            d = hv["by_threshold"][t]
+            out += [
+                (f"sensitivity at {t}", f"${d['sensitivity']:.3f}$", "vs consensus"),
+                (f"specificity at {t}", f"${d['specificity']:.3f}$", "vs consensus"),
+            ]
+        adj = hv.get("adjudication_sensitivity")
+        if adj:
+            out += [
+                ("adjudicated cells", f"${adj['n_adjudicated']}$",
+                 "read back by their annotator"),
+                ("alt agreement",
+                 f"${100 * adj['alt_percent_agreement']:.1f}\\%$",
+                 "under the other reading"),
+                ("alt kappa", f"${adj['alt_cohen_kappa']:.3f}$", "same"),
+            ]
+
     # ---- family R4 and the option-count strata (pooled A + BS) ------------------
     # These report PENDING until `results.py --pool A,bs` has run, which is the
     # intended state while `solve bs` is in flight: the manuscript still carries
@@ -1358,6 +1534,33 @@ def checks() -> list[tuple[str, str | None, str]]:
                 out.append((f"stratum {n_opt}-option, bank {bank}: mean",
                             f"{v['mean']:.3f}",
                             f"n={v['n_rows']} rows"))
+
+    # TIER-1 VERIFIER AUDIT. The verifier IS the P2/P3 treatment, so its error
+    # rates belong to the regimes and not to the harness. The manuscript cited
+    # this audit twice from the Results and described it nowhere until the
+    # fourth review round -- a number with no provenance, which no check could
+    # see because the check would have had to notice an ABSENCE.
+    #
+    # Recomputed here rather than read from a file: `verifier_audit` reads the
+    # frozen banks, which are the artefact, and it is the same call the CLI
+    # makes. A stale copy of these figures is exactly what the audit is for.
+    for bank in ("A", "bs"):
+        try:
+            a = _verifier_audit(bank)
+        except (Exception, SystemExit) as e:
+            # SystemExit, not just Exception: `run.load_bank` reports a missing
+            # bank with sys.exit, which inherits from BaseException and sails
+            # straight through `except Exception`. Written the narrow way this
+            # guard could not fire, and the public copy -- which withholds
+            # Bank B by design -- went from 6 expected failures to 19.
+            out.append((f"verifier audit, bank {bank}", None, f"unavailable: {e}"))
+            continue
+        out.append((f"verifier sensitivity, bank {bank}",
+                    f"${a['sens_n']}/{a['sens_d']}$",
+                    f"{a['sensitivity']:.1%} on the stress corpus"))
+        out.append((f"verifier false positives, bank {bank}",
+                    f"${a['fp_n']}/{a['fp_d']}$",
+                    f"{a['fp_rate']:.1%} on answer-free text"))
     return out
 
 
@@ -1380,6 +1583,25 @@ def main() -> int:
                   if "TBD-RESULT:" in l and l.strip().startswith("%% HIGHLIGHT")]
     for h in unresolved:
         print(f"PENDING  {'highlight awaiting results':<44} ({h[:60]})")
+
+    # THE ABSTRACT HAS A HARD LIMIT AND THE MARGIN IS ONE WORD.
+    #
+    # Nothing computed this until 2026-08-28, so it was recounted by hand every
+    # time the abstract changed and the answers disagreed (see abstract_words).
+    # A limit checked by whoever remembers to check it is not a limit.
+    n_abs, abs_note = abstract_words(tex)
+    if n_abs is None:
+        print(f"PENDING  {'abstract word count':<44} ({abs_note})")
+        pending_extra = 1
+    else:
+        pending_extra = 0
+        slack = ABSTRACT_LIMIT - n_abs
+        if slack < 0:
+            print(f"OVERLONG {'abstract':<44} {n_abs} words, limit "
+                  f"{ABSTRACT_LIMIT} ({abs_note})")
+        elif slack <= 5:
+            print(f"note     {'abstract':<44} {n_abs}/{ABSTRACT_LIMIT} words, "
+                  f"{slack} to spare -- any addition displaces something")
 
     # SUPERSEDED LITERALS MUST BE ABSENT, not merely outvoted by a correct one.
     #
@@ -1438,7 +1660,7 @@ def main() -> int:
               f"{lit!r} -- {why}")
 
     ok = missing = 0
-    pending = len(unresolved)
+    pending = len(unresolved) + pending_extra
     for label, literal, note in results:
         if literal is None:
             print(f"PENDING  {label:<44} ({note})")
@@ -1460,7 +1682,11 @@ def main() -> int:
         print("A STALE hit means a value this manuscript has already corrected is\n"
               "still somewhere in the file. The correct value being present too is\n"
               "exactly the condition that hides it -- find the second occurrence.")
-    return 1 if (missing or stale) else 0
+    over = n_abs is not None and n_abs > ABSTRACT_LIMIT
+    if over:
+        print("An OVERLONG abstract is a desk-reject at submission. The count is\n"
+              "taken from the built PDF, so it is what the editor will see.")
+    return 1 if (missing or stale or over) else 0
 
 
 if __name__ == "__main__":

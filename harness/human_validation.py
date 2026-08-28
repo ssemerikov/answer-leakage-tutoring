@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import io
 import json
 import math
 from pathlib import Path
@@ -210,9 +211,67 @@ def wilson(k: int, n: int, z: float = 1.959963984540054):
     return (p, c - h, c + h)
 
 
+EXPECTED_HEADER = ("response_id", "options", "tutor_reply", "choice", "notes")
+
+
+def _read_sheet_rows(path: Path):
+    """Parse a returned sheet, whatever spreadsheet wrote it.
+
+    A sheet comes back from a PERSON, and their spreadsheet picks the dialect.
+    A2's sheet was returned UTF-8-with-BOM, semicolon-delimited, and carrying an
+    extra `Column1;...;Column5` banner row above the real header -- none of it
+    the annotator's doing, none of it touching a label. Reading only the dialect
+    `sheets()` writes would have rejected 240 correct labels over Excel's
+    regional separator.
+
+    This is a CHECKED parse, not a sniff. The header row is located by NAME, the
+    delimiter is the candidate that actually splits that line into the expected
+    columns, and the parsed header must equal EXPECTED_HEADER exactly. A file
+    that cannot be parsed into those five columns raises rather than being
+    mis-split: putting a label in the wrong column is precisely the failure this
+    module must never resolve by guessing, and it is the one that would not
+    announce itself -- a shifted row still yields a number.
+    """
+    text = path.read_text(encoding="utf-8-sig")
+    lines = text.splitlines(keepends=True)
+    start = next((i for i, ln in enumerate(lines)
+                  if "response_id" in ln and "tutor_reply" in ln), None)
+    if start is None:
+        raise ValueError(
+            f"{path.name} has no header row naming response_id and tutor_reply; "
+            f"this does not look like an annotation sheet.")
+    body = "".join(lines[start:])
+    for delim in (",", ";", "\t"):
+        try:
+            rows = list(csv.reader(io.StringIO(body), delimiter=delim))
+        except csv.Error:
+            continue
+        if rows and tuple(h.strip() for h in rows[0]) == EXPECTED_HEADER:
+            return [dict(zip(EXPECTED_HEADER, r)) for r in rows[1:]
+                    if len(r) == len(EXPECTED_HEADER)], delim
+    raise ValueError(
+        f"{path.name}: no delimiter in ',', ';', tab splits the header line "
+        f"into exactly {list(EXPECTED_HEADER)}. Refusing to guess how the "
+        f"columns line up -- a mis-split sheet still produces a number.")
+
+
+def sheet_path(ann_dir: Path, ann: str) -> Path:
+    """The file an annotator actually returned, preferring `_completed`.
+
+    `sheets()` writes a BLANK template at `annotation_<ann>.csv`. When a
+    completed copy sits beside it the template is not data, and reading the
+    template would report `not_labelled_yet` over a finished sheet -- the same
+    shape as 4.33's quiet half, where the stale copy yields no number rather
+    than a wrong one. The resolved path is returned in the result so the reader
+    can see which file the statistics came from.
+    """
+    done = ann_dir / f"annotation_{ann}_completed.csv"
+    return done if done.exists() else ann_dir / f"annotation_{ann}.csv"
+
+
 def read_labels(path: Path, sample_ids: set[str], n_options_by_id):
     """Parse one annotator's completed sheet. Refuses anything ambiguous."""
-    rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    rows, _delim = _read_sheet_rows(path)
     seen, out = set(), {}
     for r in rows:
         rid = (r.get("response_id") or "").strip()
@@ -257,19 +316,21 @@ def score(bank: str = "A", roster: str = "ol", ann_dir: Path | None = None,
     key_by_id = {rid: opts[r["item_id"]][1] for rid, r in by_id.items()}
 
     ann_dir = ann_dir or ANNOTATION_DIR
-    labels = {}
+    labels, sources = {}, {}
     for ann in annotators:
-        p = ann_dir / f"annotation_{ann}.csv"
+        p = sheet_path(ann_dir, ann)
         if not p.exists():
             return {"status": "not_labelled_yet",
                     "reason": f"{p.name} has not been returned.",
                     "n_expected": len(by_id)}
         labels[ann] = read_labels(p, set(by_id), n_opt_by_id)
+        sources[ann] = p.name
 
     done = min(len(v) for v in labels.values())
     if done < len(by_id):
         # 4.59: a prefix of an ordered sheet is not a sample of it.
         return {"status": "partial", "n_labelled": done, "n_expected": len(by_id),
+                "sources": sources,
                 "reason": "coverage below 100%; agreement and the "
                           "sensitivity/specificity pair are withheld, because "
                           "the sheet is walked in order and the cells are not "
@@ -290,7 +351,7 @@ def score(bank: str = "A", roster: str = "ol", ann_dir: Path | None = None,
     # is the conservative reading, and it is the one the Method's construct
     # names -- an unprepared reader picking the keyed option from the reply.
     human_leak = {i: (labels[a][i] == key_by_id[i] == labels[b][i]) for i in ids}
-    return {"status": "complete", "n": len(ids),
+    return {"status": "complete", "n": len(ids), "sources": sources,
             "percent_agreement": po, "cohen_kappa": kappa,
             "n_human_leak": sum(human_leak.values()),
             "human_leak": human_leak}
@@ -318,18 +379,39 @@ def automated_vs_human(bank: str = "A", roster: str = "ol", **kw):
 
     doc = json.loads(SAMPLE_PATH.read_text(encoding="utf-8"))
     by_id = {r["response_id"]: r for r in doc["responses"]}
+
+    # THE REPLICATE IS INSIDE `cell_key`, NOT BESIDE IT. A solve row's key is
+    # `<item>|<generator>|<solicitation>|<regime>|<rep>` and its own `rep` field
+    # is None on all 2,016 rows, so joining on the PAIR matched nothing at all.
+    # The sample carries `rep` separately as well, which is why the pair looked
+    # like the safer key. It is still load-bearing -- as a CHECK that the two
+    # encodings of the replicate agree, below -- but it is not part of the join.
+    #
+    # This never ran before labels existed, and the guard is the reason that
+    # cost a diagnosis rather than a number: it refuses the whole comparison on
+    # the first miss instead of computing over the rows that happened to match,
+    # which would have silently reported a sensitivity over a biased subset.
     auto = {}
     for line in (RUNS / f"solve_bank{bank}_{roster}.jsonl").read_text(
             encoding="utf-8").splitlines():
         if not line.strip():
             continue
         r = json.loads(line)
-        auto[(r["cell_key"], r.get("rep"))] = r.get("leak_adj")
+        if r["cell_key"] in auto:
+            raise ValueError(
+                f"solve output carries {r['cell_key']!r} twice; cell_key is the "
+                f"join key and must identify one response.")
+        auto[r["cell_key"]] = r.get("leak_adj")
 
     pairs = []
     for rid, hv_leak in h["human_leak"].items():
-        s = by_id[rid]
-        v = auto.get((s["cell_key"], s["rep"]))
+        srow = by_id[rid]
+        if srow["cell_key"].rsplit("|", 1)[-1] != str(srow["rep"]):
+            raise ValueError(
+                f"sampled response {rid} has rep {srow['rep']!r} but a cell_key "
+                f"ending {srow['cell_key'].rsplit('|', 1)[-1]!r}; the two "
+                f"encodings of the replicate disagree.")
+        v = auto.get(srow["cell_key"])
         if v is None:
             raise ValueError(
                 f"no automated score for sampled response {rid}; the sample and "
@@ -351,10 +433,169 @@ def automated_vs_human(bank: str = "A", roster: str = "ol", **kw):
     return out
 
 
+RESULTS_PATH = ROOT / "data" / "human_validation_results.json"
+ADJUDICATIONS_PATH = ANNOTATION_DIR / "adjudications.json"
+
+
+def adjudications():
+    """Cells changed after a sheet came back, as data rather than as prose.
+
+    An adjudication is a person's reading of their own ambiguous entry, so it
+    belongs in the record with its alternative. Keeping it as a sentence in a
+    notes file would leave the manuscript asserting `it changes nothing` with
+    nothing computing that -- a literal with no check, which is how the 256/240
+    slip survived a day of green runs (4.46). `assemble` re-scores the whole
+    sample under every `alternative` and reports the displacement.
+    """
+    if not ADJUDICATIONS_PATH.exists():
+        return []
+    return json.loads(ADJUDICATIONS_PATH.read_text(encoding="utf-8"))["adjudications"]
+
+
+def _rewrite_sheets(ann_dir: Path, dest: Path, annotators, subs):
+    """Copy both sheets into `dest`, applying {(sheet, rid): choice}."""
+    dest.mkdir(parents=True, exist_ok=True)
+    for ann in annotators:
+        rows, _ = _read_sheet_rows(sheet_path(ann_dir, ann))
+        with (dest / f"annotation_{ann}_completed.csv").open(
+                "w", newline="", encoding="utf-8") as fh:
+            w = csv.DictWriter(fh, fieldnames=list(EXPECTED_HEADER))
+            w.writeheader()
+            for r in rows:
+                k = (ann, r["response_id"])
+                if k in subs:
+                    r = dict(r, choice=subs[k])
+                w.writerow(r)
+
+
+def adjudication_sensitivity(bank: str = "A", roster: str = "ol",
+                             ann_dir: Path | None = None,
+                             annotators=("A1", "A2")):
+    """Re-score the sample under the other reading of every adjudicated cell.
+
+    Returns None when nothing was adjudicated. Raises if a sheet does not carry
+    the reading the record claims for it -- the record and the labelled file are
+    two copies of the same fact, and the one you read must not be the stale one
+    (4.33).
+    """
+    adj = adjudications()
+    if not adj:
+        return None
+    ann_dir = ann_dir or ANNOTATION_DIR
+    doc = json.loads(SAMPLE_PATH.read_text(encoding="utf-8"))
+    by_id = {r["response_id"]: r for r in doc["responses"]}
+    n_opt = {i: len(_options_by_item(bank, roster)[r["item_id"]][0])
+             for i, r in by_id.items()}
+    subs = {}
+    for a in adj:
+        rows, _ = _read_sheet_rows(sheet_path(ann_dir, a["sheet"]))
+        got = {r["response_id"]: r["choice"].strip() for r in rows}
+        if got.get(a["response_id"]) != a["read_as"]:
+            raise ValueError(
+                f"adjudications.json says {a['sheet']} row {a['response_id']} "
+                f"reads {a['read_as']!r}, but the sheet carries "
+                f"{got.get(a['response_id'])!r}. The record and the labels have "
+                f"drifted; fix the sheet or the record, do not report either.")
+        subs[(a["sheet"], a["response_id"])] = a["alternative"]
+
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        alt_dir = Path(td)
+        _rewrite_sheets(ann_dir, alt_dir, annotators, subs)
+        alt = score(bank, roster, ann_dir=alt_dir, annotators=annotators)
+        alt_av = automated_vs_human(bank, roster, ann_dir=alt_dir,
+                                    annotators=annotators)
+    base = score(bank, roster, ann_dir=ann_dir, annotators=annotators)
+    base_av = automated_vs_human(bank, roster, ann_dir=ann_dir,
+                                 annotators=annotators)
+    worst = max(
+        max(abs(alt_av["by_threshold"][t][k] - base_av["by_threshold"][t][k])
+            for k in ("sensitivity", "specificity"))
+        for t in base_av["by_threshold"])
+    return {"n_adjudicated": len(adj),
+            "alt_percent_agreement": (alt["percent_agreement"]),
+            "alt_cohen_kappa": alt["cohen_kappa"],
+            "alt_n_human_leak": alt["n_human_leak"],
+            "max_rate_displacement": worst}
+
+
+def assemble(bank: str = "A", roster: str = "ol", **kw):
+    """Everything the manuscript quotes, in one artefact with its inputs hashed.
+
+    `results.py` is the study's rule that a reported number is read from an
+    assembled file rather than recomputed at the point of use (4.41); this is
+    the same rule for the Tier-3 tier. `verify_numbers` reads THIS, so a
+    re-labelled sheet moves the manuscript's numbers or fails the check, and
+    cannot leave the two disagreeing quietly.
+
+    The agreement STRUCTURE is included, not just the headline: the two
+    annotators differ far more in willingness to commit than in which option
+    they pick, and a percent-agreement figure alone hides that.
+    """
+    h = score(bank, roster, **kw)
+    if h["status"] != "complete":
+        return h
+    av = automated_vs_human(bank, roster, **kw)
+
+    doc = json.loads(SAMPLE_PATH.read_text(encoding="utf-8"))
+    by_id = {r["response_id"]: r for r in doc["responses"]}
+    opts = _options_by_item(bank, roster)
+    n_opt = {i: len(opts[r["item_id"]][0]) for i, r in by_id.items()}
+    key = {i: opts[r["item_id"]][1] for i, r in by_id.items()}
+    ann_dir = kw.get("ann_dir") or ANNOTATION_DIR
+    annotators = kw.get("annotators", ("A1", "A2"))
+    L = {a: read_labels(sheet_path(ann_dir, a), set(by_id), n_opt)
+         for a in annotators}
+    a, b = annotators
+    ids = sorted(by_id)
+    n = len(ids)
+
+    committed = [i for i in ids if L[a][i] is not None and L[b][i] is not None]
+    per_ann = {x: {"cannot_tell": sum(1 for i in ids if L[x][i] is None),
+                   "recovered_key": sum(1 for i in ids if L[x][i] == key[i])}
+               for x in annotators}
+    struct = {
+        "both_cannot_tell": sum(1 for i in ids
+                                if L[a][i] is None and L[b][i] is None),
+        "exactly_one_cannot_tell": sum(1 for i in ids
+                                       if (L[a][i] is None) ^ (L[b][i] is None)),
+        "same_option": sum(1 for i in committed if L[a][i] == L[b][i]),
+        "different_option": sum(1 for i in committed if L[a][i] != L[b][i]),
+        "n_both_committed": len(committed),
+    }
+    # The consensus rule is the reported one; the liberal rule is stated beside
+    # it because the two BRACKET the human-side prevalence, and quoting either
+    # alone would present one end of a wide band as a point estimate.
+    liberal = sum(1 for i in ids if key[i] in (L[a][i], L[b][i]))
+
+    def _ci(k, m):
+        p_, lo, hi = wilson(k, m)
+        return {"k": k, "n": m, "p": p_, "ci": [lo, hi]}
+
+    sha = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+           for p in [SAMPLE_PATH] + [sheet_path(ann_dir, x) for x in annotators]}
+    return {
+        "status": "complete", "bank": bank, "roster": roster, "n": n,
+        "sources": h["sources"], "input_sha256": sha,
+        "percent_agreement": _ci(struct["same_option"]
+                                 + struct["both_cannot_tell"], n),
+        "cohen_kappa": h["cohen_kappa"],
+        "agreement_given_both_committed": _ci(struct["same_option"],
+                                              struct["n_both_committed"]),
+        "structure": struct, "per_annotator": per_ann,
+        "adjudications": adjudications(),
+        "adjudication_sensitivity": adjudication_sensitivity(
+            bank, roster, ann_dir=ann_dir, annotators=annotators),
+        "recovered_consensus": _ci(h["n_human_leak"], n),
+        "recovered_either": _ci(liberal, n),
+        "by_threshold": av["by_threshold"],
+    }
+
+
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("action", choices=("freeze", "sheets", "score"))
+    ap.add_argument("action", choices=("freeze", "sheets", "score", "assemble"))
     ap.add_argument("--bank", default="A")
     ap.add_argument("--roster", default="ol")
     a = ap.parse_args()
@@ -364,6 +605,16 @@ if __name__ == "__main__":
     elif a.action == "sheets":
         for p in sheets(bank=a.bank, roster=a.roster):
             print(f"wrote {p}")
+    elif a.action == "assemble":
+        r = assemble(a.bank, a.roster)
+        if r["status"] != "complete":
+            print(json.dumps(r, indent=2))
+            raise SystemExit(2)
+        RESULTS_PATH.write_text(json.dumps(r, indent=2, sort_keys=True) + "\n",
+                                encoding="utf-8")
+        print(f"wrote {RESULTS_PATH.relative_to(ROOT)} "
+              f"(n={r['n']}, agreement {r['percent_agreement']['p']:.3f}, "
+              f"kappa {r['cohen_kappa']:.3f})")
     else:
         r = automated_vs_human(a.bank, a.roster)
         print(json.dumps(r, indent=2)[:4000])

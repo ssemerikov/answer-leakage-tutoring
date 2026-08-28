@@ -74,11 +74,18 @@ key index, and a SHA-256 of each item's text — plus every measurement we took.
 Obtain the textbook, re-run the extraction, and the hashes confirm the items we
 measured are byte-identical to the published ones.
 
-For the same reason two files are **absent by design**, not by oversight:
+For the same reason two log files are **absent by design**, not by oversight:
 `generate_bankBS_ol.jsonl` and its quarantined predecessor. Tutor replies to
 Bank B items sometimes quote option text verbatim — a mechanical scan found 9
-such spans — so those logs would redistribute the protected text indirectly.
-Every other artefact in this repository passed that scan.
+such spans, occurring 372 times between the two logs — so those logs would
+redistribute the protected text indirectly. One more file goes with the bank
+rather than the code for the same reason: `banks/bank_b_answer_forms.json`, the
+Tier-1 verifier's per-item answer-form table, some of whose entries *are* option
+text. `author_forms.py` says so and stops when it cannot find it.
+
+Every other artefact in this repository passed that scan, which is released as
+`harness/ops/release_scan.py` rather than described. It needs Bank B to build
+its rule from, so it cannot be re-run here — see below.
 
 ## Reproducing
 
@@ -92,14 +99,16 @@ python3 verify_numbers.py                       # every manuscript number vs the
 python3 promise_audit.py                        # does the paper keep what the Method promises?
 ```
 
-**Six tests fail in this public copy, and that is expected.** The suite is 682
-tests; here 666 pass, 10 skip and 6 fail, every one of them because it asserts
+**Six tests fail in this public copy, and that is expected.** The suite is 704
+tests; here 680 pass, 18 skip and 6 fail, every one of them because it asserts
 against a file that cannot be published: Bank B's item text (`test_checker`,
 `test_size_bank_b`), the manuscript source (`test_promise_audit`), and the
 project's own working notes (`test_claude_md_cites_real_scripts`). They are left
 in place rather than deleted or marked skip, because a suite that passes by
 having had its failing assertions removed tells a reader less than one that says
-which artefact is missing.
+which artefact is missing. The 18 skips are tests that need an artefact this
+copy does not carry and say so — the built manuscript, or a roster of served
+models — rather than asserting against its absence.
 
 `verify_numbers.py` recomputes each quantity the manuscript states and reports
 `MISSING` when the paper and the data disagree. `promise_audit.py` checks a
@@ -139,11 +148,44 @@ seed that could have been chosen after the responses existed.
 - `python3 human_validation.py score` — agreement, plus sensitivity/specificity
   against the manuscript's existing threshold grid. It refuses to report anything
   until every row in both sheets is filled.
+- `python3 human_validation.py assemble` — writes
+  `data/human_validation_results.json`, which is what the manuscript quotes.
 
 The annotator is given the option set and the reply but **neither the stem nor the
 key**, and performs the solver's own task: pick the option the reply points to, or
 `cannot_tell`. The human label and the automated score are then answers to the
 same question rather than two questions that happen to correlate.
+
+**The labels are in.** Both authors labelled all 240 responses; the returned
+sheets are `harness/docs/annotation/annotation_A{1,2}_completed.csv`. They agreed
+on 166 of 240 (69.2%, Cohen's κ 0.556), and the disagreement is almost entirely
+about *whether to commit* rather than about what the reply says: on the 158 where
+both named an option they named the same one 139 times (88.0%), and 55 of the 74
+disagreements are one annotator answering `cannot_tell`.
+
+One entry of the 480 came back as an option's text rather than its number and was
+read back by its annotator. The raw return is preserved as
+`annotation_A2_completed_AS_RETURNED.csv`, the reading and its alternative are
+recorded in `annotation/adjudications.json`, and `assemble` re-scores the whole
+sample under the alternative so the claim that it changes nothing is computed
+rather than asserted (it moves agreement by 0.004 and no rate by 0.005).
+
+## The licence boundary is a script
+
+`harness/ops/release_scan.py` builds every long verbatim span from Bank B — stems
+of 40+ characters, options of 25+ — and refuses any file containing one. It is
+what admitted the files here, and running it as a script rather than by hand is
+what caught two option strings that had reached the *code*: a verifier table
+(now shipped beside the bank, not with the code) and an explanatory comment. It
+compares with whitespace collapsed and JSON escapes undone, because a stem stored
+in a `.jsonl` has its line breaks written as escape sequences and a raw substring
+test cannot see it.
+
+It self-tests with no arguments. In this public copy both of its modes stop for
+the same reason — there is no Bank B here to build a rule from, which is the
+point — but with different exit codes: the self-test prints `SKIPPED` and exits
+`0`, because proving nothing is a fair outcome, while scanning a tree exits `1`,
+because certifying nothing as clean is not.
 
 ## Citing
 

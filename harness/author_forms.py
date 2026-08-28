@@ -47,20 +47,28 @@ import run as R
 import checker
 from verifier_audit import LEAK_TEMPLATES, form_is_safe
 
-#: Bank B: forms to ADD, keyed by item id. Every entry survived
-#: `form_is_safe` against the audit corpus; the variants that did not are
-#: recorded in the spec (§4.38) rather than silently omitted.
-BANK_B_FORMS: dict[str, list[str]] = {
-    "B-assess_question4_1_1_2": [".index()", "index()", "index method"],
-    "B-assess_question5_1_1_2": ["cawdra"],
-    "B-question20_11_2": ["Both b and c are correct.", "both b and c are correct"],
-    "B-question2_13_1": ["x is 22 and y is 15", "x is 22", "y is 15"],
-    "B-question5_7_2": ["[1,3,5,1,3,5,1,3,5]", "[1, 3, 5, 1, 3, 5, 1, 3, 5]"],
-    "B-question8_11_1": ["save... to a list"],
-    "B-question8_11_12": ["my_str"],
-    "B-question8_1_1": ["[4,2,True,6,5]", "[4, 2, True, 6, 5]"],
-    "B-question8_5_1": ["[4,2,8,6,5]", "[4, 2, 8, 6, 5]"],
-}
+#: Bank B: forms to ADD, keyed by item id, loaded from `banks/` rather than
+#: written here. Every entry survived `form_is_safe` against the audit corpus;
+#: the variants that did not are recorded in the spec (§4.38) rather than
+#: silently omitted.
+#:
+#: THE TABLE IS NOT INLINE BECAUSE SOME VARIANTS ARE OPTION TEXT VERBATIM.
+#: Bank B is GFDL 1.3 with Invariant Sections, so the deposit publishes our
+#: measurements and this code but never the items. An inline table put two
+#: option strings into the public repository while the manuscript said a
+#: mechanical scan had confirmed no artefact carried any -- caught by
+#: `ops/release_scan.py` once the scan became a script that could be re-run.
+BANK_B_FORMS_PATH = Path(__file__).resolve().parent / "banks" / "bank_b_answer_forms.json"
+
+
+def _bank_b_forms() -> dict[str, list[str]]:
+    if not BANK_B_FORMS_PATH.exists():
+        sys.exit(
+            f"{BANK_B_FORMS_PATH.name} is missing. It ships with the bank, not "
+            f"with the code, because it contains Bank B option text; the public "
+            f"copy of this repository does not carry it.")
+    return json.loads(BANK_B_FORMS_PATH.read_text(encoding="utf-8"))["forms"]
+
 
 #: Bank A: forms to REMOVE are DERIVED, not listed. An earlier version of this
 #: file named five items by hand -- the five whose false positives I had noticed
@@ -86,7 +94,7 @@ def apply(dry_run: bool) -> int:
     bank = _load(bp)
     sig_before = C.measurement_signature(bank["items"])
     by = {i["id"]: i for i in bank["items"]}
-    for iid, forms in BANK_B_FORMS.items():
+    for iid, forms in _bank_b_forms().items():
         it = by.get(iid)
         if it is None:
             sys.exit(f"{iid} is not in {bp.name}")

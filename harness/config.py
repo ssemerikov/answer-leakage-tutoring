@@ -176,9 +176,11 @@ VENDOR: dict[str, str] = {
 #: tokens, then 1466, 4253, 6848, 7770, and one that exceeded a 16,000-token
 #: probe ceiling. Re-probed at 40,000 on the offending item it returned 3441,
 #: 11769, 712 -- so the traces DO terminate and a finite budget exists; the tail
-#: is long, not unbounded. The item is `B-question5_3_1`, whose masked options
-#: are ['t', 'c', 'Error, you cannot use the [ ] operator with a string.', 'h']:
-#: with the stem hidden there is nothing to reason TO, and the trace runs until
+#: is long, not unbounded. The item is `B-question5_3_1`, whose masked option
+#: set is three single characters beside one sentence-length distractor (not
+#: quoted here: Bank B's text is GFDL 1.3 with Invariant Sections and this file
+#: is published -- see ops/release_scan.py). With the stem hidden there is
+#: nothing to reason TO, and the trace runs until
 #: the model gives up. That is the intended stimulus, not a defect, which is why
 #: the answer is a bigger cap rather than a repaired item.
 #:

@@ -117,3 +117,124 @@ def test_no_label_is_ever_manufactured():
 def test_the_threshold_grid_is_not_invented_at_scoring_time():
     assert "threshold_sensitivity" in SRC
     assert "refusing to invent one" in SRC
+
+
+# ---- the sheet comes back from a person, in their spreadsheet's dialect ----
+#
+# A2 returned the real sheet UTF-8-with-BOM, semicolon-delimited, and carrying an
+# extra `Column1;...;Column5` banner row above the header. Reading only the
+# dialect `sheets()` writes would have rejected 240 correct labels over Excel's
+# regional separator -- so the reader accepts what a spreadsheet emits, but as a
+# CHECKED parse: the header is found by name and must split into exactly the five
+# expected columns, or the file raises. A mis-split sheet still produces a number.
+
+def _excelise(src: Path, dst: Path, choices):
+    """Rewrite a sheet the way Excel handed A2's back."""
+    rows = list(csv.DictReader(src.open()))
+    out = ["﻿Column1;Column2;Column3;Column4;Column5\r\n",
+           ";".join(hv.EXPECTED_HEADER) + "\r\n"]
+    for r, c in zip(rows, choices):
+        vals = [r["response_id"], r["options"], r["tutor_reply"], c, ""]
+        out.append(";".join('"' + v.replace('"', '""') + '"' for v in vals) + "\r\n")
+    dst.write_bytes("".join(out).encode("utf-8"))
+
+
+def test_a_spreadsheet_dialect_yields_the_same_labels_as_the_written_one(tmp_path):
+    hv.sheets(out_dir=tmp_path)
+    plain = tmp_path / "annotation_A1.csv"
+    ids = {r["response_id"] for r in json.loads(hv.SAMPLE_PATH.read_text())["responses"]}
+    n_opt = {i: 3 for i in ids}
+    choices = ["1", "2", "cannot_tell"] * 80
+
+    rows = list(csv.DictReader(plain.open()))
+    with plain.open("w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+        w.writeheader()
+        for r, c in zip(rows, choices):
+            r["choice"] = c
+            w.writerow(r)
+
+    xl = tmp_path / "annotation_A1_completed.csv"
+    _excelise(plain, xl, choices)
+    assert hv.read_labels(xl, ids, n_opt) == hv.read_labels(plain, ids, n_opt)
+
+
+def test_a_sheet_that_cannot_be_split_into_the_five_columns_raises(tmp_path):
+    # The dangerous outcome is not a refusal, it is a shifted row: labels land
+    # in the wrong column and the statistics are computed anyway.
+    p = tmp_path / "weird.csv"
+    p.write_text("response_id|options|tutor_reply|choice|notes\n"
+                 "cafecafecafecafe|x|y|1|\n")
+    with pytest.raises(ValueError, match="Refusing to guess"):
+        hv.read_labels(p, {"cafecafecafecafe"}, {"cafecafecafecafe": 3})
+
+
+def test_a_returned_sheet_supersedes_the_blank_template(tmp_path):
+    # `sheets()` writes a blank template under the plain name. Reading it while
+    # a completed copy sits beside it reports `not_labelled_yet` over finished
+    # work -- 4.33's quiet half, where the stale copy yields NO number.
+    hv.sheets(out_dir=tmp_path)
+    assert hv.sheet_path(tmp_path, "A1").name == "annotation_A1.csv"
+    (tmp_path / "annotation_A1_completed.csv").write_text("x")
+    assert hv.sheet_path(tmp_path, "A1").name == "annotation_A1_completed.csv"
+
+
+def test_accepting_a_dialect_did_not_soften_the_codebook(tmp_path):
+    # Widening WHAT can be parsed must not widen WHICH labels are admissible:
+    # an option number outside 1..n is still a refusal, in any dialect.
+    ids = {"cafecafecafecafe"}
+    p = tmp_path / "bad.csv"
+    p.write_bytes("﻿Column1;Column2;Column3;Column4;Column5\r\n"
+                  "response_id;options;tutor_reply;choice;notes\r\n"
+                  "cafecafecafecafe;1. 5 | 2. 4 | 3. 6;why;5;\r\n".encode("utf-8"))
+    with pytest.raises(ValueError, match="outside 1..3"):
+        hv.read_labels(p, ids, {"cafecafecafecafe": 3})
+
+
+# ---- adjudications: a person's re-reading of their own entry, as data -------
+
+def test_the_adjudication_record_must_agree_with_the_labelled_sheet(tmp_path):
+    # The record and the sheet are two copies of one fact. If they drift, the
+    # sensitivity is computed against a reading nobody made -- and it would
+    # still print a number (4.33).
+    import shutil
+    for f in hv.ANNOTATION_DIR.glob("annotation_A*_completed.csv"):
+        shutil.copy(f, tmp_path / f.name)
+    rows, _ = hv._read_sheet_rows(tmp_path / "annotation_A2_completed.csv")
+    with (tmp_path / "annotation_A2_completed.csv").open("w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(hv.EXPECTED_HEADER)); w.writeheader()
+        for r in rows:
+            if r["response_id"] == "e5194ca9cd8c11b9":
+                r = dict(r, choice="2")          # neither the reading nor the alt
+            w.writerow(r)
+    with pytest.raises(ValueError, match="have drifted"):
+        hv.adjudication_sensitivity(ann_dir=tmp_path)
+
+
+def test_the_adjudication_sensitivity_is_computed_not_asserted():
+    # The manuscript says the one re-read cell changes nothing. That claim is
+    # only checkable because the alternative reading is recorded beside the
+    # chosen one and the whole sample is re-scored under it.
+    a = hv.adjudication_sensitivity()
+    assert a is not None and a["n_adjudicated"] >= 1
+    assert 0.0 <= a["max_rate_displacement"] < 0.05
+    for x in hv.adjudications():
+        assert x["alternative"] != x["read_as"], "an alternative must differ"
+
+
+def test_the_assembled_artefact_is_internally_consistent():
+    d = hv.assemble()
+    s = d["structure"]
+    assert d["percent_agreement"]["k"] == s["same_option"] + s["both_cannot_tell"]
+    assert s["n_both_committed"] == s["same_option"] + s["different_option"]
+    assert d["recovered_consensus"]["k"] <= d["recovered_either"]["k"]
+    assert d["percent_agreement"]["n"] == d["n"] == 240
+
+
+def test_the_manuscript_reads_the_artefact_and_not_the_sheets():
+    # 4.41: a reported number comes from an assembled file. A second reader of
+    # the CSVs would be a second implementation of the scoring rule.
+    vn = Path(hv.HARNESS / "verify_numbers.py").read_text()
+    assert "human_validation_results.json" in vn
+    assert "annotation_A1" not in vn, (
+        "verify_numbers must not parse the annotation sheets itself")

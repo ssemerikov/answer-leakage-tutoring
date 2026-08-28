@@ -27,6 +27,8 @@ never as a crash.
 """
 
 import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -411,3 +413,82 @@ class TestTruncationReachableVerdictsAreCaught:
         rows[20]["n_failed_calls"] = 59
         self._write(runs, rows)
         V.checks()  # must not raise
+
+
+class TestTheAbstractLengthIsCheckedRatherThanRecounted:
+    """The count comes off the BUILD, and refuses rather than guessing.
+
+    Four hand counts of this abstract across the project produced four answers
+    (292, 265, 249, 247), each from a macro stripper written on the spot. The
+    point of `abstract_words` is not that it is clever -- it is that there is
+    one of it, and that when it cannot see a build it says so instead of
+    falling back to a fifth stripper whose number would not be comparable.
+    """
+
+    def test_it_counts_the_real_manuscript(self):
+        if not V.PDF.exists():
+            pytest.skip("no built PDF (not published; run make)")
+        tex = V.PAPER.read_text(encoding="utf-8")
+        n, note = V.abstract_words(tex)
+        assert n is not None, note
+        assert 100 < n < 400, f"implausible count {n}"
+
+    def test_it_agrees_with_pdftotext_over_the_whole_page(self):
+        """The anchors must select the abstract, not some other block."""
+        if not V.PDF.exists():
+            pytest.skip("no built PDF (not published; run make)")
+        tex = V.PAPER.read_text(encoding="utf-8")
+        n, _ = V.abstract_words(tex)
+        out = subprocess.run(["pdftotext", "-f", "1", "-l", "1", str(V.PDF), "-"],
+                             capture_output=True, text=True)
+        page = len(out.stdout.split())
+        assert n < page, "the abstract cannot be the whole of page 1"
+        assert n > 50, "the anchors collapsed onto a fragment"
+
+    def test_a_missing_build_returns_none_rather_than_a_number(self, tmp_path):
+        tex = (V.PAPER.read_text(encoding="utf-8") if V.PAPER.exists()
+               else "\\begin{abstract}\n" + "word " * 40 + "\n\\end{abstract}")
+        n, note = V.abstract_words(tex, pdf=tmp_path / "absent.pdf")
+        assert n is None
+        assert "make" in note
+
+    def test_a_build_older_than_the_source_returns_none(self, tmp_path, monkeypatch):
+        if not V.PDF.exists() or not V.PAPER.exists():
+            pytest.skip("needs the private tree")
+        stale = tmp_path / "paper.pdf"
+        stale.write_bytes(V.PDF.read_bytes())
+        os.utime(stale, (0, 0))
+        tex = V.PAPER.read_text(encoding="utf-8")
+        n, note = V.abstract_words(tex, pdf=stale)
+        assert n is None
+        assert "older" in note
+
+    def test_no_abstract_environment_returns_none(self):
+        n, note = V.abstract_words("\\section{x}nothing here")
+        assert n is None
+        assert "abstract" in note
+
+    def test_the_limit_is_a_constant_not_a_literal_in_the_message(self):
+        """A limit written twice is a limit that will disagree with itself."""
+        src = Path(V.__file__).read_text(encoding="utf-8")
+        body = "\n".join(l for l in src.splitlines()
+                         if not l.lstrip().startswith("#"))
+        assert body.count("ABSTRACT_LIMIT = 250") == 1
+        assert " 250 " not in body.split("ABSTRACT_LIMIT = 250", 1)[1]
+
+    def test_the_overlong_branch_actually_fires(self, monkeypatch, capsys):
+        """Drive it for real, at the cost of one full run of the checks.
+
+        The guard exists for a desk-reject condition that has never occurred, so
+        nothing else would ever execute this path. An untested branch here is
+        one that would be discovered not to work on the day it was needed.
+        """
+        if not V.PDF.exists() or not V.PAPER.exists():
+            pytest.skip("needs the private tree")
+        monkeypatch.setattr(V, "ABSTRACT_LIMIT", 10)
+        monkeypatch.setattr(sys, "argv", ["verify_numbers.py"])
+        rc = V.main()
+        out = capsys.readouterr().out
+        assert "OVERLONG" in out
+        assert "desk-reject" in out
+        assert rc == 1, "an over-length abstract must fail the tool, not warn"
