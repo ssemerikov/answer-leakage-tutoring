@@ -99,7 +99,7 @@ before any study reply."
 | 11 | Options permuted "Before screening"; "The protocol did not specify this step" (Appendix A.2, "Option order") | not extracted (a defect fix dated 2026-08-16) | 2026-08-16 | CORROBORATED (deposit) | reported screens, 2026-08-17 | holds for the reported screens |
 | 12 | "Item-resampled intervals added" after "the first review of the results" (Appendix B.2) | not part of the protocol | 2026-11-09 | SELF-DATED | — | holds as disclosed |
 | 13 | The rule for the example table, "which is not part of the protocol, was fixed in the analysis record before selection" (Appendix B.2; table "Bank A replies chosen by rules fixed before selection") | not part of the protocol; Annex A | rule 2026-11-03; amendment 2026-11-08 | amendment date CORROBORATED (deposit); rule date from working notes | selection, 2026-11-03 | holds |
-| 14 | "The deposit made after the data": "Each bank was frozen and hashed before its replies were generated, and every run row records the bank's hash and a signature of the fields the measurement reads, a signature unchanged from screening to scoring" (Appendix B.2) | 3490–3493 | 2026-08-15 | — | — | holds (see 14) |
+| 14 | "The deposit made after the data": "Each bank was frozen and hashed before its replies were generated, and every row of the reported screening, placebo, generation and scoring runs records the bank's hash and a signature of the fields the measurement reads, a signature unchanged from screening to scoring" (Appendix B.2) | 3490–3493 | 2026-08-15 | — | — | holds (see 14) |
 
 ## Notes on individual claims
 
@@ -167,7 +167,7 @@ are not deposited, before the selection was run. Its amendment carries `rule_ame
 
 **14. The deposit.** The protocol planned to deposit each frozen bank, with a persistent identifier, before the first
 study reply (lines 3490–3493). Appendix B.2, "The deposit made after the data", discloses that this was not done. It says
-that "every run row records the bank's hash and a signature of the fields the measurement reads, a signature
+that "every row of the reported screening, placebo, generation and scoring runs records the bank's hash and a signature of the fields the measurement reads, a signature
 unchanged from screening to scoring". In detail:
 
 - Run rows record two fields. `bank_sha256` is the hash of the item-bank file in use. `bank_measurement_sig` is a
@@ -180,6 +180,8 @@ unchanged from screening to scoring". In detail:
 - Bank B's screen rows record the draw hash `7db9c045…`; its placebo, generation and scoring rows record `bfea4dfa…`.
   Its `bank_measurement_sig` (`14a66cca…`) is the same on screen, placebo, generation and scoring.
 - The hash of the frozen bank file itself does not appear in the rows.
+- Rows of the superseded (`QUARANTINE_*`), pilot, budget-measurement and cap-check runs carry neither field, or an
+  earlier bank's hash; the statement covers only the reported runs.
 
 What the rows do show is that the bank content the measurement reads did not change between screening and scoring.
 

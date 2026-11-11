@@ -50,6 +50,7 @@ data/results_*.json          the pre-specified analysis, per bank and pooled
 data/exploratory_*.json      descriptive shares, flagged vs given, item-resampled intervals
 data/examples_bankA.json     the annotated Bank A replies printed in the article
 data/human_validation_*.json the human-labelled sample and its results
+data/telemetry/pilot_endtoend.json  the design-stage pilot (superseded panel; see protocol/DATING.md)
 harness/*.py                 the instrument and the analysis; harness/tests/ needs no network
 docs/revision-2026-11/figures/  the coordinates of the article's result figures (make_result_figures.py)
 ```
