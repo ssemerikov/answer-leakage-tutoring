@@ -308,6 +308,10 @@ class TestSupersededValuesAreReportedAbsent:
         (tmp_path / "p.tex").write_text("accuracy ran from 0.097 to 0.337 here",
                                         encoding="utf-8")
         monkeypatch.setattr(V2, "checks", lambda: [])
+        # The synthetic checks() emits none of the labels the real RETIRED
+        # table names, and an unmatched RETIRED label is an ERROR (rc 1) --
+        # which would let this test pass for the wrong reason (P2-I2).
+        monkeypatch.setattr(V2, "RETIRED", {})
         monkeypatch.setattr(sys, "argv", ["verify_numbers.py"])
         rc = V2.main()
         out = capsys.readouterr().out
@@ -324,6 +328,8 @@ class TestSupersededValuesAreReportedAbsent:
         # `checks()` is the authority on what is currently right.
         monkeypatch.setattr(V2, "checks",
                             lambda: [("minimax: cond. acc (all 40)", "0.698", "table")])
+        # Unrelated ERRORs must not decide rc: see the test above (P2-I2).
+        monkeypatch.setattr(V2, "RETIRED", {})
         monkeypatch.setattr(sys, "argv", ["verify_numbers.py"])
         rc = V2.main()
         out = capsys.readouterr().out

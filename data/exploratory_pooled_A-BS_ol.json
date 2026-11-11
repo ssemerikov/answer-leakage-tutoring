@@ -1,0 +1,244 @@
+{
+ "banks": [
+  "A",
+  "BS"
+ ],
+ "roster": "ol",
+ "n_rows": {
+  "A": 2016,
+  "BS": 3888
+ },
+ "n_items": {
+  "A": 14,
+  "BS": 27
+ },
+ "inputs": {
+  "generate_bankA_ol.jsonl": "96242864acd2b78b399958fd6fc43e46bfe383449c78480b07fa89d48ede6cd7",
+  "solve_bankA_ol.jsonl": "fd317b0b29a83bc083db839dd2b16471388b688d284471b8cf0a47b7ec1f1623",
+  "generate_bankBS_ol.jsonl": "db1699f38a46bd2ae880cd171d2165e377b2d1426d505b8f6ec4024720a32d8c",
+  "solve_bankBS_ol.jsonl": "1fcba5aca8e0704cd7a78d8573f1f4fefadad7e9856919ef338930e748718d6c",
+  "results_pooled_A-BS_ol.json": "732e49364496bb3fd74f44362f45c2f9bcf4a4e63c3f4e6803ca15efcd889743"
+ },
+ "inputs_hash_rule": "content_sha256",
+ "intervals": {
+  "ci_cluster_item": {
+   "method": "item-cluster percentile bootstrap",
+   "function": "analyse.item_bootstrap_ci",
+   "B": 10000,
+   "seed": 20261103,
+   "n_clusters": 41,
+   "stratified_by": "bank"
+  },
+  "contrasts_ci_cluster_item": "contrasts_ci_cluster_item over both banks' items: the mean over all items of each item's difference of condition means, with items resampled WITHIN their bank (stratified), so every replicate keeps each bank's item count (n_items_by_bank). Checked against results_pooled R2_mitigation and R3_solicitation (tolerance 1e-6; P3-P1 against the pooled descriptive regime means). Beside the Holm tests, never instead of them (spec 4.69).",
+  "interaction_ci_cluster_item": "interaction_ci_cluster_item: Bank B's mean per-item contrast (Px - P0) minus Bank A's, each bank's items resampled within that bank. Checked against results_pooled R4_robustness.interaction (tolerance 1e-6).",
+  "note": "Every ci_cluster_item is approximate: a percentile bootstrap over 9\u201327 items tends to undercover. Endpoints carry Monte Carlo error at B = 10,000: an endpoint within about 0.002 of zero is borderline, and its sign should not carry a claim."
+ },
+ "contrasts_ci_cluster_item": {
+  "P1-P0": {
+   "estimate": -0.17366757000903343,
+   "ci_cluster_item": [
+    -0.2387082204155375,
+    -0.11065943992773258
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  },
+  "P2-P1": {
+   "estimate": -0.024390243902439036,
+   "ci_cluster_item": [
+    -0.053297199638663056,
+    0.0007904245709123817
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  },
+  "P3-P2": {
+   "estimate": 0.023712737127371285,
+   "ci_cluster_item": [
+    0.0013550135501355172,
+    0.04753839205058719
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  },
+  "P3-P0": {
+   "estimate": -0.17434507678410122,
+   "ci_cluster_item": [
+    -0.23746894760614273,
+    -0.114159891598916
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  },
+  "P3-P1": {
+   "estimate": -0.0006775067750677481,
+   "ci_cluster_item": [
+    -0.018631436314363134,
+    0.016375903342366716
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  },
+  "S2-S0": {
+   "estimate": 0.005504742547425473,
+   "ci_cluster_item": [
+    -0.007876016260162615,
+    0.018800813008130083
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  },
+  "S3-S0": {
+   "estimate": -0.014820460704607085,
+   "ci_cluster_item": [
+    -0.034552845528455334,
+    0.0058434959349593155
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  },
+  "S3-S2": {
+   "estimate": -0.020325203252032558,
+   "ci_cluster_item": [
+    -0.03853319783197834,
+    -0.002623221544715474
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  }
+ },
+ "interaction_ci_cluster_item": {
+  "(P1-P0)x(BS-A)": {
+   "estimate": -0.07139182833627278,
+   "ci_cluster_item": [
+    -0.19416335978835977,
+    0.06030949931412887
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  },
+  "(P2-P0)x(BS-A)": {
+   "estimate": -0.06875857338820304,
+   "ci_cluster_item": [
+    -0.18571704144620807,
+    0.05349886096413884
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  },
+  "(P3-P0)x(BS-A)": {
+   "estimate": -0.07995296884185778,
+   "ci_cluster_item": [
+    -0.19499589702136,
+    0.040441896923378406
+   ],
+   "n_items": 41,
+   "B": 10000,
+   "seed": 20261103,
+   "n_items_by_bank": {
+    "A": 14,
+    "BS": 27
+   }
+  }
+ },
+ "cross_check": {
+  "status": "passed",
+  "tolerance": 1e-06,
+  "checked_equal": [
+   [
+    "contrasts_ci_cluster_item.P1-P0.estimate",
+    "families.R2_mitigation.contrasts.P1-P0.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.P2-P1.estimate",
+    "families.R2_mitigation.contrasts.P2-P1.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.P3-P2.estimate",
+    "families.R2_mitigation.contrasts.P3-P2.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.P3-P0.estimate",
+    "families.R2_mitigation.contrasts.P3-P0.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.P3-P1.estimate",
+    "descriptives.leak_adj.regime.P3.mean-P1.mean"
+   ],
+   [
+    "contrasts_ci_cluster_item.S2-S0.estimate",
+    "families.R3_solicitation.contrasts.S2-S0.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.S3-S0.estimate",
+    "families.R3_solicitation.contrasts.S3-S0.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.S3-S2.estimate",
+    "families.R3_solicitation.contrasts.S3-S2.estimate"
+   ],
+   [
+    "interaction_ci_cluster_item.(P1-P0)x(BS-A).estimate",
+    "families.R4_robustness.interaction.(P1-P0) x (BS-A).estimate"
+   ],
+   [
+    "interaction_ci_cluster_item.(P2-P0)x(BS-A).estimate",
+    "families.R4_robustness.interaction.(P2-P0) x (BS-A).estimate"
+   ],
+   [
+    "interaction_ci_cluster_item.(P3-P0)x(BS-A).estimate",
+    "families.R4_robustness.interaction.(P3-P0) x (BS-A).estimate"
+   ]
+  ]
+ }
+}

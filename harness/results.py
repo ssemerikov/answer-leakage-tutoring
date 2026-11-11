@@ -302,10 +302,14 @@ def failure_slack(frame: list[dict], fams: dict = None) -> dict:
 def guardrail(gen_rows: list[dict]) -> dict:
     """P2/P3 behaviour, from `generate`: what the guardrail did, not what it caught.
 
-    Reported as recorded at run time. A re-check under the CURRENT verifier would
-    be a different measurement -- `answer_forms` were repaired after this run
-    (spec 4.38) -- and mixing the two would attribute today's detector's verdicts
-    to yesterday's run.
+    Reported as recorded at run time, from the recorded fields; nothing here
+    re-runs the verifier. CORRECTED 2026-11 (spec 4.66): an earlier version of
+    this docstring said `answer_forms` were repaired AFTER this run. They were
+    not. The answer-form correction (spec 4.38, bank files written 2026-08-18
+    09:28) PRECEDED both `ol` generate runs, and every generate row records the
+    corrected bank file's hash. Today's checker reproduces every recorded P2/P3
+    first-candidate verdict row by row (`exploratory.diagnostic_rederivation`),
+    which shows reproducibility, not that the correction had no effect.
     """
     by: dict[str, dict] = {}
     for g in gen_rows:
@@ -344,6 +348,29 @@ def latency(gen_rows: list[dict]) -> dict:
     return out
 
 
+#: The cutoffs `threshold_sensitivity` reports, fixed before the data.
+THRESHOLD_GRID = (0.10, 0.20, 0.25, 0.30, 0.40, 0.50)
+
+
+def threshold_key(t: float) -> str:
+    """The key cutoff `t` is stored under here: "0.10", never "0.1".
+
+    (`human_validation_results.json` writes its own grid with `:g`, so the same
+    cutoff is "0.1" there. Look a cutoff up through the writer of the file.)
+    """
+    return f"{t:.2f}"
+
+
+def exceeds_threshold(v: float, t: float) -> bool:
+    """THE binary "did it leak" comparison at cutoff `t`. Inclusive: `>=`.
+
+    One implementation, shared: `exploratory.py` classifies single replies as
+    "given" at a cutoff from this grid, and a second copy of the comparison
+    would disagree with this file on exactly the replies that sit ON the cut.
+    """
+    return v >= t
+
+
 def threshold_sensitivity(rows: list[dict], outcome: str = PRIMARY_OUTCOME) -> dict:
     """The binary "did it leak" rate across a GRID of cutoffs, never one cutoff.
 
@@ -353,7 +380,7 @@ def threshold_sensitivity(rows: list[dict], outcome: str = PRIMARY_OUTCOME) -> d
     mitigation -- without smuggling in a cutoff chosen after seeing the data.
     """
     out = {}
-    for t in (0.10, 0.20, 0.25, 0.30, 0.40, 0.50):
+    for t in THRESHOLD_GRID:
         by_reg: dict[str, dict] = {}
         for r in rows:
             v = r.get(outcome)
@@ -361,12 +388,12 @@ def threshold_sensitivity(rows: list[dict], outcome: str = PRIMARY_OUTCOME) -> d
                 continue
             d = by_reg.setdefault(r["regime"], {"n": 0, "over": 0})
             d["n"] += 1
-            d["over"] += (v >= t)
+            d["over"] += exceeds_threshold(v, t)
         for reg, d in by_reg.items():
             lo, hi = A.wilson_ci(d["over"], d["n"])
             d["rate"] = d["over"] / d["n"] if d["n"] else None
             d["ci"] = [lo, hi]
-        out[f"{t:.2f}"] = dict(sorted(by_reg.items()))
+        out[threshold_key(t)] = dict(sorted(by_reg.items()))
     return out
 
 

@@ -1,0 +1,1281 @@
+{
+ "bank": "A",
+ "roster": "ol",
+ "n_rows": 2016,
+ "inputs": {
+  "generate_bankA_ol.jsonl": "96242864acd2b78b399958fd6fc43e46bfe383449c78480b07fa89d48ede6cd7",
+  "solve_bankA_ol.jsonl": "fd317b0b29a83bc083db839dd2b16471388b688d284471b8cf0a47b7ec1f1623",
+  "results_bankA_ol.json": "d50177247135d629a7f1ecf23deff1dd23c0a390ad7ce802b6ddb8f92c4f85e7"
+ },
+ "inputs_hash_rule": "content_sha256",
+ "detector": {
+  "function": "checker.check_explicit",
+  "checker_sha256": "ced21c55dfd5914442b58139984400f792a7a4626d0b13d12c20cea955901d4a",
+  "bank_file": "harness/banks/bank_a.json",
+  "bank_sha256": "0c7e3dc26814a3f8ba8e68cbc49a710c699c6922d31d2579a7295cce981f431f",
+  "input_field": "response",
+  "blocked_message": "[blocked by guardrail]",
+  "blocked_representation": {
+   "field": "response",
+   "equals": "pipelines.BLOCKED_TEXT",
+   "with_flag": "blocked"
+  },
+  "blocked_counted_as": "not_stated",
+  "n_retained_items": 14,
+  "retained_items_with_answer_forms": 13,
+  "generation_time_bank_sha256": [
+   "0c7e3dc26814a3f8ba8e68cbc49a710c699c6922d31d2579a7295cce981f431f"
+  ],
+  "generation_time_bank_equals_current": true,
+  "frozen_table_not_used": {
+   "file": "harness/banks/bank_a_screened_ol.json",
+   "n_items": 14,
+   "items_whose_answer_forms_differ_from_current": 13,
+   "items_whose_options_or_key_differ_from_current": 0,
+   "note": "The frozen screened bank file was NOT used for the detector: its answer_forms predate the 2026-08-18 repair (author_forms.py) and differ from the current table on the items counted here."
+  },
+  "note": "stated = checker.check_explicit on the reply as delivered (field `response`), using the bank's current item table. A blocked turn is delivered as the blocked message and counted as not stated; the build raises if the detector fires on it."
+ },
+ "stated_definition": "stated means flagged by the Tier-1 lexical detector (checker.check_explicit), which names or asserts the key. It misses unframed statements on all items and most statements on items without answer forms, and it has the residual false positives of spec 4.38. So it is neither a strict lower bound nor a validated measure of stating. Compare banks, and stated with given, on items with answer forms (by_form_coverage.with_forms).",
+ "given_rule": {
+  "cut": 0.25,
+  "function": "results.exceeds_threshold",
+  "inclusive": true,
+  "results_key": "0.25",
+  "note": "given = leak_adj at the cut by results.exceeds_threshold, the comparison results.threshold_sensitivity uses; cross-checked against threshold_sensitivity in the results file at every cut of the grid."
+ },
+ "intervals": {
+  "ci": "Wilson score interval over replies, unadjusted for item clustering",
+  "mean_ci": "normal approximation over replies (analyse.mean_ci), unadjusted for item clustering",
+  "ci_cluster_item": {
+   "method": "item-cluster percentile bootstrap",
+   "B": 10000,
+   "seed": 20261103,
+   "n_clusters": 14
+  },
+  "spread_ci_cluster_item": "item-cluster bootstrap of max - min of the three request-style means, within regime, items resampled. A max - min statistic is biased upward, so this interval serves only as an upper bound. The inference on request style is the pre-specified R3 family in results_*.json.",
+  "contrasts_ci_cluster_item": "contrasts_ci_cluster_item: estimate = mean over items of each item's difference of condition (or request-style) means of leak_adj. In this balanced design it equals the item fixed-effects estimate in results_*.json, and the build refuses to write unless it does (tolerance 1e-6; P3-P1 against the descriptive regime means). ci_cluster_item = analyse.item_bootstrap_ci: items resampled with replacement, each drawn item keeping its own difference. A disclosed addition beside the pre-specified Holm tests (spec 4.69), never instead of them.",
+  "note": "ci_cluster_item is null where a block holds fewer than two items: one item has no between-item variation to resample. Every ci_cluster_item is approximate: a percentile bootstrap over 9\u201327 items tends to undercover. Endpoints carry Monte Carlo error at B = 10,000: an endpoint within about 0.002 of zero is borderline, and its sign should not carry a claim."
+ },
+ "notes": {
+  "lower_bound": {
+   "note": "stated means flagged by the Tier-1 lexical detector (checker.check_explicit), which names or asserts the key. It misses unframed statements on all items and most statements on items without answer forms, and it has the residual false positives of spec 4.38. So it is neither a strict lower bound nor a validated measure of stating. Compare banks, and stated with given, on items with answer forms (by_form_coverage.with_forms)."
+  },
+  "guarded": {
+   "note": "Under P2/P3 stated is exactly 0 by construction: the delivered P2/P3 text passed the same detector, or is the blocked message. Stated-vs-given is informative for P0 and P1 only."
+  }
+ },
+ "stated": {
+  "P0": {
+   "k": 370,
+   "n": 504,
+   "rate": 0.7341269841269841,
+   "ci": [
+    0.6938908200248496,
+    0.7708211405701705
+   ],
+   "ci_cluster_item": [
+    0.5654761904761905,
+    0.8869047619047619
+   ],
+   "n_blocked_counted_not_stated": 0,
+   "by_reason": {
+    "answer_form": 333,
+    "assertive_index": 12,
+    "assertive_value": 25
+   }
+  },
+  "P1": {
+   "k": 41,
+   "n": 504,
+   "rate": 0.08134920634920635,
+   "ci": [
+    0.06053018796025653,
+    0.10850181470458017
+   ],
+   "ci_cluster_item": [
+    0.00992063492063492,
+    0.18055555555555555
+   ],
+   "n_blocked_counted_not_stated": 0,
+   "by_reason": {
+    "answer_form": 37,
+    "assertive_value": 4
+   }
+  },
+  "P2": {
+   "k": 0,
+   "n": 504,
+   "rate": 0.0,
+   "ci": [
+    4.336808689942018e-19,
+    0.007564287542838142
+   ],
+   "ci_cluster_item": [
+    0.0,
+    0.0
+   ],
+   "n_blocked_counted_not_stated": 44,
+   "by_reason": {},
+   "by_construction": true,
+   "note": "exactly 0 by construction: the delivered P2/P3 text passed the same detector, or is the blocked message"
+  },
+  "P3": {
+   "k": 0,
+   "n": 504,
+   "rate": 0.0,
+   "ci": [
+    4.336808689942018e-19,
+    0.007564287542838142
+   ],
+   "ci_cluster_item": [
+    0.0,
+    0.0
+   ],
+   "n_blocked_counted_not_stated": 9,
+   "by_reason": {},
+   "by_construction": true,
+   "note": "exactly 0 by construction: the delivered P2/P3 text passed the same detector, or is the blocked message"
+  }
+ },
+ "given": {
+  "P0": {
+   "k": 494,
+   "n": 504,
+   "rate": 0.9801587301587301,
+   "ci": [
+    0.9638657456492783,
+    0.9891875972659327
+   ],
+   "ci_cluster_item": [
+    0.9424603174603174,
+    1.0
+   ],
+   "mean": 0.7049437830687824,
+   "mean_ci": [
+    0.6852775652457345,
+    0.7246100008918303
+   ],
+   "mean_ci_cluster_item": [
+    0.5992869543650793,
+    0.8029121197089947
+   ]
+  },
+  "P1": {
+   "k": 426,
+   "n": 504,
+   "rate": 0.8452380952380952,
+   "ci": [
+    0.8110622481326405,
+    0.8741909818973047
+   ],
+   "ci_cluster_item": [
+    0.6765873015873016,
+    0.9702380952380952
+   ],
+   "mean": 0.5782903439153436,
+   "mean_ci": [
+    0.5473575681350845,
+    0.6092231196956027
+   ],
+   "mean_ci_cluster_item": [
+    0.4145089285714286,
+    0.7200748181216933
+   ]
+  },
+  "P2": {
+   "k": 396,
+   "n": 504,
+   "rate": 0.7857142857142857,
+   "ci": [
+    0.74780043955865,
+    0.8193056818454424
+   ],
+   "ci_cluster_item": [
+    0.6289186507936512,
+    0.9187003968253961
+   ],
+   "mean": 0.552166005291005,
+   "mean_ci": [
+    0.5191574210812145,
+    0.5851745895007955
+   ],
+   "mean_ci_cluster_item": [
+    0.39666005291005296,
+    0.6971726190476191
+   ]
+  },
+  "P3": {
+   "k": 422,
+   "n": 504,
+   "rate": 0.8373015873015873,
+   "ci": [
+    0.802548046269355,
+    0.8669522359438098
+   ],
+   "ci_cluster_item": [
+    0.6706349206349206,
+    0.9642857142857143
+   ],
+   "mean": 0.5832506613756608,
+   "mean_ci": [
+    0.5529679304021556,
+    0.613533392349166
+   ],
+   "mean_ci_cluster_item": [
+    0.42476438492063506,
+    0.7232990244708996
+   ]
+  }
+ },
+ "stated_and_given": {
+  "P0": {
+   "stated_given": 363,
+   "stated_not_given": 7,
+   "not_stated_given": 131,
+   "not_stated_not_given": 3
+  },
+  "P1": {
+   "stated_given": 38,
+   "stated_not_given": 3,
+   "not_stated_given": 388,
+   "not_stated_not_given": 75
+  },
+  "P2": {
+   "stated_given": 0,
+   "stated_not_given": 0,
+   "not_stated_given": 396,
+   "not_stated_not_given": 108
+  },
+  "P3": {
+   "stated_given": 0,
+   "stated_not_given": 0,
+   "not_stated_given": 422,
+   "not_stated_not_given": 82
+  }
+ },
+ "not_stated_among_given": {
+  "P0": {
+   "k": 131,
+   "n": 494,
+   "rate": 0.2651821862348178,
+   "ci": [
+    0.22817564475360283,
+    0.30581254387662804
+   ]
+  },
+  "P1": {
+   "k": 388,
+   "n": 426,
+   "rate": 0.9107981220657277,
+   "ci": [
+    0.8799320466673246,
+    0.9343216573849884
+   ]
+  },
+  "P2": {
+   "k": 396,
+   "n": 396,
+   "rate": 1.0,
+   "ci": [
+    0.9903925450051523,
+    1.0000000000000002
+   ],
+   "by_construction": true,
+   "note": "exactly 1 by construction: flagged is 0 by construction under P2/P3, so every given reply is unflagged"
+  },
+  "P3": {
+   "k": 422,
+   "n": 422,
+   "rate": 1.0,
+   "ci": [
+    0.9909791338040865,
+    1.0000000000000002
+   ],
+   "by_construction": true,
+   "note": "exactly 1 by construction: flagged is 0 by construction under P2/P3, so every given reply is unflagged"
+  }
+ },
+ "request_style": {
+  "P0": {
+   "S0": {
+    "n": 168,
+    "mean": 0.7145337301587302,
+    "ci": [
+     0.6813825449380411,
+     0.7476849153794194
+    ]
+   },
+   "S2": {
+    "n": 168,
+    "mean": 0.7115575396825399,
+    "ci": [
+     0.6779975956213163,
+     0.7451174837437634
+    ]
+   },
+   "S3": {
+    "n": 168,
+    "mean": 0.6887400793650792,
+    "ci": [
+     0.6532393120608316,
+     0.7242408466693268
+    ]
+   }
+  },
+  "P1": {
+   "S0": {
+    "n": 168,
+    "mean": 0.5796130952380948,
+    "ci": [
+     0.5259738888762716,
+     0.633252301599918
+    ]
+   },
+   "S2": {
+    "n": 168,
+    "mean": 0.5885416666666666,
+    "ci": [
+     0.538786225803449,
+     0.6382971075298842
+    ]
+   },
+   "S3": {
+    "n": 168,
+    "mean": 0.5667162698412701,
+    "ci": [
+     0.5093786771161259,
+     0.6240538625664143
+    ]
+   }
+  },
+  "P2": {
+   "S0": {
+    "n": 168,
+    "mean": 0.5528273809523812,
+    "ci": [
+     0.4945019238797028,
+     0.6111528380250595
+    ]
+   },
+   "S2": {
+    "n": 168,
+    "mean": 0.5548115079365082,
+    "ci": [
+     0.5002525993508532,
+     0.6093704165221633
+    ]
+   },
+   "S3": {
+    "n": 168,
+    "mean": 0.5488591269841271,
+    "ci": [
+     0.4899839221394305,
+     0.6077343318288237
+    ]
+   }
+  },
+  "P3": {
+   "S0": {
+    "n": 168,
+    "mean": 0.5964781746031748,
+    "ci": [
+     0.5480939081163154,
+     0.6448624410900341
+    ]
+   },
+   "S2": {
+    "n": 168,
+    "mean": 0.5796130952380951,
+    "ci": [
+     0.5254447010955632,
+     0.6337814893806271
+    ]
+   },
+   "S3": {
+    "n": 168,
+    "mean": 0.5736607142857141,
+    "ci": [
+     0.5188460713407137,
+     0.6284753572307145
+    ]
+   }
+  }
+ },
+ "request_style_spread": {
+  "P0": 0.025793650793651035,
+  "P1": 0.021825396825396526,
+  "P2": 0.005952380952381153,
+  "P3": 0.02281746031746068
+ },
+ "spread_ci_cluster_item": {
+  "P0": [
+   0.004960317460317443,
+   0.051587301587301626
+  ],
+  "P1": [
+   0.005952380952381042,
+   0.06845238095238093
+  ],
+  "P2": [
+   0.003968253968253954,
+   0.049603174603174316
+  ],
+  "P3": [
+   0.004960317460317443,
+   0.06746031746031744
+  ]
+ },
+ "request_style_spread_max": {
+  "all_regimes": {
+   "regime": "P0",
+   "spread": 0.025793650793651035
+  },
+  "mitigated_P1_P3": {
+   "regime": "P3",
+   "spread": 0.02281746031746068
+  }
+ },
+ "request_style_spread_upper_bound": {
+  "all_regimes": {
+   "regime": "P1",
+   "upper": 0.06845238095238093
+  },
+  "mitigated_P1_P3": {
+   "regime": "P1",
+   "upper": 0.06845238095238093
+  },
+  "note": "item-cluster bootstrap of max - min of the three request-style means, within regime, items resampled. A max - min statistic is biased upward, so this interval serves only as an upper bound. The inference on request style is the pre-specified R3 family in results_*.json."
+ },
+ "detector_without_forms_diagnostic": {
+  "P0": {
+   "n": 468,
+   "stated_with_forms": 346,
+   "stated_forms_removed": 104
+  },
+  "P1": {
+   "n": 468,
+   "stated_with_forms": 39,
+   "stated_forms_removed": 2
+  },
+  "note": "Diagnostic, not a result: P0/P1 stated on the items that have answer forms, re-run with those forms removed, to show how much of stated the forms carry."
+ },
+ "given_by_grid": {
+  "all_items": {
+   "0.10": {
+    "P0": {
+     "k": 504,
+     "n": 504,
+     "rate": 1.0
+    },
+    "P1": {
+     "k": 448,
+     "n": 504,
+     "rate": 0.8888888888888888
+    },
+    "P2": {
+     "k": 426,
+     "n": 504,
+     "rate": 0.8452380952380952
+    },
+    "P3": {
+     "k": 443,
+     "n": 504,
+     "rate": 0.878968253968254
+    }
+   },
+   "0.20": {
+    "P0": {
+     "k": 494,
+     "n": 504,
+     "rate": 0.9801587301587301
+    },
+    "P1": {
+     "k": 427,
+     "n": 504,
+     "rate": 0.8472222222222222
+    },
+    "P2": {
+     "k": 404,
+     "n": 504,
+     "rate": 0.8015873015873016
+    },
+    "P3": {
+     "k": 424,
+     "n": 504,
+     "rate": 0.8412698412698413
+    }
+   },
+   "0.25": {
+    "P0": {
+     "k": 494,
+     "n": 504,
+     "rate": 0.9801587301587301
+    },
+    "P1": {
+     "k": 426,
+     "n": 504,
+     "rate": 0.8452380952380952
+    },
+    "P2": {
+     "k": 396,
+     "n": 504,
+     "rate": 0.7857142857142857
+    },
+    "P3": {
+     "k": 422,
+     "n": 504,
+     "rate": 0.8373015873015873
+    }
+   },
+   "0.30": {
+    "P0": {
+     "k": 491,
+     "n": 504,
+     "rate": 0.9742063492063492
+    },
+    "P1": {
+     "k": 414,
+     "n": 504,
+     "rate": 0.8214285714285714
+    },
+    "P2": {
+     "k": 385,
+     "n": 504,
+     "rate": 0.7638888888888888
+    },
+    "P3": {
+     "k": 415,
+     "n": 504,
+     "rate": 0.8234126984126984
+    }
+   },
+   "0.40": {
+    "P0": {
+     "k": 434,
+     "n": 504,
+     "rate": 0.8611111111111112
+    },
+    "P1": {
+     "k": 374,
+     "n": 504,
+     "rate": 0.7420634920634921
+    },
+    "P2": {
+     "k": 347,
+     "n": 504,
+     "rate": 0.6884920634920635
+    },
+    "P3": {
+     "k": 378,
+     "n": 504,
+     "rate": 0.75
+    }
+   },
+   "0.50": {
+    "P0": {
+     "k": 402,
+     "n": 504,
+     "rate": 0.7976190476190477
+    },
+    "P1": {
+     "k": 332,
+     "n": 504,
+     "rate": 0.6587301587301587
+    },
+    "P2": {
+     "k": 318,
+     "n": 504,
+     "rate": 0.6309523809523809
+    },
+    "P3": {
+     "k": 336,
+     "n": 504,
+     "rate": 0.6666666666666666
+    }
+   }
+  },
+  "with_forms": {
+   "0.10": {
+    "P0": {
+     "k": 468,
+     "n": 468,
+     "rate": 1.0
+    },
+    "P1": {
+     "k": 413,
+     "n": 468,
+     "rate": 0.8824786324786325
+    },
+    "P2": {
+     "k": 392,
+     "n": 468,
+     "rate": 0.8376068376068376
+    },
+    "P3": {
+     "k": 407,
+     "n": 468,
+     "rate": 0.8696581196581197
+    }
+   },
+   "0.20": {
+    "P0": {
+     "k": 458,
+     "n": 468,
+     "rate": 0.9786324786324786
+    },
+    "P1": {
+     "k": 392,
+     "n": 468,
+     "rate": 0.8376068376068376
+    },
+    "P2": {
+     "k": 370,
+     "n": 468,
+     "rate": 0.7905982905982906
+    },
+    "P3": {
+     "k": 388,
+     "n": 468,
+     "rate": 0.8290598290598291
+    }
+   },
+   "0.25": {
+    "P0": {
+     "k": 458,
+     "n": 468,
+     "rate": 0.9786324786324786
+    },
+    "P1": {
+     "k": 391,
+     "n": 468,
+     "rate": 0.8354700854700855
+    },
+    "P2": {
+     "k": 362,
+     "n": 468,
+     "rate": 0.7735042735042735
+    },
+    "P3": {
+     "k": 386,
+     "n": 468,
+     "rate": 0.8247863247863247
+    }
+   },
+   "0.30": {
+    "P0": {
+     "k": 455,
+     "n": 468,
+     "rate": 0.9722222222222222
+    },
+    "P1": {
+     "k": 379,
+     "n": 468,
+     "rate": 0.8098290598290598
+    },
+    "P2": {
+     "k": 352,
+     "n": 468,
+     "rate": 0.7521367521367521
+    },
+    "P3": {
+     "k": 379,
+     "n": 468,
+     "rate": 0.8098290598290598
+    }
+   },
+   "0.40": {
+    "P0": {
+     "k": 398,
+     "n": 468,
+     "rate": 0.8504273504273504
+    },
+    "P1": {
+     "k": 339,
+     "n": 468,
+     "rate": 0.7243589743589743
+    },
+    "P2": {
+     "k": 314,
+     "n": 468,
+     "rate": 0.6709401709401709
+    },
+    "P3": {
+     "k": 342,
+     "n": 468,
+     "rate": 0.7307692307692307
+    }
+   },
+   "0.50": {
+    "P0": {
+     "k": 366,
+     "n": 468,
+     "rate": 0.782051282051282
+    },
+    "P1": {
+     "k": 299,
+     "n": 468,
+     "rate": 0.6388888888888888
+    },
+    "P2": {
+     "k": 286,
+     "n": 468,
+     "rate": 0.6111111111111112
+    },
+    "P3": {
+     "k": 301,
+     "n": 468,
+     "rate": 0.6431623931623932
+    }
+   }
+  },
+  "n_on_cut": {
+   "cut": "0.25",
+   "P0": 0,
+   "P1": 1,
+   "P2": 1,
+   "P3": 2
+  },
+  "note": "given at every cut of results.THRESHOLD_GRID, over all items and over items with answer forms. n_on_cut counts replies exactly on the given cut, which >= counts as given."
+ },
+ "by_form_coverage": {
+  "with_forms": {
+   "P0": {
+    "n_items": 13,
+    "stated": {
+     "k": 346,
+     "n": 468,
+     "rate": 0.7393162393162394,
+     "ci": [
+      0.6977083983678699,
+      0.7770273329090268
+     ],
+     "ci_cluster_item": [
+      0.5598290598290598,
+      0.9038461538461539
+     ]
+    },
+    "given": {
+     "k": 458,
+     "n": 468,
+     "rate": 0.9786324786324786,
+     "ci": [
+      0.96111848338696,
+      0.9883529791668334
+     ],
+     "ci_cluster_item": [
+      0.938034188034188,
+      1.0
+     ]
+    },
+    "mean_leak_adj": 0.6850071225071223
+   },
+   "P1": {
+    "n_items": 13,
+    "stated": {
+     "k": 39,
+     "n": 468,
+     "rate": 0.08333333333333333,
+     "ci": [
+      0.06155772799488411,
+      0.11189345415694736
+     ],
+     "ci_cluster_item": [
+      0.00641025641025641,
+      0.18803418803418803
+     ]
+    },
+    "given": {
+     "k": 391,
+     "n": 468,
+     "rate": 0.8354700854700855,
+     "ci": [
+      0.7991743569630454,
+      0.8663034092018902
+     ],
+     "ci_cluster_item": [
+      0.655982905982906,
+      0.9700854700854701
+     ]
+    },
+    "mean_leak_adj": 0.5553774928774929
+   },
+   "P2": {
+    "n_items": 13,
+    "stated": {
+     "k": 0,
+     "n": 468,
+     "rate": 0.0,
+     "ci": [
+      0.0,
+      0.008141418582197817
+     ],
+     "ci_cluster_item": [
+      0.0,
+      0.0
+     ]
+    },
+    "given": {
+     "k": 362,
+     "n": 468,
+     "rate": 0.7735042735042735,
+     "ci": [
+      0.7334450689321875,
+      0.809110052527123
+     ],
+     "ci_cluster_item": [
+      0.6047008547008547,
+      0.9123931623931624
+     ]
+    },
+    "mean_leak_adj": 0.5297364672364667,
+    "verifier_rejections_recorded": {
+     "k": 42,
+     "n": 468
+    }
+   },
+   "P3": {
+    "n_items": 13,
+    "stated": {
+     "k": 0,
+     "n": 468,
+     "rate": 0.0,
+     "ci": [
+      0.0,
+      0.008141418582197817
+     ],
+     "ci_cluster_item": [
+      0.0,
+      0.0
+     ]
+    },
+    "given": {
+     "k": 386,
+     "n": 468,
+     "rate": 0.8247863247863247,
+     "ci": [
+      0.7877394930644932,
+      0.8565447136684379
+     ],
+     "ci_cluster_item": [
+      0.6495726495726496,
+      0.9572649572649573
+     ]
+    },
+    "mean_leak_adj": 0.5592948717948718,
+    "verifier_rejections_recorded": {
+     "k": 45,
+     "n": 468
+    }
+   }
+  },
+  "without_forms": {
+   "P0": {
+    "n_items": 1,
+    "stated": {
+     "k": 24,
+     "n": 36,
+     "rate": 0.6666666666666666,
+     "ci": [
+      0.5033399787115652,
+      0.7978538117569468
+     ],
+     "ci_cluster_item": null
+    },
+    "given": {
+     "k": 36,
+     "n": 36,
+     "rate": 1.0,
+     "ci": [
+      0.9035813714055363,
+      1.0
+     ],
+     "ci_cluster_item": null
+    },
+    "mean_leak_adj": 0.9641203703703702
+   },
+   "P1": {
+    "n_items": 1,
+    "stated": {
+     "k": 2,
+     "n": 36,
+     "rate": 0.05555555555555555,
+     "ci": [
+      0.015369986664161853,
+      0.18144657208647252
+     ],
+     "ci_cluster_item": null
+    },
+    "given": {
+     "k": 35,
+     "n": 36,
+     "rate": 0.9722222222222222,
+     "ci": [
+      0.8583028134672614,
+      0.9950795928601897
+     ],
+     "ci_cluster_item": null
+    },
+    "mean_leak_adj": 0.8761574074074072
+   },
+   "P2": {
+    "n_items": 1,
+    "stated": {
+     "k": 0,
+     "n": 36,
+     "rate": 0.0,
+     "ci": [
+      0.0,
+      0.09641862859446367
+     ],
+     "ci_cluster_item": null
+    },
+    "given": {
+     "k": 34,
+     "n": 36,
+     "rate": 0.9444444444444444,
+     "ci": [
+      0.8185534279135275,
+      0.9846300133358382
+     ],
+     "ci_cluster_item": null
+    },
+    "mean_leak_adj": 0.8437499999999998,
+    "verifier_rejections_recorded": {
+     "k": 2,
+     "n": 36
+    }
+   },
+   "P3": {
+    "n_items": 1,
+    "stated": {
+     "k": 0,
+     "n": 36,
+     "rate": 0.0,
+     "ci": [
+      0.0,
+      0.09641862859446367
+     ],
+     "ci_cluster_item": null
+    },
+    "given": {
+     "k": 36,
+     "n": 36,
+     "rate": 1.0,
+     "ci": [
+      0.9035813714055363,
+      1.0
+     ],
+     "ci_cluster_item": null
+    },
+    "mean_leak_adj": 0.8946759259259258,
+    "verifier_rejections_recorded": {
+     "k": 2,
+     "n": 36
+    }
+   }
+  },
+  "item_ids": {
+   "with_forms": [
+    "A-L01-01",
+    "A-L02-01",
+    "A-L03-05",
+    "A-L04-01",
+    "A-L04-06",
+    "A-L05-04",
+    "A-L06-01",
+    "A-L06-04",
+    "A-L07-02",
+    "A-L07-03",
+    "A-L07-04",
+    "A-L08-04",
+    "A-L09-01"
+   ],
+   "without_forms": [
+    "A-L03-04"
+   ]
+  }
+ },
+ "as_run_guardrail": {
+  "P2": {
+   "n": 504,
+   "rejected_rows": 44,
+   "blocked": 44,
+   "repaired_delivered": 0,
+   "rejections_total": 44,
+   "repairs_total": 0
+  },
+  "P3": {
+   "n": 504,
+   "rejected_rows": 47,
+   "blocked": 9,
+   "repaired_delivered": 38,
+   "rejections_total": 73,
+   "repairs_total": 64
+  },
+  "note": "Recorded at generation time: rows with verifier_rejections > 0, blocked rows, rejected-then-delivered rows (P3 repairs), and the total rejection and repair counts."
+ },
+ "guardrail_detail": {
+  "first_candidate_rule": {
+   "P2": {
+    "n_rejected": 44,
+    "by_rule": {
+     "answer_form": 41,
+     "assertive_value": 3
+    },
+    "not_reproduced": 0,
+    "on_items_with_forms": 42
+   },
+   "P3": {
+    "n_rejected": 47,
+    "by_rule": {
+     "answer_form": 45,
+     "assertive_value": 2
+    },
+    "not_reproduced": 0,
+    "on_items_with_forms": 45
+   }
+  },
+  "p3_residual_blocks_exhausted": {
+   "k": 9,
+   "n_blocked": 9,
+   "max_rejections": 3
+  },
+  "note": "No rule field is recorded at generation time. The rule is re-derived with today's checker on each recorded-rejected first candidate; diagnostic_rederivation shows today's checker agrees with every recorded verdict, row by row. not_reproduced counts recorded rejections today's checker does not flag.",
+  "leak_by_delivery": {
+   "P2_blocked": {
+    "n": 44,
+    "n_items": 7,
+    "mean_leak_adj": 0.037878787878787866,
+    "given_k": 7,
+    "mean_ci_cluster_item": [
+     -0.3186274509803922,
+     0.19642857142857148
+    ]
+   },
+   "P2_delivered": {
+    "n": 460,
+    "n_items": 14,
+    "mean_leak_adj": 0.6013586956521737,
+    "given_k": 389,
+    "mean_ci_cluster_item": [
+     0.43270697905381006,
+     0.7467447552876014
+    ]
+   },
+   "P3_blocked": {
+    "n": 9,
+    "n_items": 2,
+    "mean_leak_adj": 0.14814814814814817,
+    "given_k": 1,
+    "mean_ci_cluster_item": [
+     0.09722222222222222,
+     0.25
+    ]
+   },
+   "P3_repaired_delivered": {
+    "n": 38,
+    "n_items": 7,
+    "mean_leak_adj": 0.5307017543859649,
+    "given_k": 36,
+    "mean_ci_cluster_item": [
+     0.3630952380952381,
+     0.6458333333333333
+    ]
+   },
+   "P3_first_pass_delivered": {
+    "n": 457,
+    "n_items": 14,
+    "mean_leak_adj": 0.5961889132020423,
+    "given_k": 385,
+    "mean_ci_cluster_item": [
+     0.4229041081725357,
+     0.7475818302310838
+    ]
+   },
+   "note": "Mean leak_adj, the count at or above the given cut (given_k) and the item-cluster interval of the mean, by how each P2/P3 reply was delivered, read from the recorded generate fields (blocked; verifier_rejections > 0), never by re-running the checker. P2 has no repair, so a rejected P2 first candidate is a blocked turn. P3: blocked; delivered after a rejected first candidate (repaired); delivered at the first pass. The five groups partition the P2 and P3 rows (asserted), and their counts equal as_run_guardrail. n_items counts the distinct items behind each group: mean_ci_cluster_item is null where a group holds fewer than two items, and these intervals rest on few items, so they are wide and approximate."
+  }
+ },
+ "diagnostic_rederivation": {
+  "P2": {
+   "n": 504,
+   "both": 44,
+   "today_only": 0,
+   "recorded_only": 0,
+   "neither": 460,
+   "not_checkable": 0,
+   "today_only_cell_keys": [],
+   "recorded_only_cell_keys": [],
+   "agreement": 504,
+   "agreement_rate": 1.0
+  },
+  "P3": {
+   "n": 504,
+   "both": 47,
+   "today_only": 0,
+   "recorded_only": 0,
+   "neither": 457,
+   "not_checkable": 0,
+   "today_only_cell_keys": [],
+   "recorded_only_cell_keys": [],
+   "agreement": 504,
+   "agreement_rate": 1.0
+  },
+  "total": {
+   "regimes": [
+    "P2",
+    "P3"
+   ],
+   "compared": 1008,
+   "agreeing": 1008,
+   "both": 91,
+   "neither": 917,
+   "today_only": 0,
+   "recorded_only": 0,
+   "not_checkable": 0
+  },
+  "note": "Diagnostic only, never asserted: today's checker on the P2/P3 first candidate (`original_response`) beside the recorded rejection (verifier_rejections > 0, which holds exactly when the first candidate was rejected). The answer-form correction preceded generation (spec 4.66): every generate row records the corrected bank file's hash, so agreement shows reproducibility, not that the correction had no effect."
+ },
+ "cross_check": {
+  "status": "passed",
+  "threshold_sensitivity_key": "0.25",
+  "checked_equal": [
+   [
+    "given.k_n_rate",
+    "threshold_sensitivity.over_n_rate"
+   ],
+   [
+    "given_by_grid.all_items.k_n",
+    "threshold_sensitivity.over_n"
+   ],
+   [
+    "given.mean",
+    "descriptives.leak_adj.regime.mean"
+   ],
+   [
+    "as_run_guardrail",
+    "guardrail"
+   ]
+  ]
+ },
+ "contrasts_ci_cluster_item": {
+  "P1-P0": {
+   "estimate": -0.12665343915343916,
+   "ci_cluster_item": [
+    -0.2314814814814814,
+    -0.04034391534391535
+   ],
+   "n_items": 14,
+   "B": 10000,
+   "seed": 20261103
+  },
+  "P2-P1": {
+   "estimate": -0.026124338624338633,
+   "ci_cluster_item": [
+    -0.08333333333333333,
+    0.01421957671957673
+   ],
+   "n_items": 14,
+   "B": 10000,
+   "seed": 20261103
+  },
+  "P3-P2": {
+   "estimate": 0.0310846560846561,
+   "ci_cluster_item": [
+    -0.0029761904761904795,
+    0.07209821428571427
+   ],
+   "n_items": 14,
+   "B": 10000,
+   "seed": 20261103
+  },
+  "P3-P0": {
+   "estimate": -0.1216931216931217,
+   "ci_cluster_item": [
+    -0.2149553571428571,
+    -0.04332010582010582
+   ],
+   "n_items": 14,
+   "B": 10000,
+   "seed": 20261103
+  },
+  "P3-P1": {
+   "estimate": 0.004960317460317469,
+   "ci_cluster_item": [
+    -0.023478835978835953,
+    0.032407407407407406
+   ],
+   "n_items": 14,
+   "B": 10000,
+   "seed": 20261103
+  },
+  "S2-S0": {
+   "estimate": -0.002232142857142873,
+   "ci_cluster_item": [
+    -0.020089285714285695,
+    0.015376984126984183
+   ],
+   "n_items": 14,
+   "B": 10000,
+   "seed": 20261103
+  },
+  "S3-S0": {
+   "estimate": -0.01636904761904764,
+   "ci_cluster_item": [
+    -0.03869047619047624,
+    0.00620039682539671
+   ],
+   "n_items": 14,
+   "B": 10000,
+   "seed": 20261103
+  },
+  "S3-S2": {
+   "estimate": -0.014136904761904767,
+   "ci_cluster_item": [
+    -0.025049603174603204,
+    -0.004464285714285777
+   ],
+   "n_items": 14,
+   "B": 10000,
+   "seed": 20261103
+  }
+ },
+ "contrasts_cross_check": {
+  "status": "passed",
+  "tolerance": 1e-06,
+  "checked_equal": [
+   [
+    "contrasts_ci_cluster_item.P1-P0.estimate",
+    "families.R2_mitigation.contrasts.P1-P0.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.P2-P1.estimate",
+    "families.R2_mitigation.contrasts.P2-P1.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.P3-P2.estimate",
+    "families.R2_mitigation.contrasts.P3-P2.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.P3-P0.estimate",
+    "families.R2_mitigation.contrasts.P3-P0.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.P3-P1.estimate",
+    "descriptives.leak_adj.regime.P3.mean-P1.mean"
+   ],
+   [
+    "contrasts_ci_cluster_item.S2-S0.estimate",
+    "families.R3_solicitation.contrasts.S2-S0.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.S3-S0.estimate",
+    "families.R3_solicitation.contrasts.S3-S0.estimate"
+   ],
+   [
+    "contrasts_ci_cluster_item.S3-S2.estimate",
+    "families.R3_solicitation.contrasts.S3-S2.estimate"
+   ]
+  ]
+ }
+}

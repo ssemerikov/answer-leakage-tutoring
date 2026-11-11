@@ -1,62 +1,57 @@
-# Answer leakage in LLM tutoring replies — instrument, data and analysis
+# When the hint is the answer: instrument, data and analysis
 
-Replication package for *Answer leakage in LLM tutoring replies beside graded
-items* (submitted to **Computers and Education: Artificial Intelligence**).
+Replication package for the article *When the hint is the answer: AI tutoring assistants on graded
+multiple-choice items* (under review).
 
-An LLM assistant embedded in a learning game will be asked for help on graded
-items, and a helpful explanation can make the keyed option recoverable without
-ever stating it. This repository holds the instrument that measures that, the
-per-call logs it produced, and the analysis that turns them into the paper's
-numbers.
+A language-model tutor beside a graded multiple-choice item can make the key recoverable without ever
+naming it. This repository holds the instrument that measures that, the per-call logs it produced, the
+analysis that turns them into the article's numbers, the study protocol with a note on when each part
+of it was written, and an instrumentation report.
 
-**No human participants were involved at any stage.** The study measures model
-behaviour. The only human judgement in the design is authors labelling a sample
-of model outputs (Tier 3, below), which is not human-subjects research.
+**No human participants were involved at any stage.** The study measures model behaviour. The only
+human judgement in the design is two of the authors labelling a sample of tutor replies to validate the
+instrument (below), which is not human-subjects research.
 
 ## The measure
 
-A response *leaks* when a solver that never sees the question stem can pick the
-key from the tutor's reply and the option set alone — above what the options and
-a **content-free utterance** already buy:
+A reply *gives the key away* when reader models that never see the question stem pick the key from the
+reply, the options and the topic, beyond what a **content-free reply** to the same item already buys:
 
 ```
-leak_adj(response) = hinted(response) − placebo(item, solvers)
+leak_adj(reply) = hinted(reply) − placebo(item)
 ```
 
-The placebo term is per item and per solver panel, not a global constant. That is
-load-bearing rather than decorative: pooled it is only +0.048, but per item it
-ranges −0.144 to +0.500, and on one item a content-free utterance takes a solver
-from 0/20 to 9/12 correct with parse rates of 1.000 in both arms.
+The article calls `leak_adj` *adjusted recoverability*. The placebo is measured per item, not assumed
+to be zero.
 
-## Headline results
+## What is here, in the article's words
 
-| | Bank A (authored) | Bank B (independent) |
-|---|---|---|
-| retained items | 14 of 40 | 27 of 44 screened |
-| responses | 2,016 | 3,888 |
-| mean `leak_adj` | 0.605 | 0.494 |
-| P1−P0 (instruction) | −0.127 | −0.198 |
-| P3−P2 (repair vs verifier) | **+0.031** (rejects) | +0.020 (holds) |
+| Article | Code and data |
+|---|---|
+| reader model, tutor model | `solver`, `generator` |
+| request style: stuck, request for help, demand | `solicitation`: S0, S2, S3 (S1 was removed before any study reply existed) |
+| condition: no safeguard, instruction, filter, repair | `regime`: P0, P1, P2, P3 |
+| Bank A (written for the study), Bank B (an open textbook) | `A`, `bs` (the 60-item sample drawn from Bank B) |
 
-Prompt-level instruction is reliable but insufficient — it removes about a fifth
-of the baseline. A bounded **repair** step made leakage measurably *worse* than
-the verifier alone on Bank A: a rewrite optimised against a string detector is
-not a rewrite that hides the answer. Mitigation is **not bank-invariant**
-(bank × regime *F* = 7.50, *p* = 5.3×10⁻⁵), and works better on the bank we did
-not write.
-
-Whole study: **41,940 solver calls**, 5,904 analysed responses, 41 items.
+41 items were analysed (14 from Bank A, 27 from Bank B), with 5,904 tutor replies: 2,016 on Bank A
+and 3,888 on Bank B. Every number in the article is recomputed from the files below by
+`harness/verify_numbers.py`; the results themselves are in `data/results_*.json` and
+`data/exploratory_*.json`, not repeated here.
 
 ## Layout
 
 ```
-harness/banks/  bank_a*.json         Bank A, pre- and post-screen (authored here)
-                bank_b_locators.json Bank B pointers only -- see Licence below
-data/runs/      *.jsonl              per-call logs, one row per unit of work
-data/           results_*.json       assembled results, with input hashes
-harness/        *.py                 the instrument and the analysis
-harness/tests/                       the test suite, no network
-harness/ops/                         supervision and progress scripts
+protocol/PROTOCOL.md         the study protocol: a verbatim extract of the design document
+protocol/DATING.md           when each part of the protocol was written, and the evidence for each date
+protocol/INSTRUMENTATION.md  serving paths, retries, budgets, ceilings, supervision (left out of the article)
+harness/banks/               Bank A, pre- and post-screen; Bank B as locators and hashes only
+data/runs/*.jsonl            per-call logs, one row per unit of work (append-only; QUARANTINE_* superseded)
+data/results_*.json          the pre-specified analysis, per bank and pooled
+data/exploratory_*.json      descriptive shares, flagged vs given, item-resampled intervals
+data/examples_bankA.json     the annotated Bank A replies printed in the article
+data/human_validation_*.json the human-labelled sample and its results
+harness/*.py                 the instrument and the analysis; harness/tests/ needs no network
+docs/revision-2026-11/figures/  the coordinates of the article's result figures (make_result_figures.py)
 ```
 
 ## Licence — and why Bank B is only pointers
@@ -80,7 +75,7 @@ Bank B items sometimes quote option text verbatim — a mechanical scan found 9
 such spans, occurring 372 times between the two logs — so those logs would
 redistribute the protected text indirectly. One more file goes with the bank
 rather than the code for the same reason: `banks/bank_b_answer_forms.json`, the
-Tier-1 verifier's per-item answer-form table, some of whose entries *are* option
+answer check's per-item answer-form table, some of whose entries *are* option
 text. `author_forms.py` says so and stops when it cannot find it.
 
 Every other artefact in this repository passed that scan, which is released as
@@ -91,51 +86,37 @@ its rule from, so it cannot be re-run here — see below.
 
 ```bash
 cd harness
-python3 -m pytest tests/ -q          # no network required; see note below
+python3 -m pytest tests/ -q                      # no network; see the note below
 python3 results.py --bank A   --roster ol
 python3 results.py --bank bs  --roster ol
-python3 results.py --pool A,bs --roster ol      # family R4
-python3 verify_numbers.py                       # every manuscript number vs the data
-python3 promise_audit.py                        # does the paper keep what the Method promises?
+python3 results.py --pool A,bs --roster ol       # the pooled model and the bank comparison
+python3 human_validation.py assemble
+python3 exploratory.py && python3 make_result_figures.py
 ```
 
-**Six tests fail in this public copy, and that is expected.** The suite is 704
-tests; here 680 pass, 18 skip and 6 fail, every one of them because it asserts
-against a file that cannot be published: Bank B's item text (`test_checker`,
-`test_size_bank_b`), the manuscript source (`test_promise_audit`), and the
-project's own working notes (`test_claude_md_cites_real_scripts`). They are left
-in place rather than deleted or marked skip, because a suite that passes by
-having had its failing assertions removed tells a reader less than one that says
-which artefact is missing. The 18 skips are tests that need an artefact this
-copy does not carry and say so — the built manuscript, or a roster of served
-models — rather than asserting against its absence.
+**Some tests fail in this public copy, and that is expected.** In this copy 1,464 tests pass,
+28 skip, and 12 fail and 24 error. Every failure and error is a missing file that cannot be
+published: the Bank B generation log `data/runs/generate_bankBS_ol.jsonl` (29), the Bank B sample
+`harness/banks/bank_b_sample.json` (2), the manuscript source (2) and the project's working notes (1).
+They are left in place rather than deleted or skipped, because a suite that passes by having its
+failing assertions removed tells a reader less than one that names the artefact it is missing.
+`exploratory.py` needs the Bank B generation log for the same reason, so its Bank B output is
+deposited as computed rather than re-computable here.
 
-`verify_numbers.py` recomputes each quantity the manuscript states and reports
-`MISSING` when the paper and the data disagree. `promise_audit.py` checks a
-different failure: a Method sentence promising something the Results never
-deliver leaves *no number to mismatch*, so it is invisible to every other check.
+`verify_numbers.py` and `promise_audit.py` check the manuscript source, which is not deposited.
 
-Re-running the model calls needs a roster of served models and is not required to
-reproduce any published number — the logs are complete.
+`verify_refs.py` checks the bibliography against Crossref. Set `VERIFY_REFS_MAILTO` to your own
+address if you want Crossref's polite pool; the deposit carries no address.
 
-## Known limitations, stated here as in the paper
+Re-running the model calls needs a roster of served models and is not needed to reproduce any
+published number: the logs are complete.
 
-- **The panel disagrees with itself.** ICC(2,1) is 0.620, 0.245 and 0.175 across
-  three vendor-disjoint rater pairs. Per-solver levels span only 0.087, so the
-  panel disputes *which* replies leak more than *how many*. Per-response uses
-  (filtering, training) are affected more than the prevalence claim.
-- **A generator token cap of 400 was a library default, not a choice.** It
-  affected 127 Bank A cells. Re-generating exactly those at the measured budget
-  moves the paired mean by +0.024 (95% CI [−0.004, +0.051]) and flips no verdict.
-  Disclosed rather than re-run, and the direction is the opposite of what cell
-  counts suggested.
-- **Tier 2 (an automated judge panel) was specified and not run.** The reachable
-  roster leaves half the generators two judges from one vendor family, which
-  would inflate agreement. `run.py judge` refuses on that roster.
-- **Tier 3 human labels are pending.** The sample, the codebook and the scorer
-  are here; the labels are not, and nothing in this repository will produce them.
+## Known limitations
 
-## Tier 3: the human-validation package
+They are stated in the article (Discussion and Appendices B–D) and in `protocol/DATING.md`, which
+lists every departure from the protocol and every claim about timing that the files cannot evidence.
+
+## The human-validation package
 
 `data/human_validation_sample.json` is the frozen 240-response sample — five from
 each of the 48 design cells, drawn in hash order with **no seed**, so there is no
@@ -146,7 +127,7 @@ seed that could have been chosen after the responses existed.
 - `harness/docs/annotation_codebook.md` — the labelling rules.
 - `python3 human_validation.py sheets` — regenerates the two blind sheets.
 - `python3 human_validation.py score` — agreement, plus sensitivity/specificity
-  against the manuscript's existing threshold grid. It refuses to report anything
+  against the article's threshold grid. It refuses to report anything
   until every row in both sheets is filled.
 - `python3 human_validation.py assemble` — writes
   `data/human_validation_results.json`, which is what the manuscript quotes.

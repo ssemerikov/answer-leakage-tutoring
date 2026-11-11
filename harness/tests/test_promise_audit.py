@@ -115,3 +115,56 @@ def test_cli_exit_status_agrees_with_its_output(tmp_path):
         capture_output=True, text=True,
     )
     assert r.returncode == 0, r.stdout
+
+
+def test_the_comment_step_is_the_shared_stripper(monkeypatch):
+    # One comment stripper for every tool (texutil): a second copy is a second
+    # opinion about what the manuscript says (4.33).
+    import texutil
+    seen = []
+
+    def spy(text):
+        seen.append(text)
+        return "REPLACED"
+
+    monkeypatch.setattr(texutil, "strip_comments", spy)
+    assert pa.strip_latex("We report x. % c\n") .strip() == "REPLACED"
+    assert seen == ["We report x. % c\n"]
+
+
+def test_a_line_break_then_percent_is_a_comment_in_the_audit_too():
+    # `\\%` is a forced break and a real comment; the old lookbehind kept it.
+    s = pa.strip_latex("We report x \\\\% hidden words\n")
+    assert "hidden" not in s
+
+
+def test_a_trailing_comment_does_not_swallow_the_rest_of_the_paragraph():
+    # N1 (fix round 1): `sentences()` joined a paragraph's lines BEFORE
+    # stripping comments, so a trailing `%` swallowed every later line --
+    # including, here, a promise.
+    got = [s for _, s in pa.sentences(
+        "We report the first result. % a note\n"
+        "We will release all code in the deposit.\n")]
+    assert len(got) == 2, got
+    assert "release all code" in got[1]
+
+
+def test_sentences_take_their_comment_rule_from_texutil(monkeypatch):
+    import texutil
+    seen = []
+    real = texutil.strip_comment_line
+
+    def spy(line):
+        seen.append(line)
+        return real(line)
+
+    monkeypatch.setattr(texutil, "strip_comment_line", spy)
+    pa.sentences("We report x.\n% c\nmore text.\n")
+    # every raw line goes through the shared rule first (strip_latex then
+    # re-applies it to the joined paragraph, which is harmless)
+    assert seen[:3] == ["We report x.", "% c", "more text."]
+
+
+def test_a_full_line_comment_inside_a_paragraph_does_not_split_it():
+    got = pa.sentences("We report the widget\n% an aside\ncount here.\n")
+    assert [s for _, s in got] == ["We report the widget count here."]

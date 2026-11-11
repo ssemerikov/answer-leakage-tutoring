@@ -47,7 +47,9 @@ import json
 import math
 from pathlib import Path
 
+import analyse as A
 import config as C
+import results as RS
 
 ROOT = Path(__file__).resolve().parent.parent
 HARNESS = Path(__file__).resolve().parent
@@ -104,6 +106,82 @@ def usable_rows(bank: str = "A", roster: str = "ol"):
         if not (r.get("response") or "").strip():
             continue
         out.append(r)
+    return out
+
+
+#: Facts that BOTH run files record about one reply, as (generate field, solve
+#: field). The join checks they agree: two copies of one fact that differ mean
+#: one of them describes a different reply, and picking either is a guess.
+_JOIN_AGREE = (("item_id", "item_id"), ("regime", "regime"),
+               ("solicitation_key", "solicitation_key"),
+               ("model", "generator"), ("blocked", "blocked"))
+
+
+def join_generate_solve(bank: str = "A", roster: str = "ol"):
+    """One record per delivered reply that has a `leak_adj`: the generate row,
+    plus `generator` and the solve row's `leak_adj`. In SOLVE-file order.
+
+    THE ONE JOIN. `automated_vs_human` and `exploratory` both need "this reply
+    and its score", and a second reader of the solve file would be a second copy
+    of the join rule -- the copy that joined on (cell_key, rep) matched nothing,
+    because the replicate lives INSIDE `cell_key` (see `automated_vs_human`).
+
+    Solve-file order is deliberate: it is the order `results.py` builds its
+    frame in, so a mean taken over this list sums in the same order as the
+    results file's and reproduces its float exactly.
+
+    REFUSES rather than computing over a partial match: a duplicate key on
+    either side, a solve row with no usable generate row, or a field that the
+    two files both record and disagree on. A solve row whose `leak_adj` is null
+    is left out (never read as zero; results.py, spec 3.2c).
+
+    The bank id is upper-cased for the file name: the CLI says `bs`, the run
+    files say `bankBS`. `usable_rows` is deliberately NOT changed to do this --
+    the frozen sample's hash depends on it.
+    """
+    b = bank.upper()
+    gen = {}
+    for g in usable_rows(b, roster):
+        if g["cell_key"] in gen:
+            raise ValueError(
+                f"generate_bank{b}_{roster}.jsonl carries usable cell_key "
+                f"{g['cell_key']!r} twice; cell_key is the join key and must "
+                f"identify one delivered reply.")
+        gen[g["cell_key"]] = g
+
+    out, seen = [], set()
+    for line in (RUNS / f"solve_bank{b}_{roster}.jsonl").read_text(
+            encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        s = json.loads(line)
+        ck = s["cell_key"]
+        if ck in seen:
+            raise ValueError(
+                f"solve output carries {ck!r} twice; cell_key is the join key "
+                f"and must identify one response.")
+        seen.add(ck)
+        g = gen.get(ck)
+        if g is None:
+            raise ValueError(
+                f"solve row {ck!r} has no usable generate row; the two files "
+                f"have diverged, and joining what matches would compute over a "
+                f"partial, unrepresentative set.")
+        for gf, sf in _JOIN_AGREE:
+            gv, sv = g.get(gf), s.get(sf)
+            if gf == "blocked":
+                gv, sv = bool(gv), bool(sv)
+            if gv != sv:
+                raise ValueError(
+                    f"{ck!r}: generate.{gf}={gv!r} and solve.{sf}={sv!r} "
+                    f"disagree; one of the two files describes a different "
+                    f"reply.")
+        if s.get("leak_adj") is None:
+            continue
+        rec = dict(g)
+        rec["generator"] = g["model"]
+        rec["leak_adj"] = s["leak_adj"]
+        out.append(rec)
     return out
 
 
@@ -209,6 +287,26 @@ def wilson(k: int, n: int, z: float = 1.959963984540054):
     c = (p + z * z / (2 * n)) / d
     h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
     return (p, c - h, c + h)
+
+
+def _kci(k: int, m: int):
+    """A count with its Wilson interval, in the shape the results file uses."""
+    p_, lo, hi = wilson(k, m)
+    return {"k": k, "n": m, "p": p_, "ci": [lo, hi]}
+
+
+# The two human-recovery rules, each in ONE place. `score` (the consensus
+# headline), `assemble` (the liberal bound) and `by_regime` (both, per regime)
+# all call these, so a per-regime count cannot drift from the headline it
+# partitions. A label is an option index, or None for cannot_tell.
+def _recovered_both(la, lb, key) -> bool:
+    """Consensus: BOTH annotators chose the key."""
+    return la == key == lb
+
+
+def _recovered_either(la, lb, key) -> bool:
+    """Liberal: at least one annotator chose the key."""
+    return key in (la, lb)
 
 
 EXPECTED_HEADER = ("response_id", "options", "tutor_reply", "choice", "notes")
@@ -350,7 +448,8 @@ def score(bank: str = "A", roster: str = "ol", ann_dir: Path | None = None,
     # A human "recovered the key" when BOTH annotators chose it: the consensus
     # is the conservative reading, and it is the one the Method's construct
     # names -- an unprepared reader picking the keyed option from the reply.
-    human_leak = {i: (labels[a][i] == key_by_id[i] == labels[b][i]) for i in ids}
+    human_leak = {i: _recovered_both(labels[a][i], labels[b][i], key_by_id[i])
+                  for i in ids}
     return {"status": "complete", "n": len(ids), "sources": sources,
             "percent_agreement": po, "cohen_kappa": kappa,
             "n_human_leak": sum(human_leak.values()),
@@ -391,17 +490,13 @@ def automated_vs_human(bank: str = "A", roster: str = "ol", **kw):
     # cost a diagnosis rather than a number: it refuses the whole comparison on
     # the first miss instead of computing over the rows that happened to match,
     # which would have silently reported a sensitivity over a biased subset.
-    auto = {}
-    for line in (RUNS / f"solve_bank{bank}_{roster}.jsonl").read_text(
-            encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        r = json.loads(line)
-        if r["cell_key"] in auto:
-            raise ValueError(
-                f"solve output carries {r['cell_key']!r} twice; cell_key is the "
-                f"join key and must identify one response.")
-        auto[r["cell_key"]] = r.get("leak_adj")
+    #
+    # The mapping comes from THE join (`join_generate_solve`), which refuses a
+    # duplicate key itself; a reply with a null score is absent from it, so the
+    # lookup below still raises on it exactly as it did when this function read
+    # the solve file on its own.
+    auto = {r["cell_key"]: r["leak_adj"]
+            for r in join_generate_solve(bank, roster)}
 
     pairs = []
     for rid, hv_leak in h["human_leak"].items():
@@ -419,12 +514,15 @@ def automated_vs_human(bank: str = "A", roster: str = "ol", **kw):
                 f"computed over whichever rows happened to match.")
         pairs.append((hv_leak, v))
 
+    # The cut is applied by `results.exceeds_threshold`, the comparison the
+    # results file's grid uses -- not a third copy of it (fix round 1, F12).
     out = {"status": "complete", "n": len(pairs), "by_threshold": {}}
     for t in grid:
-        tp = sum(1 for hl, v in pairs if hl and v >= t)
-        fn = sum(1 for hl, v in pairs if hl and v < t)
-        tn = sum(1 for hl, v in pairs if not hl and v < t)
-        fp = sum(1 for hl, v in pairs if not hl and v >= t)
+        over = [(hl, RS.exceeds_threshold(v, t)) for hl, v in pairs]
+        tp = sum(1 for hl, o in over if hl and o)
+        fn = sum(1 for hl, o in over if hl and not o)
+        tn = sum(1 for hl, o in over if not hl and not o)
+        fp = sum(1 for hl, o in over if not hl and o)
         sens, sl, sh = wilson(tp, tp + fn)
         spec, pl, ph = wilson(tn, tn + fp)
         out["by_threshold"][f"{t:g}"] = {
@@ -566,11 +664,8 @@ def assemble(bank: str = "A", roster: str = "ol", **kw):
     # The consensus rule is the reported one; the liberal rule is stated beside
     # it because the two BRACKET the human-side prevalence, and quoting either
     # alone would present one end of a wide band as a point estimate.
-    liberal = sum(1 for i in ids if key[i] in (L[a][i], L[b][i]))
-
-    def _ci(k, m):
-        p_, lo, hi = wilson(k, m)
-        return {"k": k, "n": m, "p": p_, "ci": [lo, hi]}
+    liberal = sum(1 for i in ids if _recovered_either(L[a][i], L[b][i], key[i]))
+    _ci = _kci
 
     sha = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
            for p in [SAMPLE_PATH] + [sheet_path(ann_dir, x) for x in annotators]}
@@ -589,7 +684,89 @@ def assemble(bank: str = "A", roster: str = "ol", **kw):
         "recovered_consensus": _ci(h["n_human_leak"], n),
         "recovered_either": _ci(liberal, n),
         "by_threshold": av["by_threshold"],
+        "by_regime": by_regime(by_id, L, key, annotators),
     }
+
+
+#: The mitigated regimes, pooled for the single "under mitigation" figure.
+POOLED_MITIGATED = ("P1", "P2", "P3")
+
+
+def cluster_method(n_clusters: int) -> dict:
+    """How every `ci_cluster_item` in an artefact was computed, recorded once
+    per file. B and the seed are read from the shared function's own defaults,
+    so the record cannot disagree with what ran."""
+    import inspect
+    sig = inspect.signature(A.cluster_bootstrap_ci).parameters
+    return {"method": "item-cluster percentile bootstrap",
+            "B": sig["B"].default, "seed": sig["seed"].default,
+            "n_clusters": n_clusters}
+
+
+def cluster_ci(values, clusters, statistic="proportion", **kw):
+    """`analyse.cluster_bootstrap_ci` as a list, or None for fewer than two
+    items: one item has no between-item variation, and an interval computed
+    there would be a number with no meaning."""
+    if len(set(clusters)) < 2:
+        return None
+    return list(A.cluster_bootstrap_ci(values, clusters, statistic, **kw))
+
+
+def by_regime(responses_by_id, labels, key_by_id, annotators=("A1", "A2")):
+    """Human recovery of the key per mitigation regime, over the frozen sample.
+
+    `both` is the consensus rule and `either` the liberal one -- the SAME two
+    functions the headline `recovered_consensus` / `recovered_either` use, so the
+    per-regime counts partition the headline counts exactly. Each is a count
+    with its Wilson interval. `pooled_P1_P3` pools the three mitigated regimes,
+    because that is the quantity the revised manuscript quotes.
+
+    Every count also carries `ci_cluster_item` (fix round 1): responses are
+    clustered within the sample's 14 items, and a Wilson interval over
+    responses treats them as independent. The method is recorded once, in
+    `by_regime["intervals"]`.
+
+    The allocation is 5 responses per cell, so each regime holds 60 of the 240.
+    A response whose regime is not in the design raises: dropping it would
+    shrink a denominator silently.
+    """
+    a, b = annotators
+    by: dict[str, list] = {r: [] for r in C.REGIMES}
+    for rid in sorted(responses_by_id):
+        reg = responses_by_id[rid]["regime"]
+        if reg not in by:
+            raise ValueError(
+                f"sampled response {rid} has regime {reg!r}, which is not in "
+                f"the design {list(C.REGIMES)}.")
+        by[reg].append(rid)
+
+    def block(ids):
+        both = [_recovered_both(labels[a][i], labels[b][i], key_by_id[i])
+                for i in ids]
+        either = [_recovered_either(labels[a][i], labels[b][i], key_by_id[i])
+                  for i in ids]
+        items = [responses_by_id[i]["item_id"] for i in ids]
+        out_b, out_e = _kci(sum(both), len(ids)), _kci(sum(either), len(ids))
+        out_b["ci_cluster_item"] = cluster_ci(both, items)
+        out_e["ci_cluster_item"] = cluster_ci(either, items)
+        return {"n": len(ids), "n_items": len(set(items)),
+                "both": out_b, "either": out_e}
+
+    out = {reg: block(ids) for reg, ids in by.items()}
+    pooled = block([i for reg in POOLED_MITIGATED for i in by[reg]])
+    out["pooled_P1_P3"] = {"regimes": list(POOLED_MITIGATED), **pooled}
+    out["intervals"] = {
+        "ci": "Wilson score interval over responses, unadjusted for item "
+              "clustering",
+        "ci_cluster_item": cluster_method(
+            len({r["item_id"] for r in responses_by_id.values()})),
+        "note": "Responses are clustered within items (5 per cell, few items); "
+                "ci_cluster_item resamples items. It is null where a block "
+                "holds fewer than two items. Every ci_cluster_item is "
+                "approximate: a percentile bootstrap over 9\u201327 items "
+                "tends to undercover.",
+    }
+    return out
 
 
 if __name__ == "__main__":

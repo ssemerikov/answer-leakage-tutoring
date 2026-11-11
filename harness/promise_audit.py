@@ -55,6 +55,10 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import texutil  # noqa: E402  - one comment stripper for every tool
+
 HERE = Path(__file__).resolve().parent
 PAPER = HERE.parent / "source" / "paper.tex"
 LEDGER = HERE / "docs" / "promise_ledger.json"
@@ -89,14 +93,10 @@ def strip_latex(text: str) -> str:
     around it, which is how two abstract word counts came out wrong before
     anyone noticed the stripper rather than the count was at fault.
     """
-    lines = []
-    for ln in text.splitlines():
-        if ln.lstrip().startswith("%"):
-            continue
-        # a real comment starts at an unescaped %
-        ln = re.sub(r"(?<!\\)%.*$", "", ln)
-        lines.append(ln)
-    s = "\n".join(lines)
+    # The comment step is the SHARED stripper (texutil), not a private loop:
+    # this function used to carry its own `(?<!\\)%` copy, which also read the
+    # forced break `\\%` as an escaped percent.
+    s = texutil.strip_comments(text)
     s = re.sub(r"\\(?:label|ref|eqref|cite[tp]?|citealp)\s*\{[^}]*\}", " ", s)
     s = re.sub(r"\\(?:textbf|textit|texttt|emph|mathrm|text)\s*\{([^{}]*)\}", r"\1", s)
     s = re.sub(r"\\[A-Za-z@]+\s*(\[[^\]]*\])?", " ", s)
@@ -132,8 +132,12 @@ def sentences(text: str) -> list[tuple[int, str]]:
     """
     raw = text.splitlines()
     out, buf, start = [], [], 1
-    for i, ln in enumerate(raw, 1):
-        if ln.lstrip().startswith("%"):
+    for i, raw_ln in enumerate(raw, 1):
+        # Comments come off PER LINE, before the paragraph is joined: joined
+        # first, a trailing `%` swallowed every later line of the paragraph.
+        # A full-line comment is no line at all (it does not end a paragraph).
+        ln = texutil.strip_comment_line(raw_ln)
+        if ln is None:
             continue
         if not ln.strip():
             if buf:

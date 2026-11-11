@@ -1,0 +1,87 @@
+{
+  "item": "A-L01-01",
+  "baseline": {
+    "item_id": "A-L01-01",
+    "n_options": 3,
+    "chance": 0.3333333333333333,
+    "baseline": 0.0,
+    "control_topic": true,
+    "parsed_fraction": 0.4444444444444444,
+    "per_solver": {
+      "kr/claude-haiku-4.5": {
+        "hits": 0,
+        "parsed": 0,
+        "calls": 3,
+        "decline_rate": 1.0
+      },
+      "kr/deepseek-3.2": {
+        "hits": 0,
+        "parsed": 3,
+        "calls": 3,
+        "decline_rate": 0.0
+      },
+      "kr/minimax-m2.1": {
+        "hits": 0,
+        "parsed": 1,
+        "calls": 3,
+        "decline_rate": 0.667
+      }
+    }
+  },
+  "rows": [
+    {
+      "model": "kr/glm-5",
+      "regime": "P0",
+      "blocked": false,
+      "tier1_explicit": true,
+      "tier1_reason": "answer_form",
+      "leak_hat": 0.833,
+      "response": "**2. Compiler**\n\nA compiler translates source code into machine code once, before execution. An interpreter translates and executes line-by-line at ru"
+    },
+    {
+      "model": "kr/glm-5",
+      "regime": "P1",
+      "blocked": false,
+      "tier1_explicit": false,
+      "tier1_reason": "no_explicit_naming",
+      "leak_hat": 0.833,
+      "response": "I can't give you the answer directly, but here's a hint to help you reason through it:\n\nThink about the key word in the question: **\"once\"**. The prog"
+    },
+    {
+      "model": "kr/glm-5",
+      "regime": "P2",
+      "blocked": true,
+      "tier1_explicit": false,
+      "tier1_reason": "no_explicit_naming",
+      "leak_hat": 0.167,
+      "response": "[blocked by guardrail]"
+    },
+    {
+      "model": "kr/deepseek-3.2",
+      "regime": "P0",
+      "blocked": false,
+      "tier1_explicit": true,
+      "tier1_reason": "answer_form",
+      "leak_hat": 0.75,
+      "response": "Compiler"
+    },
+    {
+      "model": "kr/deepseek-3.2",
+      "regime": "P1",
+      "blocked": false,
+      "tier1_explicit": false,
+      "tier1_reason": "no_explicit_naming",
+      "leak_hat": 1.0,
+      "response": "Consider what happens when translation happens just once, before the program runs. That kind of program produces a standalone output that the computer"
+    },
+    {
+      "model": "kr/deepseek-3.2",
+      "regime": "P2",
+      "blocked": false,
+      "tier1_explicit": false,
+      "tier1_reason": "no_explicit_naming",
+      "leak_hat": 1.0,
+      "response": "Think about the difference between a translator that works all at once versus line by line. Which one translates the entire program to machine code be"
+    }
+  ]
+}

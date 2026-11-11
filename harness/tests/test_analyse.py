@@ -536,3 +536,221 @@ def test_the_damage_is_in_the_standard_error_not_the_estimate():
                                covariates=())["P1-P0"]
     assert abs(with_cov.estimate - without.estimate) < 0.05
     assert with_cov.se > 5 * without.se
+
+
+# ---- item-cluster bootstrap (revision 2026-11, P1C fix round 1) -------------
+#
+# Replies are clustered within items: 504 replies per regime on Bank A come
+# from 14 items. An interval that treats them as independent is several times
+# too narrow. `cluster_bootstrap_ci` is the ONE implementation every artefact
+# uses: resample ITEMS with replacement, keep all replies of each drawn item.
+
+def _slow_cluster_ci(values, clusters, stat, B, seed, groups=None):
+    """Reference: the same numpy draws, the resample built row by row."""
+    import numpy as np
+    ids = sorted(set(clusters))
+    rng = np.random.default_rng(seed)
+    draws = rng.integers(0, len(ids), size=(B, len(ids)))
+    out = []
+    for row in draws:
+        samp = [(v, g) for k in row for v, c, g in
+                zip(values, clusters, groups or [None] * len(values))
+                if c == ids[k]]
+        if stat == "spread":
+            ms = []
+            for g in sorted(set(groups)):
+                xs = [v for v, gg in samp if gg == g]
+                ms.append(sum(xs) / len(xs))
+            out.append(max(ms) - min(ms))
+        else:
+            out.append(sum(v for v, _ in samp) / len(samp))
+    lo, hi = np.quantile(out, [0.025, 0.975])
+    return (float(lo), float(hi))
+
+
+def _clustered(n_items=8, per=6):
+    vals, cl, gr = [], [], []
+    for i in range(n_items):
+        for j in range(per):
+            vals.append(((i * 7 + j * 3) % 10) / 10)
+            cl.append(f"I{i}")
+            gr.append(("S0", "S2", "S3")[j % 3])
+    return vals, cl, gr
+
+
+def test_cluster_bootstrap_resamples_whole_items():
+    vals, cl, _ = _clustered()
+    got = A.cluster_bootstrap_ci(vals, cl, "mean", B=300, seed=7)
+    want = _slow_cluster_ci(vals, cl, "mean", B=300, seed=7)
+    assert got == pytest.approx(want, abs=1e-12)
+
+
+def test_cluster_bootstrap_spread_is_max_minus_min_of_group_means():
+    vals, cl, gr = _clustered()
+    got = A.cluster_bootstrap_ci(vals, cl, "spread", groups=gr, B=300, seed=7)
+    want = _slow_cluster_ci(vals, cl, "spread", B=300, seed=7, groups=gr)
+    assert got == pytest.approx(want, abs=1e-12)
+
+
+def test_cluster_bootstrap_defaults_are_the_recorded_ones():
+    import inspect
+    sig = inspect.signature(A.cluster_bootstrap_ci).parameters
+    assert sig["B"].default == 10000 and sig["seed"].default == 20261103
+    vals, cl, _ = _clustered()
+    assert A.cluster_bootstrap_ci(vals, cl, "mean") == \
+        A.cluster_bootstrap_ci(vals, cl, "mean"), "a fixed seed is reproducible"
+
+
+def test_cluster_bootstrap_is_wide_when_items_differ_and_iid_is_not():
+    # 10 items, 50 replies each; five items always leak, five never do. The
+    # iid Wilson interval is about +/-0.044; the items-as-units one is not.
+    vals = [1] * 250 + [0] * 250
+    cl = [f"I{i // 50}" for i in range(500)]
+    lo, hi = A.cluster_bootstrap_ci(vals, cl, "proportion", B=2000)
+    wlo, whi = A.wilson_ci(250, 500)
+    assert (hi - lo) > 4 * (whi - wlo)
+    assert lo < 0.5 < hi
+
+
+def test_cluster_bootstrap_degenerates_when_nothing_varies():
+    vals = [0] * 30
+    cl = [f"I{i % 5}" for i in range(30)]
+    assert A.cluster_bootstrap_ci(vals, cl, "proportion", B=200) == (0.0, 0.0)
+
+
+def test_cluster_bootstrap_refuses_what_it_cannot_measure():
+    with pytest.raises(ValueError, match="two clusters"):
+        A.cluster_bootstrap_ci([1, 0, 1], ["I1"] * 3, "proportion")
+    with pytest.raises(ValueError, match="0/1"):
+        A.cluster_bootstrap_ci([0.5, 1], ["I1", "I2"], "proportion")
+    with pytest.raises(ValueError, match="length"):
+        A.cluster_bootstrap_ci([1, 0], ["I1"], "mean")
+    with pytest.raises(ValueError, match="statistic"):
+        A.cluster_bootstrap_ci([1, 0], ["I1", "I2"], "median")
+    with pytest.raises(ValueError, match="groups"):
+        A.cluster_bootstrap_ci([1, 0], ["I1", "I2"], "spread")
+
+
+# ---- item-level bootstrap of a per-item statistic (revision 2026-11, P1F) ---
+#
+# A within-item contrast is first reduced to ONE number per item (the item's
+# difference of condition means); the item is then the resampling unit. Pooled
+# over two banks, items are resampled WITHIN their bank (stratified), so every
+# replicate keeps 14 Bank A and 27 Bank B items. The bank x condition
+# interaction is Bank B's mean per-item contrast minus Bank A's: a weighted sum
+# of stratum means with weights +1 / -1.
+
+def _slow_item_ci(per_item, strata, weights, B, seed):
+    """Reference: the declared draw scheme, built replicate by replicate.
+    One generator per call; strata in sorted order, items sorted within each;
+    one (B, n_s) block of draws per stratum, in that order."""
+    import numpy as np
+    strata = strata or {i: "_" for i in per_item}
+    labels = sorted(set(strata.values()))
+    ids = {s: sorted(i for i in per_item if strata[i] == s) for s in labels}
+    n_all = len(per_item)
+    w = weights or {s: len(ids[s]) / n_all for s in labels}
+    rng = np.random.default_rng(seed)
+    draws = {s: rng.integers(0, len(ids[s]), size=(B, len(ids[s]))) for s in labels}
+    out = []
+    for t in range(B):
+        tot = 0.0
+        for s in labels:
+            xs = [per_item[ids[s][k]] for k in draws[s][t]]
+            tot += w[s] * (sum(xs) / len(xs))
+        out.append(tot)
+    lo, hi = np.quantile(out, [0.025, 0.975])
+    return (float(lo), float(hi))
+
+
+def _per_item_two_banks():
+    """3 items in one bank, 12 in the other, with very different values: a
+    pooled resample that ignored the banks would mix them in varying shares."""
+    per = {f"a{i}": 0.1 * i for i in range(3)}
+    per.update({f"b{i:02d}": 0.5 + 0.03 * i for i in range(12)})
+    strata = {i: ("A" if i.startswith("a") else "BS") for i in per}
+    return per, strata
+
+
+def test_item_bootstrap_with_one_stratum_is_the_cluster_scheme():
+    # Equal cluster sizes: the mean of the drawn replies equals the mean of the
+    # drawn items' means, so the two functions must agree to rounding -- which
+    # proves the new function draws exactly as `cluster_bootstrap_ci` does.
+    vals, cl, _ = _clustered(n_items=9, per=6)
+    by = {}
+    for v, c in zip(vals, cl):
+        by.setdefault(c, []).append(v)
+    per_item = {c: sum(xs) / len(xs) for c, xs in by.items()}
+    for B, seed in ((300, 7), (10000, 20261103)):
+        got = A.item_bootstrap_ci(per_item, B=B, seed=seed)
+        want = A.cluster_bootstrap_ci(vals, cl, "mean", B=B, seed=seed)
+        assert got == pytest.approx(want, abs=1e-12)
+
+
+def test_item_bootstrap_stratified_matches_the_declared_draws():
+    per, strata = _per_item_two_banks()
+    got = A.item_bootstrap_ci(per, strata, B=400, seed=11)
+    assert got == pytest.approx(_slow_item_ci(per, strata, None, 400, 11), abs=1e-12)
+
+
+def test_item_bootstrap_keeps_each_stratum_size():
+    # Constant within each stratum: a stratified replicate always holds 3 zeros
+    # and 12 ones, so the pooled mean is exactly 12/15 in every replicate. An
+    # unstratified resample would vary it.
+    per = {f"a{i}": 0.0 for i in range(3)}
+    per.update({f"b{i:02d}": 1.0 for i in range(12)})
+    strata = {i: ("A" if i.startswith("a") else "BS") for i in per}
+    lo, hi = A.item_bootstrap_ci(per, strata, B=500)
+    assert lo == pytest.approx(0.8, abs=1e-12) and hi == pytest.approx(0.8, abs=1e-12)
+    lo_u, hi_u = A.item_bootstrap_ci(per, B=500)
+    assert hi_u - lo_u > 0.2
+
+
+def test_item_bootstrap_interaction_weights_are_b_minus_a():
+    per, strata = _per_item_two_banks()
+    w = {"A": -1.0, "BS": 1.0}
+    est = A.item_statistic(per, strata, w)
+    mean_a = sum(v for i, v in per.items() if strata[i] == "A") / 3
+    mean_b = sum(v for i, v in per.items() if strata[i] == "BS") / 12
+    assert est == pytest.approx(mean_b - mean_a, abs=1e-15)
+    got = A.item_bootstrap_ci(per, strata, w, B=400, seed=5)
+    assert got == pytest.approx(_slow_item_ci(per, strata, w, 400, 5), abs=1e-12)
+    assert got[0] <= est <= got[1]
+
+
+def test_item_statistic_defaults_to_the_mean_over_all_items():
+    per, strata = _per_item_two_banks()
+    m = sum(per.values()) / len(per)
+    assert A.item_statistic(per) == pytest.approx(m, abs=1e-15)
+    assert A.item_statistic(per, strata) == pytest.approx(m, abs=1e-15)
+
+
+def test_item_bootstrap_defaults_are_the_cluster_bootstrap_ones():
+    import inspect
+    a = inspect.signature(A.item_bootstrap_ci).parameters
+    c = inspect.signature(A.cluster_bootstrap_ci).parameters
+    for k in ("B", "seed", "level"):
+        assert a[k].default == c[k].default, k
+    per, strata = _per_item_two_banks()
+    assert A.item_bootstrap_ci(per, strata) == A.item_bootstrap_ci(per, strata), \
+        "re-seeded on every call, so a call is reproducible on its own"
+
+
+def test_item_bootstrap_sorts_items_before_drawing():
+    per, strata = _per_item_two_banks()
+    rev = dict(reversed(list(per.items())))
+    assert A.item_bootstrap_ci(rev, strata, B=300) == A.item_bootstrap_ci(per, strata, B=300)
+
+
+def test_item_bootstrap_refuses_what_it_cannot_measure():
+    with pytest.raises(ValueError, match="two items"):
+        A.item_bootstrap_ci({"I1": 0.2})
+    with pytest.raises(ValueError, match="two items"):
+        A.item_bootstrap_ci({"a": 0.1, "b": 0.2, "c": 0.3},
+                            {"a": "A", "b": "BS", "c": "BS"})
+    with pytest.raises(ValueError, match="stratum"):
+        A.item_bootstrap_ci({"a": 0.1, "b": 0.2}, {"a": "A"})
+    with pytest.raises(ValueError, match="weights"):
+        A.item_bootstrap_ci({"a": 0.1, "b": 0.2}, {"a": "A", "b": "A"}, {"BS": 1.0})
+    with pytest.raises(ValueError, match="finite"):
+        A.item_bootstrap_ci({"a": 0.1, "b": float("nan")})

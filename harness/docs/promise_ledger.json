@@ -1,338 +1,51 @@
 {
- "06e43105b670768c": {
-  "evidence": "capped and uncapped",
-  "reason": "Generator cap reported as a measured limitation, with the sensitivity result.",
+ "30cfe9f5b2884f53": {
+  "evidence": "Item-resampled 95\\%: percentile bootstrap over items",
+  "reason": "Table 3 prints the item-resampled interval beside each Holm p; no verdict rests on it alone.",
+  "section": "Analysis details and protocol deviations",
+  "sentence": "These intervals are reported beside the pre-specified tests, never instead of them.",
+  "status": "satisfied"
+ },
+ "3b622ee8702472df": {
+  "evidence": "Within each bank",
+  "reason": "Magnitudes are reported per bank (Table 3a); App C adds none pooled.",
+  "section": "Robustness",
+  "sentence": "Magnitudes are reported per bank.",
+  "status": "satisfied"
+ },
+ "456bef0df396441c": {
+  "evidence": "a difference of $-0.141$",
+  "reason": "App C (option-count strata) reports the bank comparison descriptively, without a test.",
+  "section": "Analysis details and protocol deviations",
+  "sentence": "The bank comparison itself is reported descriptively (Appendix ).",
+  "status": "satisfied"
+ },
+ "79ae625a6b71ab31": {
+  "evidence": "adjusted within-reader-model level",
+  "reason": "App C (ceiling sensitivity) reports the within-reader-model level beside the pooled one.",
+  "section": "Item banks and screening",
+  "sentence": "This is why the baseline is estimated per item over the whole panel, and why within-reader-model estimates are reported beside the pooled ones (Appendix ).",
+  "status": "satisfied"
+ },
+ "93b25f3943b5b117": {
+  "evidence": "$0.013$ to $0.085$",
+  "reason": "App B reports the adjusted fit's estimates, standard errors and lost rejections next to the primary fit.",
+  "section": "Analysis details and protocol deviations",
+  "sentence": "Because the choice reverses every verdict in Bank A's family R2, both fits are reported here.",
+  "status": "satisfied"
+ },
+ "bc16ca637b52140f": {
+  "evidence": "Spread of the three levels",
+  "reason": "Per-reader-model levels are printed in Table 2 (validity), with their spread.",
   "section": "Method",
-  "sentence": "We therefore report the ceiling as a measured limitation of the instrument and release the capped and uncapped scores together, rather than treating the reasoning about P_0 as though it settled the question it was standi",
+  "sentence": "Agreement is low on two of Bank A's three panels, and no Bank B panel reaches Bank A's best, so, by a rule fixed in advance, levels are reported per reader model.",
   "status": "satisfied"
  },
- "0888e53ba384f91b": {
-  "evidence": "vacat",
-  "reason": "The vacated families are disclosed in the Method.",
-  "section": "Method",
-  "sentence": "We report the vacating rather than presenting three families as the original plan.",
-  "status": "satisfied"
- },
- "1bb3b4898ade650d": {
-  "evidence": "0.656",
-  "reason": "The pre-commitment is honoured in the Discussion.",
-  "section": "Discussion",
-  "sentence": "We pre-committed to reading a low value as evidence that identifiability is partly a property of the solver, and we hold to it: the within-item contrasts above are comparisons within a fixed panel and are unaffected in d",
-  "status": "satisfied"
- },
- "1cc0c7976a8dc2df": {
-  "evidence": "0.245",
-  "reason": "Both low panels are reported.",
+ "ee565ba3d87551b9": {
+  "evidence": "Within each bank",
+  "reason": "Table 3 panel (a) reports every contrast per bank; no pooled magnitude is generalised.",
   "section": "Results",
-  "sentence": "Two of three panels are low, so we report them.",
-  "status": "satisfied"
- },
- "1d441e49b8d9c645": {
-  "evidence": "quota",
-  "reason": "Serving-infrastructure constraint is reported in the Method.",
-  "section": "Method",
-  "sentence": "One property of the serving infrastructure determined how the study is run, and we report it because it constrains any work built on commercial routing.",
-  "status": "satisfied"
- },
- "1e7966c6ed2662df": {
-  "evidence": "not to the regime a reply announces",
-  "reason": "sec:results-human reports agreement and restates the blinding limit, noting the gap in declining rates between annotators is consistent with a refusal being legible as one.",
-  "section": "Method",
-  "sentence": "Human annotation is blind to condition only where the response permits it: a mitigated response frequently announces its own refusal, so annotators can often infer the regime, and we report agreement without claiming con",
-  "status": "satisfied"
- },
- "2d3fb6af17bb2d08": {
-  "evidence": "",
-  "reason": "States the weaker position in place; nothing deferred to Results.",
-  "section": "Method",
-  "sentence": "But the stronger form of that reassurance --- that the partition would survive a different threshold --- does not hold here, and we state the weaker position rather than the convenient one.",
-  "status": "not-a-promise"
- },
- "321f89708df03f99": {
-  "evidence": "0.095",
-  "reason": "Bank B's P3-P2 is reported in sec:results-bank with its adjusted p (0.095) and its sign, and the Bank A contrast it is compared against is in sec:results-mitigation.",
-  "section": "Discussion",
-  "sentence": "What does not carry across is the ordering among the mitigated regimes: P3 - P2 keeps its positive sign on Bank B but is no longer separable from zero there, so the repair finding is a replicated dire",
-  "status": "satisfied"
- },
- "35eb6d1b9d791e92": {
-  "evidence": "0.453",
-  "reason": "MDE derived from the realised design; model factor reported descriptively.",
-  "section": "Method",
-  "sentence": "The model factor is reported descriptively, with intervals and no pairwise hypothesis tests: at the achieved 14 items per cell, the minimum detectable difference between two models is 0.453 before multiplicity correction",
-  "status": "satisfied"
- },
- "392277f695c1b99d": {
-  "evidence": "0.5",
-  "reason": "The smaller verifier limitation is reported.",
-  "section": "Method",
-  "sentence": "A smaller instrument limitation is reported for completeness.",
-  "status": "satisfied"
- },
- "3e24b4bbd2ff3221": {
-  "evidence": "three solver calls wide",
-  "reason": "The invariance interval is reported in calls, as promised.",
-  "section": "Method",
-  "sentence": "We report the interval, in calls, as emitted by the freezing step, so the claim is recomputed from the data whenever the bank is frozen instead of being asserted once in prose.",
-  "status": "satisfied"
- },
- "5153f78690da5644": {
-  "evidence": "",
-  "reason": "Scope caveat, stated in place.",
-  "section": "Discussion",
-  "sentence": "And the measure asks whether a reply makes an item's key recoverable, which is not the same question as whether a student learns less; the link between the two is an assumption this design inherits rather than tests, and",
-  "status": "not-a-promise"
- },
- "52ab85fbf0fa28dc": {
-  "evidence": "0.838",
-  "reason": "Conditional accuracy is reported beside the primary outcome in the mitigation family (sec:results-r2).",
-  "section": "Method",
-  "sentence": "Section measures the willingness channel directly so that it can be differenced out, and we report conditional accuracy alongside the primary outcome throughout so that a reader can see which channel moved.",
-  "status": "satisfied"
- },
- "58c01e5630f825b2": {
-  "evidence": "",
-  "reason": "States a licence constraint; no quantity is promised.",
-  "section": "Method",
-  "sentence": "This asymmetry is a licence constraint rather than a choice, and we state it so that the reproduction path for each bank is unambiguous.",
-  "status": "not-a-promise"
- },
- "5a0068e105ffd6ee": {
-  "evidence": "0.685",
-  "reason": "Ceiling-exclusion sensitivity check reported, bounding the conservatism.",
-  "section": "Method",
-  "sentence": "The bias this introduces is one-directional --- censoring at the top can only shrink an estimate --- so the effect we report is a conservative one, and we prefer that to a stricter screen that would discard measured item",
-  "status": "satisfied"
- },
- "5bdef397e26784ff": {
-  "evidence": "0.985",
-  "reason": "Same covariate disclosure, reported in the main text rather than an appendix.",
-  "section": "Method",
-  "sentence": "The consequence is instructive rather than marginal, and it is why we report it here instead of in a robustness appendix.",
-  "status": "satisfied"
- },
- "5e92be4105a97a6b": {
-  "evidence": "0.556",
-  "reason": "Self-discharging: the sentence characterises the kappa printed beside it in sec:results-human.",
-  "section": "Results",
-  "sentence": "And = 0.556 is moderate: it is reported as the measured agreement of two readers applying one codebook, not as a claim that the construct is sharp.",
-  "status": "satisfied"
- },
- "5f529dcc190dcfa4": {
-  "evidence": "",
-  "reason": "States how pilot figures are treated; no quantity deferred.",
-  "section": "Limitations",
-  "sentence": "Pilot figures obtained from it are reported as pilot figures and are not pooled with the results, and every measurement reported here comes from a single panel on a single path.",
-  "status": "not-a-promise"
- },
- "68e6d866e20cb734": {
-  "evidence": "0.986",
-  "reason": "Willingness figures are given, so the smallness is shown rather than asserted.",
-  "section": "Method",
-  "sentence": "The willingness channel, defined as declining to answer, is therefore small in the data we report, and we say so rather than presenting a control against a threat we no longer observe.",
-  "status": "satisfied"
- },
- "6c1162013ecd65fb": {
-  "evidence": "removed, before any response was generated",
-  "reason": "Records the S1 deletion; the disclosure is the promise and it is made in place.",
-  "section": "Method",
-  "sentence": "The deletion halves the pre-registered solicitation family from five contrasts to three, which loosens no threshold that remains --- Holm divides by the number of tests in the family --- but we record it here rather than",
-  "status": "satisfied"
- },
- "6e4ac4d3d0d55940": {
-  "evidence": "grid",
-  "reason": "A threshold grid is reported rather than a single cutoff.",
-  "section": "Results",
-  "sentence": "The finding does not depend on where the threshold for ``leakage'' is placed, which is why we report a grid rather than a cutoff.",
-  "status": "satisfied"
- },
- "6eebc063c1eb1341": {
-  "evidence": "0.985",
-  "reason": "Criterion, evidence (partial R^2) and both fits are given.",
-  "section": "Method",
-  "sentence": "One pre-registered covariate was not used, and because the decision changes every conclusion in the mitigation family we state the criterion, the evidence and both fits.",
-  "status": "satisfied"
- },
- "8451c02c316a7b4d": {
-  "evidence": "budget",
-  "reason": "The piloting correction (token budgets) is reported.",
-  "section": "Method",
-  "sentence": "A second property of the instrument required correction during piloting, and we report it because it would be invisible in the released data and because any replication using reasoning models will meet it.",
-  "status": "satisfied"
- },
- "88a0d5ab26484aa5": {
-  "evidence": "0.556",
-  "reason": "sec:results-human reports kappa = 0.556 and the sensitivity range 99.3% to 84.8% against the two-annotator consensus.",
-  "section": "Conclusion",
-  "sentence": "Against human labels the measure is sensitive rather than conservative --- essentially every response two readers agree gives the answer away is caught, at = 0.556 between them --- so the level we rep",
-  "status": "satisfied"
- },
- "8d21871905651ab6": {
-  "evidence": "0.274",
-  "reason": "The placebo floor subsection reports the placebo-corrected measure.",
-  "section": "Method",
-  "sentence": "We therefore report a placebo-corrected measure.",
-  "status": "satisfied"
- },
- "8ef6c61d7d0c08b4": {
-  "evidence": "answer-leakage-tutoring",
-  "reason": "The deposit exists. Every screened candidate's baseline is in the released screen logs -- 40 Bank A rows, 44 Bank B rows, each with a `baseline` and a per-solver breakdown -- and bank_a_screened_ol.json carries a 40-entry baseline_distribution. Verified against the published tree, not against the intention to publish.",
-  "section": "Limitations",
-  "sentence": "We record the screening roster inside the frozen bank so the dependence is visible rather than implicit, and we release the full baseline distribution for every candidate item so that any other threshold, or any other pa",
-  "status": "satisfied"
- },
- "96085abfa7fbe1b1": {
-  "evidence": "",
-  "reason": "Positioning against related work, not a commitment to report a quantity.",
-  "section": "Related work",
-  "sentence": "Where existing work establishes leakage as a category and evaluates adherence formatively, we treat the leakage rate as the quantity to be estimated, under solicitations designed to elicit it and under guardrails designe",
-  "status": "not-a-promise"
- },
- "a357fe5645bf2a32": {
-  "evidence": "judge",
-  "reason": "The un-run Tier-2 panel and the reason are disclosed.",
-  "section": "Method",
-  "sentence": "We did not run it, and we report why rather than omitting it.",
-  "status": "satisfied"
- },
- "a963f565b9fd9ed7": {
-  "evidence": "$2/378$",
-  "reason": "The two failure modes are named in the same paragraph (a short key let through on Bank B, a bare English word firing on Bank A) and the current pairing's rates are given as 70/70, 135/135, 2/378 and 4/729, each recomputed by verify_numbers from the frozen banks.",
-  "section": "Method",
-  "sentence": "We report the two failure modes rather than the rates they produced, because the rate depends on the detector and the answer-form table jointly and only their current pairing is reproducible from the ",
-  "status": "satisfied"
- },
- "b51f7491219365a7": {
-  "evidence": "0.656",
-  "reason": "Low ICC fired the pre-registered fallback; per-solver estimates are reported as the result of record.",
-  "section": "Method",
-  "sentence": "The intraclass correlation of per-solver leak_ adj across the panel is computed over responses scored by every solver, and we state its interpretation in advance so it cannot be read after the fact: a high value licenses",
-  "status": "satisfied"
- },
- "b870bf553e83a877": {
-  "evidence": "fourteen",
-  "reason": "The corrected retention and its cause are reported.",
-  "section": "Method",
-  "sentence": "We report this because it is the direction that matters: the defect was manufacturing retained items, and one of the fourteen we now report would otherwise have entered the study as a fifteenth whose retention rested on ",
-  "status": "satisfied"
- },
- "bc6ab8940c40b08c": {
-  "evidence": "0.587",
-  "reason": "The four- and five-option strata are given with their response counts; the note that option count does not order them is the reason they are worth reporting rather than pooling.",
-  "section": "Results",
-  "sentence": "Bank B's remaining strata are reported separately: 0.460 over 1 , 728 four-option responses and 0.587 over 1 , 008 five-option responses.",
-  "status": "satisfied"
- },
- "c1d254b83fc89c45": {
-  "evidence": "0.620",
-  "reason": "Panel agreement is reported (three panels).",
-  "section": "Method",
-  "sentence": "Because the solver panel is the instrument, we also report whether its members agree.",
-  "status": "satisfied"
- },
- "c23e78d4ec78da3a": {
-  "evidence": "7.50",
-  "reason": "R4 is reported in sec:results-bank: joint bank x regime F=7.50 on 3 and 5,852 df, p=5.3e-05 against the alpha/2=0.025 threshold, plus the descriptive bank comparison that replaces the unidentified main effect.",
-  "section": "Method",
-  "sentence": "The robustness family therefore contributes a single test --- the joint bank regime interaction, which is identified because regime does vary within every item, and which is the difference between banks in the regime con",
-  "status": "satisfied"
- },
- "c71167e05eaec278": {
-  "evidence": "0.985",
-  "reason": "Criterion stated as applied before the contrasts were read.",
-  "section": "Method",
-  "sentence": "An analyst who adjusted by default, or who chose after seeing the p -values, would have reported the opposite of what we report; the criterion above was applied before the contrasts were read, and the full adjusted fit i",
-  "status": "satisfied"
- },
- "c774eaa87e3349d6": {
-  "evidence": "0.685",
-  "reason": "Ceiling-cell count reported and the pre-registered exclusion run.",
-  "section": "Method",
-  "sentence": "We report the count here so it can be weighed, and pre-register the exclusion of ceiling cells from the within-solver analysis as a sensitivity check.",
-  "status": "satisfied"
- },
- "c78ac13eb19f5682": {
-  "evidence": "not measured here",
-  "reason": "Self-discharging disclosure: the same paragraph says the in-situ precision of the 53 withheld turns is not measured, why the 240-response sample cannot supply it, and what would. Supersedes 5a4250793da9ad3c: the corpus is called 'stress' by the tool that builds it, and the manuscript now uses that one name in both places.",
-  "section": "Results",
-  "sentence": "We state the gap rather than leaving the audit's stress-corpus false-positive rate to stand in for an in-situ one.",
-  "status": "satisfied"
- },
- "d65705513c7893d6": {
-  "evidence": "0.556",
-  "reason": "Labels returned 2026-08-28. sec:results-human reports agreement (166/240, kappa 0.556) and the sensitivity/specificity grid against the consensus labels, with Wilson intervals on each.",
-  "section": "Method",
-  "sentence": "A sample of 240 responses --- five drawn from each of the 48 cells of the generator regime solicitation design --- is labelled by two authors independently against a written codebook, and we report inter-annotator agreem",
-  "status": "satisfied"
- },
- "d8b2defc32b5d9e7": {
-  "evidence": "",
-  "reason": "Characterises a figure already given; nothing deferred.",
-  "section": "Limitations",
-  "sentence": "Four items is an indication of magnitude and not an estimate, and we report it as such.",
-  "status": "not-a-promise"
- },
- "dce5607d6ab1d707": {
-  "evidence": "separately",
-  "reason": "The two cautions are stated where the figures are given.",
-  "section": "Results",
-  "sentence": "Two cautions govern how these figures may be read, and both are the reason the mitigation contrasts are reported separately.",
-  "status": "satisfied"
- },
- "ddbd394b3df5594a": {
-  "evidence": "0.656",
-  "reason": "Per-solver within-solver levels reported beside the pooled figure.",
-  "section": "Method",
-  "sentence": "We therefore report the within-solver difference leak_s = hinted_s - baseline_s , averaged over solvers that answered in at least one arm, alongside the pooled figure, so that each solver acts as its own control.",
-  "status": "satisfied"
- },
- "eb1c7230bc824506": {
-  "evidence": "44",
-  "reason": "Guardrail activation reported in full from the generation stage. Supersedes ca486210a658ef9e, whose wording said the identifiability analysis was still in progress; it is not.",
-  "section": "Results",
-  "sentence": "Guardrail activation and repair What the guardrail did is measured by the generation stage alone, so it is reported here in full and independently of the identifiability analysis that follows.",
-  "status": "satisfied"
- },
- "f16f880b09674958": {
-  "evidence": "+0.039",
-  "reason": "Single-item deletion range reported in place.",
-  "section": "Results",
-  "sentence": "Its direction is robust in the sense that matters here --- the estimate stays positive under every single-item deletion, ranging over [+0.015, +0.039] --- while its magnitude is not resolved at this item count, so we rep",
-  "status": "satisfied"
- },
- "f1c7eb030cf108e8": {
-  "evidence": "matched",
-  "reason": "Matched roster pair is what the Results report; release is covered by the deposit entry.",
-  "section": "Method",
-  "sentence": "We report the matched pair rather than the mismatched one, and release every run so the distinction is checkable.",
-  "status": "satisfied"
- },
- "f276ecdc3fe1f5ae": {
-  "evidence": "0.460",
-  "reason": "No longer vacuous: Bank B occupies the four- and five-option strata, reported separately at 0.460 (n=1,728) and 0.587 (n=1,008) beside the three-option contrast both banks share.",
-  "section": "Limitations",
-  "sentence": "We report the bank contrast within the three-option stratum, where the criterion is identical, and report the other strata separately.",
-  "status": "satisfied"
- },
- "f3cbc2767bb5840d": {
-  "evidence": "0.095",
-  "reason": "Both halves are given: P3-P2 keeps its sign (+0.020) on Bank B as on Bank A, and its adjusted p of 0.095 is stated as holding rather than rejecting.",
-  "section": "Results",
-  "sentence": "The direction survives the change of bank; the significance does not, and we report both halves.",
-  "status": "satisfied"
- },
- "fa9f00ddb045e826": {
-  "evidence": "0.245",
-  "reason": "Reported although it fell the inconvenient way.",
-  "section": "Method",
-  "sentence": "This is a validity check on the measure and is reported whichever way it falls.",
-  "status": "satisfied"
- },
- "fdf1cddbfe9a1b91": {
-  "evidence": "0.141",
-  "reason": "The three-option stratum, the only one both banks occupy, carries the contrast: -0.141 (se 0.013, [-0.166, -0.117]), reported without a test because topic grain still differs.",
-  "section": "Results",
-  "sentence": "That difference is confounded with both instrument asymmetries of Section , so we report it within option-count strata, where the retention criterion is identical.",
+  "sentence": "We therefore report magnitudes per bank and generalise neither them nor their difference.",
   "status": "satisfied"
  }
 }

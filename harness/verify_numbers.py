@@ -14,9 +14,26 @@ we never try to read numbers out of LaTeX and guess what they mean, because a
 regex that silently matches nothing passes just as quietly as the drift it was
 meant to catch. Hence `MISSING` is a failure, not a skip.
 
+PRESENCE IS TESTED ON THE COMMENT-STRIPPED TEXT (texutil.strip_comments), and
+so is the absence of superseded literals: before 2026-11-02 a number that
+survived only in a `%%` comment "verified". Since then the tool also: retires a
+check only by an explicit RETIRED entry with a reason (an entry matching no
+check is an ERROR); lints the abstract as the plain text Editorial Manager
+receives, with every number pinned by a current check (LINT); checks
+`highlights.txt` beside the manuscript; and counts the main text off the built
+PDF against MAIN_TEXT_CAP (OVERLONG). Each of these makes the run exit 1.
+
 Checks whose data does not exist yet are reported as PENDING and do not fail the
 run -- the manuscript still carries `\\TBD` for those, which is the intended
 state until the backend returns.
+
+THE ONE EXCEPTION (P2-I2, 2026-11-11). Three checks LOCATE text in the
+paper before comparing it: the rows of Table 3 (found by row label inside
+their panel, so a cell may be typeset `-0.127` or `$-0.127$`), the stems and
+reply of Table 4 (read as printed: `\\texttt{x}` is x), and the App A screen
+figure (compared with `make_screen_figure.py`'s output). They still parse no
+number's MEANING: each compares what is printed with what was computed, and
+a row or passage that cannot be found makes the check MISSING, never PENDING.
 
 KNOWN LIMITATION, stated rather than papered over. A short literal such as `40`
 or `29` occurs in many places in a LaTeX file, so those checks prove the number
@@ -40,11 +57,15 @@ import re
 import statistics as st
 import subprocess
 import sys
+import unicodedata
+from collections import Counter
+from dataclasses import dataclass
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import config as C  # noqa: E402  - the recorded pre-measurement ceiling
+import texutil  # noqa: E402  - ONE comment stripper (P0.4 R1)
 import solvability as S  # noqa: E402  - after sys.path, so this runs from any cwd
 from analyse import mean_ci as A_mean_ci  # noqa: E402
 from analyse import wilson_ci as S_wilson  # noqa: E402  - one Wilson, not two
@@ -62,11 +83,158 @@ PDF = ROOT / "source" / "paper.pdf"
 # Retrieved from the guide for authors via search -- ScienceDirect 403s a direct
 # fetch, so treat it as well supported rather than verified, and re-check at
 # submission. The action is unambiguous under either 250 or 300.
+# P2-I2 (2026-11-11): kept at 250 for Computers & Education by the integration
+# checklist's ruling ("ABSTRACT_LIMIT = 250 (C&E)"); still re-check at submission.
 ABSTRACT_LIMIT = 250
+
+# THE HIGHLIGHTS FILE LIVES BESIDE THE MANUSCRIPT IT SUMMARISES, so `main()`
+# reads `PAPER.with_name(HIGHLIGHTS_NAME)` rather than a second module path: a
+# test that redirects PAPER is redirected here for free, and cannot start
+# reading the real file the day the C&E rewrite creates it.
+HIGHLIGHTS_NAME = "highlights.txt"
+HIGHLIGHTS_MIN, HIGHLIGHTS_MAX = 3, 5
+HIGHLIGHT_MAX_CHARS = 85      # Elsevier: "maximum 85 characters, including spaces"
+
+# Main text, counted off the build (see `main_text_words`). TARGET is where
+# the rewrite aims; CAP is the hard ceiling that fails the tool.
+MAIN_TEXT_TARGET = 7600
+MAIN_TEXT_CAP = 8000
+
+# RETIRING A CHECK IS AN EXPLICIT ACT WITH A REASON, never a deletion.
+#
+# label (exactly as `checks()` emits it) -> why it no longer applies. A
+# retired check is reported as RETIRED, counts as neither verified nor
+# missing, and its literal stops counting as CURRENT -- so it no longer
+# protects a superseded twin from STALE and no longer pins a number in the
+# abstract or highlights. A label here that matches no check is an ERROR: a
+# typo must not silently retire nothing (4.36's silently-exempt failure).
+#
+# P2-I2 (2026-11-11), the C&E restructure. Reasons cite the number-triage
+# disposition (docs/revision-2026-11/number_triage.csv; "row N" is its 0-based
+# data row) and the integration checklist ruling that removed the sentence.
+_DEPOSIT = ("moved to the deposited instrumentation report at the C&E "
+            "restructure (triage DEPOSIT): the manuscript no longer prints it")
+_IID = ("iid normal interval over replies, superseded in the Results by the "
+        "item-resampled intervals at the C&E restructure (triage rows 114-124; "
+        "checklist ruling); its literal survives only as an accidental twin")
+_P4_DUP = "prose duplicate removed in P4; value checked by "
+RETIRED: dict[str, str] = {
+    # the kr pilot panel left the paper
+    "n screened (Bank A, kr)": "kr pilot screen of the pre-rebalance bank; the "
+        "pilot left the paper at the C&E restructure (triage row 0). 40 stays "
+        "pinned by 'Bank A mcq items' and 'bank A mcq'",
+    "n retained": "kr pilot retained count, never printed; '29' matched only "
+        "inside other numbers (triage row 1)",
+    "corr(parsed, baseline) all 40": "pilot parse/baseline correlation; "
+        + _DEPOSIT + " (triage row 2); '0.89' matched only minimax's parse rate",
+    "kr pilot parse rate (context only)": "pilot decline rate; " + _DEPOSIT
+        + " (triage row 3)",
+    "levels containing a discard": "computed from the kr pilot screen (11 "
+        "discards) while App A describes the ol screen (triage rows 12-13, "
+        "FLAG F1); replaced by 'App A: levels with a discard (ol)'",
+    "rho(level, discard)": "kr pilot screen (triage rows 12-13, FLAG F1); "
+        "replaced by 'App A: rho(level, discard) (ol)'",
+    # the token-budget / truncation story (pilot 600-token screen)
+    "truncated calls (numerator)": "pilot 600-token truncation; " + _DEPOSIT
+        + " (triage row 14)",
+    "truncated calls (denominator)": "pilot 600-token truncation; " + _DEPOSIT
+        + " (triage row 15); '240' matched only the human-validation n",
+    "truncation rate": "pilot 600-token truncation rate; " + _DEPOSIT
+        + " (triage row 16)",
+    "shift, >=5% truncated": "truncation-correction shift; " + _DEPOSIT
+        + " (triage row 17)",
+    "most negative shift": "truncation-correction shift; " + _DEPOSIT
+        + " (triage row 18)",
+    "truncation shift, noise floor (SE, calls)": "noise floor of the "
+        "truncation comparison; " + _DEPOSIT + " (triage row 19)",
+    # retries, routing, run scale
+    "retry attempt cap": "retry policy; " + _DEPOSIT + " (triage row 30)",
+    "stage abort threshold": "stage abort threshold; " + _DEPOSIT
+        + " (triage row 31)",
+    "overhead min": "router injected-context overhead; " + _DEPOSIT
+        + " (triage row 32)",
+    "overhead max": "router injected-context overhead; " + _DEPOSIT
+        + " (triage row 33)",
+    "overhead spread": "router injected-context overhead; " + _DEPOSIT
+        + " (triage row 34)",
+    "overhead drift (mean)": "router injected-context drift; " + _DEPOSIT
+        + " (triage row 35)",
+    "primary: transport failures": "duplicate rounding (0.1%) of the 2 of "
+        "2400 failed screen calls, which App A states once as 0.08% (triage "
+        "row 38, RETIRE)",
+    "primary: corr(parsed, baseline)": "meaningful only against the pilot's "
+        "0.89; " + _DEPOSIT + " (triage row 39); '0.20' matched only the "
+        "rebalanced item's final-instrument baseline",
+    "solver calls consumed": "run-scale total over every stage; " + _DEPOSIT
+        + " (triage row 202)",
+    # the iid regime intervals and the Bank A regime means cut from Section 4
+    "P0 leak_adj CI low": _IID + " ('0.685' is the within-solver gain)",
+    "P0 leak_adj CI high": _IID,
+    "P1 leak_adj CI low": _IID,
+    "P1 leak_adj CI high": _IID + " ('0.609' is the S2 mean and gemma4's "
+        "all-40 accuracy)",
+    "P2 leak_adj CI low": _IID,
+    "P2 leak_adj CI high": _IID,
+    "P3 leak_adj CI low": _IID,
+    "P3 leak_adj CI high": _IID,
+    "P2 mean leak_adj": "cut from Section 4 for length (D4 re-review K12; "
+        "triage row 119); '0.552' matched only a pgfplots coordinate",
+    "P3 mean leak_adj": "cut from Section 4 for length (D4 re-review K13; "
+        "triage row 122); '0.583' is the A-L09-01 placebo rate",
+    "gemma4:cloud mean leak_adj": "printed nowhere since the C&E restructure: "
+        "Section 4.1 gives only the range of the tutor-model means (triage "
+        "row 126; checklist 'Dropped rows'), pinned by 'Bank A tutor-model range'",
+    "minimax-m3:cloud mean leak_adj": "printed nowhere since the C&E "
+        "restructure (triage row 128); the range check pins the extremes",
+    # human-side prevalence over all 240 (Section 4.4 now reports P1-P3 and P0)
+    "consensus recovered": "all-240 consensus count printed nowhere since the "
+        "C&E restructure; Section 4.4 reports the mitigated 99 of 180 and P0 "
+        "39 of 60 (triage rows 227-232); '138' only twins a coordinate",
+    "consensus rate": "printed nowhere since the C&E restructure (triage rows "
+        "227-232)",
+    "consensus CI": "printed nowhere since the C&E restructure (triage rows "
+        "227-232); a loosened check would pass on App C's '0.512'",
+    "liberal recovered": "printed nowhere since the C&E restructure (triage "
+        "rows 227-232)",
+    "liberal rate": "printed nowhere since the C&E restructure (triage rows "
+        "227-232); a loosened check would pass on App C's '87.9' cell",
+    "liberal CI": "printed nowhere since the C&E restructure (triage rows "
+        "227-232)",
+    # P4 (2026-11-11, presentation round; controller ruling R2.4): the prose copy
+    # of each value left Section 4; the value is still printed and checked once,
+    # in its Table 3 row.
+    "RQ2: P1-P0 both banks": _P4_DUP + "'Table 3a row P1-P0'",
+    "RQ2: P2-P1 per bank": _P4_DUP + "'Table 3a row P2-P1'",
+    "RQ2: P2-P1 pooled": _P4_DUP + "'Table 3b row P2-P1'",
+    "RQ2: P3-P1, Bank A": _P4_DUP + "'Table 3a row P3-P1'",
+    "RQ3: pooled S3-S2 interval": _P4_DUP + "'Table 3b row S3-S2'",
+    "RQ4: joint test df": _P4_DUP + "'Table 3b: joint test df and p'",
+}
+
+# Numbers allowed in the abstract (and highlights) WITHOUT a check computing
+# them: number -> reason. Normalised form, e.g. "2,016", "98" for 98%. Every
+# entry is a decision a reviewer can read; an empty table means every number
+# in the abstract is backed by a recomputation.
+ABSTRACT_NUMBER_ALLOW: dict[str, str] = {}
 
 
 def _letters(tok: str) -> str:
     return re.sub(r"[^a-z]", "", tok.lower())
+
+
+def _pdf_staleness(pdf: Path) -> str | None:
+    """ONE answer to "is the build current?", for every count taken off it.
+
+    Returns None when `pdf` exists and is not older than PAPER, else the
+    reason it cannot be read as the manuscript. Both `abstract_words` and
+    `main_text_words` ask this function; two copies of a freshness rule are
+    two rules (4.33).
+    """
+    if not pdf.exists():
+        return f"no build at {pdf.name} -- run make"
+    if pdf.stat().st_mtime < PAPER.stat().st_mtime:
+        return f"{pdf.name} is older than paper.tex -- run make"
+    return None
 
 
 def abstract_words(tex: str, pdf: Path = PDF) -> tuple[int | None, str]:
@@ -89,18 +257,19 @@ def abstract_words(tex: str, pdf: Path = PDF) -> tuple[int | None, str]:
     Returns (count, note). A count of None is not a pass: it means the PDF is
     missing or older than the source, so the question was not asked.
     """
-    m = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", tex, re.S)
+    # Located in the COMMENT-STRIPPED text, as `abstract_lint` does: a
+    # commented-out old abstract above the new one used to win the search.
+    m = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}",
+                  texutil.strip_comments(tex), re.S)
     if not m:
         return None, "no abstract environment in paper.tex"
-    body = "\n".join(l for l in m.group(1).splitlines()
-                     if not l.lstrip().startswith("%"))
+    body = m.group(1)
     src_toks = [t for t in _letters_seq(body) if t]
     if len(src_toks) < 6:
         return None, "abstract too short to anchor"
-    if not pdf.exists():
-        return None, f"no build at {pdf.name} -- run make"
-    if pdf.stat().st_mtime < PAPER.stat().st_mtime:
-        return None, f"{pdf.name} is older than paper.tex -- run make"
+    stale = _pdf_staleness(pdf)
+    if stale:
+        return None, stale
 
     try:
         out = subprocess.run(["pdftotext", "-f", "1", "-l", "1", str(pdf), "-"],
@@ -139,6 +308,1166 @@ def _letters_seq(body: str) -> list[str]:
     s = re.sub(r"[${}~\\]", " ", s)
     return [_letters(t) for t in s.split()]
 
+
+# ---------------------------------------------------------------------------
+# NUMBERS IN PLAIN TEXT (abstract lint, highlights) -- P0.4 R3/R4
+# ---------------------------------------------------------------------------
+
+# A standalone quantity; documented piece by piece in `number_tokens`.
+NUMBER_RE = re.compile(r"""
+    (?<![A-Za-z0-9_.])
+    (?<![A-Za-z]-)
+    (?:
+        (?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?
+      | \.\d+
+    )
+    (?:[eE][-+]?\d+)?
+    (?:%|[A-Za-z]+)?
+    (?![A-Za-z0-9_])
+    (?!\.\d)
+""", re.X)
+
+# Spans masked BEFORE tokenising, because the number in them NAMES something
+# rather than counts it: a version (`Python 3`), a cross-reference
+# (`Section 4.5`, `Table 2`), a parameterised index (`ICC(2,1)`), a model name
+# written with spaces (`Llama 3.1 70B`, `Claude 3.5 Sonnet`) or a model tag
+# (`gemma4:31b`). The lists are short on purpose. A missing entry costs a LINT
+# that names the token -- loud; an over-broad entry would mask a real
+# quantity, which would then never be pinned -- silent. Add a name only when
+# it is a NAME, never a count.
+_NAMED_NUMBER_RE = re.compile(
+    r"\b(?:Python|Section|Sections|Sec\.|Table|Tables|Figure|Figures|Fig\.|"
+    r"Eq\.|Equation|Appendix|Chapter|Tier|Version)[\s~]*\d+(?:\.\d+)*")
+_INDEX_RE = re.compile(r"\b[A-Za-z]+\(\d+(?:\s*,\s*\d+)*\)")
+# A model family's version is masked when ATTACHED or hyphenated (Qwen3,
+# Llama-3.1, GPT-4o) or, written with a space, only when it is a decimal or
+# carries a size letter (Llama 3.1 70B, Mistral 7B) -- never a bare count:
+# "Gemma 27 items" is 27 items (fix round 2, N-b).
+_MODEL_NAME_RE = re.compile(
+    r"\b(?:Llama|Claude|Gemini|Gemma|Mistral|Mixtral|Qwen|Phi|GPT|DeepSeek|"
+    r"MiniMax|Kimi|OLMo|Falcon|Grok|Yi)"
+    r"(?:-?v?\d+(?:\.\d+)*[A-Za-z]{0,2}"
+    r"|\s+(?:\d+\.\d+(?:\.\d+)*[A-Za-z]{0,2}|\d+[A-Za-z]{1,2})\b)"
+    r"(?:[\s-]+\d+(?:\.\d+)?[BbMm]\b)?")
+# name:tag only when the name carries a digit or a hyphen (gemma4:31b,
+# gpt-oss:120b) AND the tag is one of the forms Ollama uses -- a size
+# (27b, 1.5b, 7m), `latest`, or letters and hyphens (cloud, it-qat). A bare
+# numeric tag is a quantity: "S3:0.6", "P2:-0.05" (fix round 2, N-b); a plain
+# word:value such as `kappa:.56` was never masked.
+_MODEL_TAG_RE = re.compile(
+    r"\b[A-Za-z](?=[\w.-]*[\d-])[\w.-]*:"
+    r"(?:\d+(?:\.\d+)?[bmBM]\b|latest\b|[A-Za-z][A-Za-z-]*)")
+
+# A letter-led hyphenated compound is a NAME, digits and all: A-L09-01,
+# gpt-oss-120b, SHA-256, Foo-3.5 (P0.6: item ids yielded "01"). A digit-led
+# run (3-4, 0.033--0.450) is not matched, so a range stays two quantities.
+_HYPHEN_ID_RE = re.compile(r"\b[A-Za-z][A-Za-z0-9]*(?:-[A-Za-z0-9.]*[A-Za-z0-9])+")
+_DECIMAL_SEGMENT_RE = re.compile(r"\d*\.\d+")
+
+
+def _mask_hyphen_id(m: re.Match) -> str:
+    """Mask a letter-led hyphenated compound, EXCEPT trailing decimal
+    segments: "S3-S2-0.024" is a contrast and its value, "Bank~B-0.05" a name
+    and a minus 0.05 (P0.6 fix round 1, M5). A decimal followed by a
+    letter-bearing segment stays part of the name (Llama-3.1-70B, A-0.5-B);
+    an integer after a hyphen stays an identifier (GPT-4, top-10 -- F1)."""
+    segs = m.group(0).split("-")
+    keep = len(segs)
+    while keep > 1 and _DECIMAL_SEGMENT_RE.fullmatch(segs[keep - 1]):
+        keep -= 1
+    head = "-".join(segs[:keep])
+    return " " * len(head) + m.group(0)[len(head):]
+
+
+def normalise_numeric(text: str) -> str:
+    r"""LaTeX number forms to plain text: `{,}`->`,`, drop `$`, `\%`->`%`,
+    and a space between a control word and a digit glued to it (`\pm0.09`
+    -> `\pm 0.09`; P0.6 fix round 1, M6 -- otherwise the digit reads as part
+    of the control word's name and no token is found)."""
+    text = text.replace("{,}", ",").replace("$", "").replace("\\%", "%")
+    return re.sub(r"(\\[A-Za-z]+)(?=[\d.])", r"\1 ", text)
+
+
+def number_tokens(text: str) -> list[str]:
+    r"""Standalone quantities in `text`, in order, normalised for comparison.
+
+    Integers that are part of an identifier or a name are NOT numbers --
+    `RQ1`, `P0`, `S3`, `Python 3`, `ICC(2,1)`, `SHA-256`, `GPT-4o`,
+    `Llama-3.1`, `Qwen3`, `gemma4:31b`, `Section 4.5`, version `2.3.0` --
+    only standalone quantities count, and every form of one counts: `0.605`,
+    `.56`, `2,016`, `98%`, `16k`, `5x`, `1e-20`. Two steps:
+
+    1. MASK spans whose number names something (replaced by spaces):
+       `_NAMED_NUMBER_RE`  a name word then a number: Python 3, Section 4.5,
+                           Table 2, Fig. 3, Eq. 1, Appendix 2, Tier 1 ...
+       `_INDEX_RE`         a parameterised index: ICC(2,1)
+       `_MODEL_NAME_RE`    a model family then its version and size, written
+                           with spaces: Llama 3.1 70B, Claude 3.5 Sonnet
+       `_MODEL_TAG_RE`     a name:tag model id: gemma4:31b, gpt-oss:120b
+       `_HYPHEN_ID_RE`     a letter-led hyphenated compound: A-L09-01, SHA-256
+    2. MATCH `NUMBER_RE` on what is left:
+       (?<![A-Za-z0-9_.])          not glued to an identifier or another
+                                   number: RQ1, P0, S3, gemma4, the 5 of 1.5
+       (?<![A-Za-z]-)              not the tail of a hyphenated name:
+                                   SHA-256, GPT-4o, Tier-1, P1-P0, Llama-3.1
+       (?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?   27, 2,016, 0.605
+         | \.\d+                   or a leading-dot decimal (APA): .556
+       (?:[eE][-+]?\d+)?           e-notation: 1e-20, 2.5E+3
+       (?:%|[A-Za-z]+)?            a percent sign, or a unit/letter suffix
+                                   that stays in the token: 16k, 5x, 2nd
+       (?![A-Za-z0-9_])            nothing glued after it
+       (?!\.\d)                    not the head of a version triple: 2.3.0
+
+    NORMALISATION, identical on both sides of a comparison: a trailing `%`
+    is dropped (`98%` -> `98`) and a leading-dot decimal gains its zero
+    (`.556` -> `0.556`). A sign is not part of the token (`-0.144` ->
+    `0.144`), so pinning cannot catch a flipped sign; the literal presence
+    checks can, because they compare the whole typeset literal.
+    Call on text already passed through `normalise_numeric` if it is LaTeX.
+    """
+    for rx in (_NAMED_NUMBER_RE, _INDEX_RE, _MODEL_NAME_RE, _MODEL_TAG_RE):
+        text = rx.sub(lambda m: " " * len(m.group(0)), text)
+    text = _HYPHEN_ID_RE.sub(_mask_hyphen_id, text)
+    out = []
+    for m in NUMBER_RE.finditer(text):
+        tok = m.group(0).rstrip("%")
+        out.append("0" + tok if tok.startswith(".") else tok)
+    return out
+
+
+def pinned_numbers(literals) -> set[str]:
+    """Every number token any current check literal contains.
+
+    Pinning is TOKEN-SET MEMBERSHIP, never substring: `2` is a substring of
+    `0.620` and of `2/378`'s neighbour `378`, and a substring test would make
+    nearly every small integer "pinned" by accident. The guarantee is modest
+    -- some check recomputes this number somewhere -- and stated as such.
+
+    The token set of `_pin_index` -- one composition of `number_tokens` and
+    `normalise_numeric` over the literals, not two (P0.6 fix round 2, N6).
+    """
+    return set(_pin_index(literals))
+
+
+def _unpinned(text: str, literals) -> list[str]:
+    """Distinct numbers in `text` that no literal pins and the allow list
+    does not excuse, in order of first appearance."""
+    pinned = pinned_numbers(literals)
+    seen: list[str] = []
+    for n in number_tokens(normalise_numeric(text)):
+        if n not in pinned and n not in ABSTRACT_NUMBER_ALLOW and n not in seen:
+            seen.append(n)
+    return seen
+
+
+_GREEK_MACROS = frozenset("""
+    alpha beta gamma delta epsilon varepsilon zeta eta theta vartheta iota
+    kappa varkappa lambda mu nu xi omicron pi varpi rho varrho sigma varsigma
+    tau upsilon phi varphi chi psi omega Gamma Delta Theta Lambda Xi Pi Sigma
+    Upsilon Phi Psi Omega""".split())
+
+
+def _is_greek(ch: str) -> bool:
+    if "\u0370" <= ch <= "\u03ff" or "\u1f00" <= ch <= "\u1fff":
+        return True
+    return "GREEK" in unicodedata.name(ch, "")   # incl. mathematical italic
+
+
+def abstract_lint(tex: str, literals: set[str]) -> list[str]:
+    r"""Problems that would stop the abstract surviving as PLAIN TEXT.
+
+    Editorial Manager takes the abstract as a pasted string, so LaTeX in it
+    arrives as LaTeX: `$0.605$`, `2{,}016`, `\kappa`. Applied to the source of
+    the `abstract` environment AFTER comment stripping. Problems, one per
+    distinct offender with a count: any `$`; any macro other than `\%`;
+    `{,}`; Greek letters (macro or Unicode); and every number token that no
+    CURRENT check literal pins (`pinned_numbers`) unless ABSTRACT_NUMBER_ALLOW
+    excuses it. Empty list = clean. No abstract = nothing to lint (the word
+    count already reports a missing abstract as PENDING).
+    """
+    m = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}",
+                  texutil.strip_comments(tex), re.S)
+    if not m:
+        return []
+    src = m.group(1)
+    probs: list[str] = []
+    k = src.count("$")
+    if k:
+        probs.append(f"`$` math mode ({k}x) -- arrives in Editorial Manager "
+                     f"as literal dollar signs")
+    k = src.count("{,}")
+    if k:
+        probs.append(f"`{{,}}` thousands separator ({k}x) -- write 2,016 as plain text")
+    # Fix round 1 (M10): ties, TeX dashes and braces also arrive verbatim.
+    k = src.count("~")
+    if k:
+        probs.append(f"`~` tie ({k}x) -- arrives as a literal tilde; use a space")
+    k = len(re.findall(r"(?<!-)---(?!-)", src))
+    if k:
+        probs.append(f"`---` TeX em dash ({k}x) -- write the dash character")
+    k = len(re.findall(r"(?<!-)--(?!-)", src))
+    if k:
+        probs.append(f"`--` TeX en dash ({k}x) -- write the dash character")
+    k = sum(src.replace("{,}", "").count(c) for c in "{}")
+    if k:
+        probs.append(f"`{{`/`}}` braces ({k}x) -- grouping arrives as literal braces")
+    macros: Counter = Counter()
+    greek: Counter = Counter()
+    for mm in re.finditer(r"\\([A-Za-z]+|.)", src, re.S):
+        name = mm.group(1)
+        if name == "%":
+            continue
+        (greek if name in _GREEK_MACROS else macros)["\\" + name] += 1
+    for ch in src:
+        if _is_greek(ch):
+            greek[ch] += 1
+    for name, k in macros.items():
+        probs.append(f"macro {name} ({k}x) -- not plain text")
+    for g, k in greek.items():
+        probs.append(f"Greek letter {g} ({k}x) -- spell it out")
+    for n in _unpinned(src, literals):
+        probs.append(f"unpinned number {n} -- no current check literal computes "
+                     f"it (pin it, or allow it in ABSTRACT_NUMBER_ALLOW with a reason)")
+    return probs
+
+
+def highlights_check(path: Path, literals: set[str]) -> tuple[str, list[str]]:
+    """Check the highlights file: ('PENDING'|'OK'|'FAIL', problems).
+
+    PENDING when the file does not exist yet. Otherwise: HIGHLIGHTS_MIN to
+    HIGHLIGHTS_MAX non-empty lines (blank lines are ignored); each at most
+    HIGHLIGHT_MAX_CHARS Unicode characters including spaces, counted after
+    trimming the line; every number pinned exactly as in `abstract_lint`
+    (same tokens, same allow list -- a highlight restates the abstract).
+    """
+    if not path.exists():
+        return "PENDING", []
+    lines = [l.strip() for l in path.read_text(encoding="utf-8").splitlines()
+             if l.strip()]
+    probs: list[str] = []
+    if not HIGHLIGHTS_MIN <= len(lines) <= HIGHLIGHTS_MAX:
+        probs.append(f"{len(lines)} highlights; {HIGHLIGHTS_MIN} to "
+                     f"{HIGHLIGHTS_MAX} are required")
+    for i, line in enumerate(lines, 1):
+        if len(line) > HIGHLIGHT_MAX_CHARS:
+            probs.append(f"highlight {i} is {len(line)} characters (limit "
+                         f"{HIGHLIGHT_MAX_CHARS}): {line[:50]}...")
+        for n in _unpinned(line, literals):
+            probs.append(f"highlight {i}: unpinned number {n}")
+    return ("FAIL" if probs else "OK"), probs
+
+
+# ---------------------------------------------------------------------------
+# MAIN-TEXT LENGTH, OFF THE BUILD -- P0.4 R5
+# ---------------------------------------------------------------------------
+
+# THE SCOPE ANCHOR, one rule for the word count and the coverage report
+# (`_intro_anchor`). Accepted forms (P0.6 fix round 1, C2 ruling):
+# \section{Introduction}, \section[...]{Introduction},
+# \section{\label{...}Introduction} and \section*{Introduction}. Anything else
+# is NOT an anchor -- the coverage gate then refuses rather than scanning an
+# empty scope. \section{Introduction\label{...}} stays refused (P0.6 fix
+# round 2, N3 ruling): the integrator writes \section{Introduction}\label{...}.
+_INTRO_RE = re.compile(
+    r"\\section\*?\s*(?:\[[^\]]*\]\s*)?\{\s*(?:\\label\s*\{[^{}]*\}\s*)?"
+    r"Introduction\s*\}", re.I)
+_DOCUMENT_BEGIN_RE = re.compile(r"\\begin\s*\{\s*document\s*\}")
+_SECTION_TOKEN_RE = re.compile(r"\\section(?![A-Za-z])")
+_NO_ANCHOR = "no \\section{Introduction}"
+_ANCHOR_HINT = ("the anchor is the first \\section after \\begin{document}; write "
+                "\\section{Introduction}\\label{...}, not "
+                "\\section{Introduction\\label{...}}")
+_NO_ANCHOR_NOTE = f"{_NO_ANCHOR} in paper.tex -- {_ANCHOR_HINT}"
+
+
+def _intro_anchor(code: str) -> re.Match | None:
+    r"""THE scope anchor in comment-stripped `code`, or None.
+
+    The anchor is the FIRST `\section` (starred or not) after
+    `\begin{document}` -- from the start of `code` when it has none (a
+    fragment) -- and only when that heading is an accepted Introduction form
+    (`_INTRO_RE`). P0.6 fix round 2, N3: the first `_INTRO_RE` match ANYWHERE
+    let a late `\section*{Introduction}` (a prompt quoted in an appendix)
+    become the anchor when the real heading was renamed or written
+    `\section{Introduction\label{...}}` -- the body dropped out of the
+    coverage scan and the word count started at the decoy. One function, read
+    by `_scoped_code`, `_count_main_text` and `main_text_words`.
+    """
+    doc = _DOCUMENT_BEGIN_RE.search(code)
+    first = _SECTION_TOKEN_RE.search(code, doc.end() if doc else 0)
+    return _INTRO_RE.match(code, first.start()) if first else None
+
+
+def _anchor_hint(refusal: str | None) -> str:
+    """What to append to a printed refusal: the no-anchor one says how to
+    write the heading (P0.6 fix round 2, N3)."""
+    return f" -- {_ANCHOR_HINT}" if refusal == _NO_ANCHOR else ""
+
+
+# The first of these, after the Introduction, ends the main text. Each is
+# found in the SOURCE, and the count stops at the HEADING it renders. For a
+# `\section*{...}` or an appendix `\section{...}` that heading is the source
+# title; `\printcredits` and `\bibliography` render a heading the class or the
+# bibliography style supplies, which the source cannot contain -- those two
+# strings are `_RENDERED_HEADINGS`, the only page text written here.
+# ONE list of back-matter section titles, read by the main-text count and by
+# the uncovered-numbers report (P0.6). Matched as FULL titles (P0.6 fix round
+# 1, M7): a body section "Ethics of answer leakage" or "Funding models" is not
+# back matter, and the prefix rule used to blank it -- and to end the word
+# count early.
+_BACK_MATTER_TITLES = (
+    "Declaration of competing interest", "Declaration of competing interests",
+    "Declaration of interest", "Declaration of interests", "Competing interests",
+    "CRediT authorship contribution statement", "Funding", "Funding sources",
+    "Ethics", "Ethics statement", "Data availability", "Data availability statement",
+    "Declaration of generative AI and AI-assisted technologies in the writing process",
+    "Declaration of generative AI", "References")
+_MAIN_TEXT_END_RES = (
+    ("section", re.compile(
+        r"\\section\*?\s*\{\s*((?:" + "|".join(map(re.escape, _BACK_MATTER_TITLES))
+        + r"))\s*\}", re.I)),
+    ("printcredits", re.compile(r"\\printcredits\b")),
+    ("bibliography", re.compile(r"\\bibliography\s*\{|\\begin\s*\{thebibliography\}"
+                                r"|\\printbibliography\b")),
+    ("appendix", re.compile(r"\\appendix\b")),
+)
+_RENDERED_HEADINGS = {   # cas-sc.cls / cas-model2-names render these
+    "printcredits": "CRediT authorship contribution statement",
+    "bibliography": "References",
+}
+_FURN_TOP, _FURN_BOTTOM = 2, 3    # page-edge lines eligible as furniture
+_HEADING_WRAP = 3                 # a heading may wrap over this many lines
+# A rendered heading's number: "1. ", "4.5 ", "A. ", "Appendix A. "
+_HEADING_NUMBER_RE = re.compile(r"^(?:Appendix\s+)?(?:[A-Z]|\d+)(?:\.\d+)*\.?\s+")
+
+
+def _heading_text(s: str) -> str:
+    """A heading as it PRINTS, for a strict comparison (fix round 2, N-a).
+
+    Case and punctuation are kept: a CAS heading is printed in its source
+    case with no trailing full stop, so "references." or "funding." at the
+    end of a paragraph is not the heading. Only what TeX itself changes is
+    normalised: macros and braces go, `~` is a space, `---`/`--` are the
+    dashes they print, and typographic quotes equal straight ones.
+    """
+    s = re.sub(r"\\[A-Za-z]+\*?", " ", s).replace("{", "").replace("}", "")
+    s = s.replace("~", " ").replace("---", "\u2014").replace("--", "\u2013")
+    s = s.replace("\u2019", "'").replace("\u2018", "'").replace("`", "'")
+    return " ".join(s.split())
+
+
+def _heading_lines(lines: list[str], title: str, start: int = 0) -> list[int]:
+    """Indices of lines that ARE the heading `title` exactly as it prints
+    (`_heading_text`; a number prefix such as "1. " or "A. " is allowed),
+    including a heading wrapped over up to _HEADING_WRAP lines."""
+    want = _heading_text(title)
+    hits = []
+    for i in range(start, len(lines)):
+        got = _heading_text(_HEADING_NUMBER_RE.sub("", lines[i].strip(), count=1))
+        if not got:
+            continue
+        j = i
+        while got != want and want.startswith(got + " ") and j - i < _HEADING_WRAP - 1 \
+                and j + 1 < len(lines):
+            j += 1
+            got = f"{got} {_heading_text(lines[j])}".strip()
+        if got == want:
+            hits.append(i)
+    return hits
+
+
+def _strip_page_furniture(text: str) -> tuple[str, int]:
+    """Remove running heads and feet from `pdftotext` output.
+
+    A line is furniture when it sits among the first _FURN_TOP or last
+    _FURN_BOTTOM non-empty lines of a page AND the same line (digits
+    normalised, so `Page 3 of 20` matches `Page 4 of 20`) does so on at least
+    half the pages. Restricting to page EDGES is what keeps a numeric table
+    cell that recurs on many pages from being mistaken for furniture.
+    Derived from the PDF, never from hard-coded page text, so a new short
+    title or author line is recognised without an edit here.
+
+    Returns (text with pages joined by newlines, number of tokens removed).
+    """
+    pages = [pg.split("\n") for pg in text.split("\f")]
+    nonempty = [[i for i, l in enumerate(ls) if l.strip()] for ls in pages]
+    n_pages = sum(1 for ne in nonempty if ne)
+
+    def norm(line: str) -> str:
+        return re.sub(r"\d+", "#", " ".join(line.split()))
+
+    edges = [set(ne[:_FURN_TOP] + ne[-_FURN_BOTTOM:]) for ne in nonempty]
+    counts: Counter = Counter()
+    for ls, idx in zip(pages, edges):
+        counts.update({norm(ls[i]) for i in idx})
+    need = max(2, -(-n_pages // 2))
+    furniture = ({k for k, c in counts.items() if c >= need}
+                 if n_pages >= 2 else set())
+    removed = 0
+    out = []
+    for ls, idx in zip(pages, edges):
+        keep = []
+        for i, line in enumerate(ls):
+            if i in idx and norm(line) in furniture:
+                removed += len(line.split())
+                continue
+            keep.append(line)
+        out.append("\n".join(keep).strip("\n"))
+    return "\n".join(out), removed
+
+
+def _count_main_text(pdf_text: str, tex: str,
+                     strip_furniture: bool = True) -> tuple[int | None, str]:
+    """Count the main text in `pdftotext` output, between two HEADINGS.
+
+    Span: from the Introduction heading to the heading of whichever comes
+    first in the comment-stripped source after it -- a back-matter
+    `\\section*` (competing interest, CRediT, Funding, Ethics, Data
+    availability, generative-AI declaration, References), `\\printcredits`,
+    the bibliography, or `\\appendix` (its first `\\section`). Anchoring on
+    headings rather than on the first and last body words means a citation
+    or a formula in either sentence cannot break the count (fix round 1, F2).
+
+    Refuses (None) rather than guesses when the source has no scope anchor
+    (`_intro_anchor`: the first `\\section` after `\\begin{document}` must be
+    the Introduction -- P0.6 fix round 2, N3), when the Introduction heading
+    occurs more than once (a contents list would make the count stop at its
+    copy of the end heading -- an under-count, the dangerous direction for a
+    cap) or when the end heading is not found after it, or found MORE than
+    once (fix round 2, N-a: a body line or table cell that prints exactly like
+    the title would otherwise end the count early). Headings are matched as
+    they print (`_heading_text`): case kept, no trailing full stop.
+
+    What is counted: every whitespace token from the Introduction heading line
+    (its number included) up to the end heading line -- tables, captions,
+    footnotes and display maths inside the span included -- minus running
+    heads and feet (`_strip_page_furniture`; `strip_furniture=False` exists
+    for the test that proves the stripping removes something). Page-1
+    front-matter footnotes (corresponding-author mark, e-mails, ORCIDs) fall
+    inside the span and ARE counted: a small over-count, on the side the cap
+    protects.
+    """
+    body = texutil.strip_comments(tex)
+    m = _intro_anchor(body)
+    if not m:
+        return None, _NO_ANCHOR_NOTE
+    found = [(e.start(), kind, e) for kind, rx in _MAIN_TEXT_END_RES
+             for e in [rx.search(body, m.end())] if e]
+    if not found:
+        return None, ("no back matter, bibliography or appendix after the "
+                      "Introduction in paper.tex")
+    _, kind, e = min(found, key=lambda t: t[0])
+    if kind == "section":
+        end_title = e.group(1)
+    elif kind == "appendix":
+        sec = re.search(r"\\section\*?\s*\{([^{}]*)\}", body[e.end():])
+        if not sec:
+            return None, "\\appendix with no \\section after it in paper.tex"
+        end_title = sec.group(1)
+    else:
+        end_title = _RENDERED_HEADINGS[kind]
+
+    if strip_furniture:
+        text, n_furn = _strip_page_furniture(pdf_text)
+    else:
+        text, n_furn = pdf_text.replace("\f", "\n"), 0
+    lines = text.split("\n")
+    starts = _heading_lines(lines, "Introduction")
+    if not starts:
+        return None, "Introduction heading not found in the PDF"
+    if len(starts) > 1:
+        return None, (f"Introduction heading found {len(starts)} times in the "
+                      f"PDF -- refusing to guess where the main text starts")
+    ends = _heading_lines(lines, end_title, starts[0] + 1)
+    if not ends:
+        return None, f"end heading {end_title!r} not found after the Introduction"
+    if len(ends) > 1:
+        # a table cell or a body line that prints exactly like the title:
+        # stopping at the first would under-count (fix round 2, N-a)
+        return None, (f"end heading {end_title!r} found {len(ends)} times after "
+                      f"the Introduction -- refusing to guess where the main "
+                      f"text ends")
+    span = "\n".join(lines[starts[0]:ends[0]]).replace("-\n", "")
+    return len(span.split()), (f"rendered, Introduction to {end_title!r}; running "
+                               f"heads/feet removed ({n_furn} tokens "
+                               f"document-wide); tables, captions and footnotes "
+                               f"in the span counted")
+
+
+def main_text_words(tex: str, pdf: Path = PDF) -> tuple[int | None, str]:
+    """Main-text word count off the BUILT PDF (see `_count_main_text`).
+
+    Same contract as `abstract_words`: None is not a pass, it means the
+    question was not asked -- no build, a stale build (`_pdf_staleness`, the
+    one freshness rule), or anchors that could not be found.
+    """
+    body = texutil.strip_comments(tex)
+    if not _intro_anchor(body):
+        return None, _NO_ANCHOR_NOTE
+    stale = _pdf_staleness(pdf)
+    if stale:
+        return None, stale
+    text = _pdftotext(pdf)
+    if text is None:
+        return None, "pdftotext failed or unavailable"
+    return _count_main_text(text, tex)
+
+
+def _pdftotext(pdf: Path) -> str | None:
+    """The whole document as `pdftotext` renders it, or None."""
+    try:
+        out = subprocess.run(["pdftotext", str(pdf), "-"],
+                             capture_output=True, text=True, timeout=120)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return out.stdout if out.returncode == 0 else None
+
+
+# ---------------------------------------------------------------------------
+# THE UNCOVERED-NUMBERS REPORT -- P0.6 (fix round 1)
+# ---------------------------------------------------------------------------
+# "Every number in the new text gets a check." Without a tool that rule rests
+# on discipline, which is how the paper came to hold ~34 unchecked quantities
+# (number_triage.md §c). `uncovered_numbers` lists every number token in the
+# main text and appendices that no current check literal carries.
+
+@dataclass
+class Uncovered:
+    kind: str        # "UNCOVERED" | "NEW" | "INFO literature" | "INFO year"
+    token: str       # normalised as number_tokens() normalises it
+    line: int        # 1-based line in paper.tex
+    context: str     # ~60 characters of the source line around the token
+    note: str = ""
+    strict_fail: bool = False   # an INFO year that --strict-coverage counts
+
+    @property
+    def label(self) -> str:
+        return "NEW (check pending)" if self.kind == "NEW" else self.kind
+
+
+@dataclass
+class Coverage:
+    """What `_coverage_scan` found. `refusal` not None means the scan is NOT
+    a measurement (no scope anchor, or a scope holding no number at all) and
+    the gate must fail rather than report "0 uncovered" (fix round 1, C2)."""
+    records: list
+    n_tokens: int
+    n_covered: int
+    covered: list          # (line, token, [labels of the checks pinning it])
+    refusal: str | None = None
+
+
+def _current_literals(results) -> dict[str, str]:
+    """{label: literal} of every CURRENT check in `results` (a `checks()`
+    list): its literal is computed and its label is not RETIRED. The one
+    place this filter is written (P0.6 fix round 2, N6): main()'s presence,
+    STALE, lint, highlight and coverage checks and `uncovered_numbers`'
+    default read it."""
+    return {label: lit for label, lit, _ in results
+            if lit and label not in RETIRED}
+
+
+class ScopeNotAnchored(ValueError):
+    """`uncovered_numbers` was asked to scan a paper whose scope is not a
+    measurement: no scope anchor, or an anchored scope holding no number
+    token (fix round 1, C2; P0.6 fix round 2, N4)."""
+
+
+_YEAR_RE = re.compile(r"(?:19|20)\d\d")
+# TAGS, read from the RAW line's comment part. Well-formed:
+#   %% NEW: <source>              (a parenthesised qualifier is allowed:
+#   %% NEW (<qualifier>): <source>  the drafts use it, and it is unambiguous)
+#   %% LIT: <bibkey> p.<n>[ trailing text]   (pp.<n>-<m> too)
+#   %% YEAR[ anything]
+# Anything else that LOOKS like one of these (`%% new: ...`, `%% NEW` with no
+# colon, `%% lit: ...`, `% year ...`) is a NEAR-MISS: reported, never ignored.
+_NEW_TAG_RE = re.compile(r"%+\s*NEW\s*(?:\(([^()]*)\))?\s*:\s*(\S.*?)\s*$")
+_NEW_EMPTY_RE = re.compile(r"%+\s*NEW\s*(?:\([^()]*\))?\s*:\s*$")
+_LIT_TAG_RE = re.compile(r"%+\s*LIT\s*:(.*)$")
+_LIT_BODY_RE = re.compile(
+    r"\s*([A-Za-z][\w:.+-]*)\s+pp?\.\s*\d+(?:\s*[-\u2013]+\s*\d+)?(?:\s.*)?$")
+_YEAR_TAG_RE = re.compile(r"%+\s*YEAR\b")
+_TAGLIKE_RE = re.compile(r"%+\s*((?i:new|lit|year))\b")
+# ONE definition of "a citation command" (P0.6 fix round 2, N6): \cite, \citep,
+# \citet, \citeauthor, \Cite ... `_CITE_CMD_RE` asks whether a line CITES (the
+# LIT and year rules); `_CITE_RE` names the commands whose arguments are keys,
+# which adds \nocite -- it prints no citation, so it never makes a line cite.
+_CITE_NAME = r"[Cc]ite[A-Za-z]*"
+_CITE_CMD_RE = re.compile(r"\\" + _CITE_NAME + r"\*?\s*[\[{]")
+_BIB_CMD_RE = re.compile(r"\\bibliography\s*\{([^{}]*)\}")
+_BIB_KEY_RE = re.compile(r"@\s*([A-Za-z]+)\s*[{(]\s*([^,\s]+)\s*,")
+_BACK_MATTER_START_RE = re.compile(
+    r"\\section\*?\s*\{\s*(?:" + "|".join(map(re.escape, _BACK_MATTER_TITLES))
+    + r")\s*\}|\\printcredits\b", re.I)
+# A back-matter region ends at the next section whose title is NOT a
+# back-matter title, at \appendix, or at \end{document}.
+_SECTION_RE = re.compile(r"\\section\*?\s*\{([^{}]*)\}")
+_BACK_TITLE_RE = re.compile(r"\s*(?:" + "|".join(map(re.escape, _BACK_MATTER_TITLES))
+                            + r")\s*$", re.I)
+
+# Commands whose arguments never carry a reported quantity:
+# name -> (optional-group openers allowed, mandatory brace groups consumed).
+# Only the listed mandatory groups go -- \multicolumn{3}{c}{TEXT} keeps TEXT.
+# \cite* is handled apart: its optional notes stay IN scope except for page
+# locators (fix round 1, M4: "\citep[reporting 32\%;][]" carries a quantity).
+_EXCLUDED_ARGS: dict[str, tuple[str, int]] = {
+    **{r: ("", 1) for r in texutil.REF_COMMANDS}, "auxref": ("", 1),
+    "label": ("", 1), "includegraphics": ("[", 1), "input": ("", 1),
+    "include": ("", 1), "usepackage": ("[", 1), "RequirePackage": ("[", 1),
+    "url": ("", 1), "href": ("", 1), "hspace": ("", 1), "vspace": ("", 1),
+    "setlength": ("", 2), "addtolength": ("", 2), "setcounter": ("", 2),
+    "addtocounter": ("", 2), "renewcommand": ("", 2), "newcommand": ("[", 2),
+    "cmidrule": ("[(", 1), "cline": ("", 1), "multicolumn": ("", 2),
+    "multirow": ("[", 2), "resizebox": ("", 2), "scalebox": ("", 1),
+    "rule": ("[", 2), "raisebox": ("", 1), "fontsize": ("", 2),
+    "linespread": ("", 1), "enlargethispage": ("", 1), "addlinespace": ("[", 0),
+    "bibliography": ("", 1), "bibliographystyle": ("", 1),
+    "printbibliography": ("[", 0), "tag": ("", 1),
+}
+_CITE_RE = re.compile(r"(?:" + _CITE_NAME + r"|nocite)$")
+# A page/part locator inside a \cite note: p.~12, pp.~3--5, ch.~3, Fig.~2 ...
+# (the separator is texutil.TEX_SPACE, shared with make_variants; N6)
+_LOCATOR_RE = re.compile(
+    r"\b(?:pp?|pg|chs?|chap|secs?|sect|figs?|tabs?|tbl|eqs?|vol|no|nos|para|fn|app|"
+    r"pages?|chapters?)\.?" + texutil.TEX_SPACE + r"*\d+[a-z]?"
+    + r"(?:\s*(?:--?|\u2013|,|&)\s*\d+[a-z]?)*", re.I)
+# \begin{env}: its [options] go (typeset keys excepted); these envs also lose
+# N spec args.
+_ENV_SPEC_ARGS = {"tabular": 1, "tabular*": 2, "tabularx": 2, "tabulary": 2,
+                  "array": 1, "longtable": 1, "minipage": 1, "wrapfigure": 2,
+                  "wraptable": 2, "multicols": 1, "thebibliography": 1}
+# Option keys whose VALUES are typeset text, so stay in scope (fix round 1,
+# I1): a number in an axis title or a node label is a claim.
+_TYPESET_KEYS = {"label", "pin", "xlabel", "ylabel", "zlabel", "title",
+                 "legend entries", "xticklabels", "yticklabels", "zticklabels",
+                 "nodes near coords", "extra x tick labels", "extra y tick labels",
+                 "node contents"}     # P0.6 fix round 2, N2
+# TeX lengths. Applied ONLY at TikZ code level now (fix round 1, M4): in prose
+# "fell 5.3pt" is a quantity, and in arguments the whole group goes anyway.
+_UNIT_RE = re.compile(
+    r"(?<![A-Za-z0-9_.])-?\d*\.?\d+(?:pt|mm|cm|in|em|ex|bp|pc|sp|dd|cc|mu)\b"
+    r"|(?<![A-Za-z0-9_.])-?\d*\.?\d+\s*\\(?:textwidth|linewidth|columnwidth|"
+    r"textheight|paperwidth|hsize|vsize|baselineskip|tabcolsep|arrayrulewidth)\b")
+# `[` must follow on the SAME line (fix round 1, M4): `\\` then a newline
+# then "[0.617]" is text.
+_LINEBREAK_OPT_RE = re.compile(r"\\\\\*?[ \t]*(?=\[)")
+_TIKZ_RE = re.compile(r"\\begin\s*\{tikzpicture\}.*?\\end\s*\{tikzpicture\}", re.S)
+# Fix round 1 (I1 ruling): `[` is an option list only after these commands,
+# after \begin{...} (the generic pass), or after a TikZ keyword.
+_TIKZ_OPT_CMDS = {"node", "draw", "path", "addplot", "coordinate", "fill",
+                  "filldraw", "matrix"}
+_TIKZ_KEYWORD_BEFORE_RE = re.compile(r"\b(?:node|coordinate|edge|pic|child|plot|to)\s*$")
+# A brace group that opens with a drawing command, or with a TikZ/pgfplots
+# environment (a \foreach body that opens with \begin{scope}), is CODE; any
+# other brace group is TEXT and is kept whole -- including node text that
+# opens with \begin{tabular} or \begin{minipage} (P0.6 fix round 2, N1: a bare
+# `begin|end` here made such text code, and its numbers dropped out).
+_TIKZ_CODE_ENVS = ("scope", "pgfonlayer", "axis", "semilogxaxis", "semilogyaxis",
+                   "loglogaxis", "groupplot", "polaraxis")
+_TIKZ_CODE_START_RE = re.compile(
+    r"\s*\\(?:(?:draw|node|path|fill|filldraw|addplot|coordinate|foreach|matrix|"
+    r"clip|shade|shadedraw|pic|pgfmathsetmacro)\b"
+    r"|(?:begin|end)\s*\{\s*(?:" + "|".join(_TIKZ_CODE_ENVS) + r")\s*\})")
+_TIKZ_DATA_RE = re.compile(r"\b(?:coordinates|table|file)\s*(?=[\[{])")
+# A \foreach list is code (positions, counts) and goes -- unless its variable
+# list is slash-paired (`\x/\l`): then its values are typically node text, so
+# the WHOLE list stays in scope, the loud direction (P0.6 fix round 2, N2).
+_FOREACH_LIST_RE = re.compile(r"\\foreach\b(?P<vars>[^{]*?)\bin\s*(?=\{)")
+_FOREACH_PAIRED_RE = re.compile(r"\\[A-Za-z]+\s*/\s*\\[A-Za-z]+")
+_CTRL_RE = re.compile(r"\\([A-Za-z]+)\*?")
+
+
+def _blank(buf: list[str], i: int, j: int) -> None:
+    for k in range(i, min(j, len(buf))):
+        if buf[k] != "\n":
+            buf[k] = " "
+
+
+def _skip_ws(s: str, i: int) -> int:
+    while i < len(s) and s[i] in " \t\n":
+        i += 1
+    return i
+
+
+def _skip_sp(s: str, i: int) -> int:
+    """Spaces and tabs only: an optional `[` never crosses a line (M4)."""
+    while i < len(s) and s[i] in " \t":
+        i += 1
+    return i
+
+
+def _command_args_end(s: str, i: int, opts: str, n_mand: int) -> int:
+    """End of a command's excluded arguments, starting just after its name."""
+    end = i
+    j = _skip_sp(s, i)
+    while j < len(s) and s[j] in opts and s[j] in "[(":
+        end = j = texutil.group_end(s, j)
+        j = _skip_sp(s, j)
+    for _ in range(n_mand):
+        j = _skip_ws(s, end)
+        if j < len(s) and s[j] == "{":
+            end = texutil.group_end(s, j)
+        else:
+            break
+    return end
+
+
+def _blank_options(s: str, buf: list[str], i: int, j: int) -> None:
+    """Blank the option list `s[i:j]` (`[` ... `]`), keeping the VALUES of
+    typeset keys (`_TYPESET_KEYS`). For `label`/`pin` the position prefix
+    (`above:`, `60:`) and any `[...]` before it go too."""
+    buf[i] = " "
+    if j - 1 > i and s[j - 1] == "]":
+        buf[j - 1] = " "
+    items, start, k = [], i + 1, i + 1
+    while k < j - 1:
+        c = s[k]
+        if c == "\\":
+            k += 2
+            continue
+        if c in "{[(":
+            k = texutil.group_end(s, k)
+            continue
+        if c == ",":
+            items.append((start, k))
+            start = k + 1
+        k += 1
+    items.append((start, j - 1))
+    for a, b in items:
+        eq, k = -1, a
+        while k < b:
+            c = s[k]
+            if c == "\\":
+                k += 2
+                continue
+            if c in "{[(":
+                k = texutil.group_end(s, k)
+                continue
+            if c == "=":
+                eq = k
+                break
+            k += 1
+        key = " ".join(s[a:eq].split()).lower() if eq >= 0 else ""
+        if key not in _TYPESET_KEYS:
+            _blank(buf, a, b)
+            continue
+        v = eq + 1
+        if key in ("label", "pin"):
+            v = _skip_ws(s, v)
+            if v < b and s[v] == "[":
+                v = texutil.group_end(s, v)
+            colon = s.find(":", v, b)
+            brace = s.find("{", v, b)
+            if colon >= 0 and (brace < 0 or colon < brace):
+                v = colon + 1
+        _blank(buf, a, v)
+
+
+def _scan_tikz(s: str, buf: list[str], a: int, b: int) -> None:
+    """Inside one tikzpicture: blank option lists (typeset keys kept),
+    coordinates, data blocks, \\foreach lists (not slash-paired ones) and
+    code-level lengths. A brace group that does not open with a drawing
+    command or a TikZ/pgfplots environment is TEXT and is skipped whole, so
+    "(14 items, 26 discarded)" in a node keeps its numbers."""
+    text_spans: list[tuple[int, int]] = []
+    i = a
+    while i < b:
+        c = s[i]
+        if c == "\\":
+            m = _CTRL_RE.match(s, i)
+            if not m:
+                i += 2
+                continue
+            k = m.end()
+            if m.group(1) in _TIKZ_OPT_CMDS:
+                k2 = k
+                while k2 < b and s[k2] in "+ \t":
+                    k2 += 1
+                if k2 < b and s[k2] == "[":
+                    e = texutil.group_end(s, k2)
+                    _blank_options(s, buf, k2, e)
+                    i = e
+                    continue
+            i = k
+            continue
+        if c == "{":
+            e = texutil.group_end(s, i)
+            if _TIKZ_CODE_START_RE.match(s, i + 1):
+                i += 1
+            else:
+                text_spans.append((i, e))
+                i = e
+            continue
+        if c == "[" and _TIKZ_KEYWORD_BEFORE_RE.search(s, a, i):
+            e = texutil.group_end(s, i)
+            _blank_options(s, buf, i, e)
+            i = e
+            continue
+        if c == "(":
+            e = texutil.group_end(s, i)
+            if any(ch in s[i:e] for ch in ",:"):
+                _blank(buf, i, e)
+            i = e if e > i else i + 1
+            continue
+        i += 1
+    for dm in _TIKZ_DATA_RE.finditer(s, a, b):
+        j = _skip_ws(s, dm.end())
+        while j < b and s[j] == "[":
+            j = _skip_ws(s, texutil.group_end(s, j))
+        if j < b and s[j] == "{":
+            _blank(buf, dm.start(), texutil.group_end(s, j))
+    for fm in _FOREACH_LIST_RE.finditer(s, a, b):
+        if _FOREACH_PAIRED_RE.search(fm.group("vars")):
+            continue
+        _blank(buf, fm.end(), texutil.group_end(s, fm.end()))
+    for um in _UNIT_RE.finditer(s, a, b):
+        if not any(x <= um.start() < y for x, y in text_spans):
+            _blank(buf, um.start(), um.end())
+
+
+def _scoped_code(tex: str) -> tuple[str, bool]:
+    """(paper.tex with everything OUT of scope blanked, anchored?).
+
+    Same length and the same line breaks as `tex`, so an offset is a line.
+    Comments go first (per line, by the shared rule), then everything before
+    the Introduction and after \\end{document}, the back matter, the
+    bibliography, and the arguments and regions listed in `uncovered_numbers`.
+    Not anchored (`_intro_anchor` finds none) -> everything blanked, False.
+    """
+    lines = []
+    for raw in tex.split("\n"):
+        code = texutil.strip_comment_line(raw)
+        lines.append("" if code is None else code)
+    # keep each line's length so offsets stay put: pad stripped lines
+    code_lines = [c + " " * (len(r) - len(c)) for c, r in zip(lines, tex.split("\n"))]
+    s = "\n".join(code_lines)
+    buf = list(s)
+
+    m = _intro_anchor(s)
+    if not m:
+        return "".join(" " if c != "\n" else c for c in s), False
+    end_doc = s.find("\\end{document}", m.end())
+    end = len(s) if end_doc < 0 else end_doc
+    _blank(buf, 0, m.start())
+    _blank(buf, end, len(s))
+
+    # back matter: to the next non-back-matter section, \appendix or the end
+    for bm in _BACK_MATTER_START_RE.finditer(s, m.end(), end):
+        stop = end
+        for sec in _SECTION_RE.finditer(s, bm.end(), end):
+            if not _BACK_TITLE_RE.match(sec.group(1)):
+                stop = sec.start()
+                break
+        app = s.find("\\appendix", bm.end(), end)
+        if 0 <= app < stop:
+            stop = app
+        _blank(buf, bm.start(), stop)
+    for bib in re.finditer(r"\\begin\s*\{thebibliography\}.*?\\end\s*\{thebibliography\}",
+                           s, re.S):
+        _blank(buf, bib.start(), bib.end())
+
+    # command arguments
+    for cm in re.finditer(r"\\([A-Za-z]+)(\*?)", s):
+        name = cm.group(1)
+        if name == "begin":
+            j = _skip_ws(s, cm.end())
+            if j >= len(s) or s[j] != "{":
+                continue
+            env_end = texutil.group_end(s, j)
+            env = s[j + 1:env_end - 1].strip()
+            k = _skip_sp(s, env_end)
+            stop = env_end
+            while k < len(s) and s[k] == "[":
+                e = texutil.group_end(s, k)
+                _blank_options(s, buf, k, e)
+                stop = e
+                k = _skip_sp(s, e)
+            _blank(buf, stop, _command_args_end(s, stop, "", _ENV_SPEC_ARGS.get(env, 0)))
+            continue
+        if _CITE_RE.match(name):
+            _blank(buf, cm.start(), cm.end())
+            k = _skip_sp(s, cm.end())
+            while k < len(s) and s[k] == "[":
+                e = texutil.group_end(s, k)
+                buf[k] = " "
+                if s[e - 1] == "]":
+                    buf[e - 1] = " "
+                for loc in _LOCATOR_RE.finditer(s, k + 1, e - 1):
+                    _blank(buf, loc.start(), loc.end())
+                k = _skip_sp(s, e)
+            k = _skip_ws(s, k)
+            if k < len(s) and s[k] == "{":
+                _blank(buf, k, texutil.group_end(s, k))
+            continue
+        spec = _EXCLUDED_ARGS.get(name)
+        if spec is not None:
+            _blank(buf, cm.start(), _command_args_end(s, cm.end(), *spec))
+    for lb in _LINEBREAK_OPT_RE.finditer(s):
+        _blank(buf, lb.end(), texutil.group_end(s, lb.end()))
+
+    for tz in _TIKZ_RE.finditer(s):
+        _scan_tikz(s, buf, tz.start(), tz.end())
+    return "".join(buf), True
+
+
+def _math_mask(s: str) -> list[bool]:
+    """Per character: inside inline or display maths ($, $$, \\( \\), \\[ \\])?"""
+    mask = [False] * len(s)
+    inside, i, n = False, 0, len(s)
+    while i < n:
+        c = s[i]
+        if c == "\\" and i + 1 < n:
+            nxt = s[i + 1]
+            if nxt in "([":
+                inside = True
+            elif nxt in ")]":
+                inside = False
+            mask[i] = mask[i + 1] = inside
+            i += 2
+            continue
+        if c == "$":
+            step = 2 if s.startswith("$$", i) else 1
+            inside = not inside
+            for k in range(i, min(n, i + step)):
+                mask[k] = True
+            i += step
+            continue
+        mask[i] = inside
+        i += 1
+    return mask
+
+
+def _context(raw_line: str, token: str) -> str:
+    code = " ".join((texutil.split_comment(raw_line)[0]).split())
+    probes = [token, token.replace(",", "{,}")]
+    if token.startswith("0."):
+        probes.append(token[1:])
+    k = next((code.find(p) for p in probes if p in code), 0)
+    lo = max(0, k - 30)
+    return code[lo:lo + 60 + len(token)]
+
+
+def _pin_index(literals) -> dict[str, list[str]]:
+    """token -> the labels of every check whose literal carries it. A mapping
+    is {label: literal}; a plain collection of literals labels each by itself."""
+    pairs = literals.items() if hasattr(literals, "items") else ((l, l) for l in literals)
+    out: dict[str, list[str]] = {}
+    for label, lit in pairs:
+        for t in dict.fromkeys(number_tokens(normalise_numeric(lit))):
+            out.setdefault(t, []).append(label)
+    return out
+
+
+def _bib_keys(tex_path: Path, tex: str) -> set[str] | None:
+    """Keys of the bibliography `\\bibliography{...}` names (beside paper.tex;
+    `bibliography.bib` only when there is no such command). None when no file
+    exists -- a LIT tag then cannot be checked, so it excuses nothing."""
+    names = []
+    for m in _BIB_CMD_RE.finditer(texutil.strip_comments(tex)):
+        names += [n.strip() for n in m.group(1).split(",") if n.strip()]
+    if not names:
+        names = ["bibliography"]
+    keys, found = set(), False
+    for n in names:
+        f = Path(tex_path).parent / (n if n.endswith(".bib") else n + ".bib")
+        if f.exists():
+            found = True
+            for kind, key in _BIB_KEY_RE.findall(f.read_text(encoding="utf-8",
+                                                             errors="replace")):
+                if kind.lower() not in ("comment", "string", "preamble"):
+                    keys.add(key)
+    return keys if found else None
+
+
+def _line_tag(comment: str, bib_keys) -> tuple[str, str]:
+    """(kind, detail) of the tag in a raw line's comment part. kind is one of
+    "" (none), "NEW", "LIT", "YEAR", "BAD-NEW" (any near-miss tag, or an
+    empty `%% NEW:` -- it beats coverage, fail-safe), "BAD" (a `%% LIT:` tag
+    that cannot excuse; it does not beat coverage)."""
+    m = _NEW_TAG_RE.search(comment)
+    if m:
+        qual = f" ({m.group(1).strip()})" if m.group(1) else ""
+        return "NEW", f"source{qual}: {m.group(2)}"
+    if _NEW_EMPTY_RE.search(comment):
+        return "BAD-NEW", "malformed NEW tag, want `%% NEW: <source>`"
+    m = _LIT_TAG_RE.search(comment)
+    if m:
+        body = _LIT_BODY_RE.match(m.group(1))
+        if not body:
+            return "BAD", "malformed LIT tag, want `%% LIT: <bibkey> p.<n>`"
+        key = body.group(1)
+        if bib_keys is None:
+            return "BAD", f"LIT key {key!r} unchecked: no bibliography file found"
+        if key not in bib_keys:
+            return "BAD", f"LIT key {key!r} is not in the bibliography"
+        return "LIT", m.group(1).strip()
+    if _YEAR_TAG_RE.search(comment):
+        return "YEAR", ""
+    m = _TAGLIKE_RE.search(comment)
+    if m:
+        frag = comment[m.start():m.start() + 40].strip()
+        return "BAD-NEW", (f"near-miss tag {frag!r}: want `%% NEW: <source>`, "
+                           f"`%% LIT: <bibkey> p.<n>` or `%% YEAR`")
+    return "", ""
+
+
+def _is_year(tok: str, code: str, line_start: int, math: list[bool]) -> bool:
+    """A 4-digit 1900-2099 integer written outside maths (M2b)."""
+    if not _YEAR_RE.fullmatch(tok):
+        return False
+    for m in re.finditer(rf"(?<![\d.,]){tok}(?!\d)", code):
+        if not math[line_start + m.start()]:
+            return True
+    return False
+
+
+def _coverage_scan(tex: str, literals, bib_keys=None) -> Coverage:
+    """Scan `tex`; see `uncovered_numbers` for the rules.
+
+    `literals`: {label: literal} (labels then appear in notes and in
+    --list-covered) or a plain collection of literals. `bib_keys`: the keys a
+    LIT tag may name; None means no bibliography could be read.
+    """
+    pins = _pin_index(literals)
+    scoped_text, anchored = _scoped_code(tex)
+    if not anchored:
+        return Coverage([], 0, 0, [], _NO_ANCHOR)
+    math = _math_mask(scoped_text)
+    raw_lines = tex.split("\n")
+    out: list[Uncovered] = []
+    covered: list[tuple[int, str, list[str]]] = []
+    n_tok = n_cov = 0
+    start = 0
+    for no, (code, raw) in enumerate(zip(scoped_text.split("\n"), raw_lines), 1):
+        line_start, start = start, start + len(code) + 1
+        if not code.strip():
+            continue
+        toks = number_tokens(normalise_numeric(code))
+        if not toks:
+            continue
+        raw_code, comment = texutil.split_comment(raw)
+        tag, detail = _line_tag(comment, bib_keys)
+        cites = bool(_CITE_CMD_RE.search(raw_code))
+        for tok in toks:
+            n_tok += 1
+            labels = pins.get(tok)
+            ctx = _context(raw, tok)
+            if tag == "NEW":
+                twin = f"; also pinned by: {'; '.join(labels)}" if labels else ""
+                out.append(Uncovered("NEW", tok, no, ctx, detail + twin))
+            elif tag == "BAD-NEW":
+                out.append(Uncovered("UNCOVERED", tok, no, ctx, detail))
+            elif labels:
+                n_cov += 1
+                covered.append((no, tok, labels))
+            elif tag == "LIT" and cites:
+                out.append(Uncovered("INFO literature", tok, no, ctx, detail))
+            elif _is_year(tok, code, line_start, math):
+                excused = cites or tag == "YEAR"
+                out.append(Uncovered(
+                    "INFO year", tok, no, ctx,
+                    "" if excused else "no \\cite or %% YEAR on this line: "
+                                       "fails --strict-coverage",
+                    strict_fail=not excused))
+            elif tag == "LIT":
+                out.append(Uncovered("UNCOVERED", tok, no, ctx,
+                                     "LIT tag, but this line has no \\cite"))
+            elif tag == "BAD":
+                out.append(Uncovered("UNCOVERED", tok, no, ctx, detail))
+            else:
+                out.append(Uncovered("UNCOVERED", tok, no, ctx))
+    refusal = None if n_tok else "0 number tokens in scope"
+    return Coverage(out, n_tok, n_cov, covered, refusal)
+
+
+def uncovered_numbers(tex_path: Path, literals=None) -> list[Uncovered]:
+    r"""Every number token in the main text and appendices that no check pins.
+
+    SCOPE. The comment-stripped source from the scope anchor to
+    `\end{document}`. The anchor (`_intro_anchor`) is the FIRST `\section`
+    after `\begin{document}`, and it must be `\section{Introduction}`,
+    `\section[...]{Introduction}`, `\section{\label{...}Introduction}` or
+    `\section*{Introduction}` (`\section{Introduction\label{...}}` is refused:
+    write `\section{Introduction}\label{...}`). With no anchor, or with an
+    anchored scope that holds no number token, the scan REFUSES (raises
+    `ScopeNotAnchored`; `main()` prints `FAIL coverage: scope not anchored`):
+    neither is a measurement (fix round 1, C2; P0.6 fix round 2, N3 and N4).
+    Excluded:
+      - the back-matter declarations, matched by their FULL titles
+        (`_BACK_MATTER_TITLES`) or `\printcredits`, each running to the next
+        section that is not back matter, `\appendix` or `\end{document}`;
+      - the bibliography (`\bibliography`, `\bibliographystyle`,
+        `thebibliography`);
+      - the arguments of the `\ref` family (`texutil.REF_COMMANDS`), `\label`,
+        `\includegraphics[...]`, `\input`, `\usepackage`, `\url`/`\href`'s URL,
+        spacing and length commands, table specs (`\begin{tabular}{...}`,
+        `\multicolumn{n}{spec}` -- its text stays -- `\cmidrule`, `\\[2pt]` on
+        the same line), and `\begin{env}[options]`;
+      - `\cite*` keys and the page LOCATORS in their notes (`p.~12`,
+        `ch.~3`); any other note text ("reporting 32\%") stays in scope;
+      - inside `tikzpicture`: option lists after `\node`, `\draw`, `\path`,
+        `\addplot`, `\coordinate`, `\fill`, `\filldraw`, `\matrix`, a TikZ
+        keyword or `\begin{...}`; coordinates (a code-level parenthesised
+        group with a comma or colon); `coordinates`/`table` data blocks;
+        `\foreach` lists, except a slash-paired one (`\x/\l`), which stays
+        WHOLE (P0.6 fix round 2, N2); code-level lengths.
+    KEPT, because typeset: node text (any brace group that does not open with
+    a drawing command or a TikZ/pgfplots environment such as `scope` or
+    `axis` -- `{\begin{tabular}...}` is text), the values of `_TYPESET_KEYS`
+    (label, pin, x/y/zlabel, title, legend entries, x/y/zticklabels, extra
+    x/y tick labels, nodes near coords, node contents), captions, table
+    cells, and prose -- including "width = 0.12" or
+    "fell 5.3pt" (no global key=value or length rule; fix round 1, I1/M4).
+    The abstract is out of scope here because `abstract_lint` owns it.
+
+    PGFPLOTS DATA IS NOT CHECKED HERE. Coordinates come from generated figure
+    code: the P1C result figures are compared with their generator by
+    `tests/test_make_result_figures.py::test_the_emitted_files_are_current`.
+    The screen histogram pasted inline in paper.tex (`make_screen_figure.py`
+    output) has NO such comparison today -- this report does not cover it.
+
+    TOKENS. `number_tokens(normalise_numeric(...))`, exactly as the abstract
+    lint, so the identifier rule (RQ1, P0, Python 3, GPT-4o ...) is shared.
+
+    COVERED is LOOSE: a token is covered if it equals a token of ANY current
+    check literal. A twin -- the same string for another quantity -- counts
+    as covered (ruled, M1). `--list-covered` prints every covered token with
+    the labels of the checks that pin it, for the P2 exit review.
+
+    KINDS, in precedence order (fix round 1, C1 and M2 rulings):
+      NEW              the line carries a well-formed `%% NEW: <source>`
+                       (or `%% NEW (<qualifier>): <source>`): EVERY token on
+                       it is NEW, even one a check pins -- the note then names
+                       the pinning check(s). Removing the tag is the
+                       integrator's deliberate act after writing the check.
+      UNCOVERED        any near-miss tag (`%% new: ...`, `%% NEW` with no
+                       colon, `%% lit: ...`, `% Year ...`) or an empty
+                       `%% NEW:` also beats coverage, with a note saying what
+                       the tag should be. A `%% LIT:` whose body or key is bad
+                       does not: it is reported only when no check pins the
+                       token (below)
+      covered          not reported (see --list-covered)
+      INFO literature  a valid `%% LIT: <bibkey> p.<n>` (trailing text
+                       allowed) on a line that carries a `\cite`, with a key
+                       that is in the bibliography
+      INFO year        a 4-digit 1900-2099 integer written outside maths;
+                       under --strict-coverage it FAILS unless its line
+                       carries a `\cite` or a `%% YEAR` tag
+      UNCOVERED        everything else -- including a LIT-tagged token whose
+                       line cites nothing or whose key is unknown, with a note
+    Tags are read from the RAW line and apply to that line only.
+
+    `literals`: {label: literal} or a collection of literals; None computes
+    {label: literal} with `_current_literals(checks())`.
+    """
+    if literals is None:
+        literals = _current_literals(checks())
+    tex = Path(tex_path).read_text(encoding="utf-8")
+    cov = _coverage_scan(tex, literals, _bib_keys(Path(tex_path), tex))
+    if cov.refusal:     # ANY refusal: an empty scope is not "0 uncovered" (N4)
+        raise ScopeNotAnchored(f"{tex_path}: scope not anchored ({cov.refusal})"
+                               f"{_anchor_hint(cov.refusal)}")
+    return cov.records
 
 def _load(name: str) -> list[dict] | None:
     p = RUNS / name
@@ -319,21 +1648,22 @@ def checks() -> list[tuple[str, str | None, str]]:
         #
         # Emitted as a literal instead, like every other quantity here: the
         # value is recomputed from the data and the manuscript must contain it.
-        k_tot = ol[0].get("k_per_solver", 20) * len(ol[0].get("per_solver", {}) or [1])
-        band_calls = (min(rej_b) - max(kept_b)) * k_tot
+        band_calls, k_tot = _screen_band(ol)
         # Rounded with a tolerance, not compared exactly: the band is a
         # difference of two exact sixtieths scaled by 60, so it lands on
         # 2.9999999999999996 rather than 3.0 and an equality test sends a whole
         # number down the decimal branch. The same class of error as §4.17,
         # where a bare `<=` decided an exact tie by one ULP.
+        # RE-TARGETED at P2-I2: the bare word ("three") matched any "three"
+        # in the paper (triage row 8). It is now the App A sentence that
+        # states the band, anchored by its own words.
         out.append(("invariance band (solver calls)",
-                    _spell(round(band_calls))
+                    f"is {_spell(round(band_calls))} reader-model calls wide"
                     if abs(band_calls - round(band_calls)) < 1e-6
                     else f"{band_calls:.2f}",
                     "min(rejected) - max(retained), in calls out of "
-                    f"{k_tot}; spelled out because the Method reads "
-                    f"'{_spell(round(band_calls))} solver call"
-                    f"{'' if round(band_calls) == 1 else 's'} wide'"))
+                    f"{k_tot}; spelled out because App A reads "
+                    f"'{_spell(round(band_calls))} reader-model calls wide'"))
 
         # THE SCREEN RETAINS ON A POOLED BASELINE, THE ANALYSIS WORKS PER
         # SOLVER (spec 4.34). `per_solver_leak` computes
@@ -856,6 +2186,10 @@ def checks() -> list[tuple[str, str | None, str]]:
         out.append(("placebo calls", str(pcalls), "placebo subsection"))
         out.append(("placebo parse rate", f"{pparsed / pcalls * 100:.1f}", "per cent"))
         assert pfailed == 0, f"{pfailed} placebo transport failures; the text says none"
+        # P2-I2: anchored twin of the bare `504` (also the P2/P3 reply counts)
+        out.append(("placebo calls (anchored)",
+                    f"${pcalls}$ reader calls, none failed, with a parseable reply on "
+                    f"${pparsed / pcalls * 100:.1f}\\%$", "App B placebo floor"))
 
         pooled = [r["placebo_hinted"] for r in plc]
         m, lo, hi = A_mean_ci(pooled)
@@ -871,6 +2205,11 @@ def checks() -> list[tuple[str, str | None, str]]:
         out.append(("placebo minus baseline, CI high", f"{dhi:.3f}", "placebo subsection"))
         out.append(("placebo minus baseline, min", f"{min(diffs.values()):.3f}", "per item"))
         out.append(("placebo minus baseline, max", f"{max(diffs.values()):.3f}", "per item"))
+        # P2-I2: the per-item range as the Method prints it, anchoring the
+        # twins `0.500` / `-0.144` (triage rows 84-85)
+        out.append(("placebo minus baseline, range (anchored)",
+                    f"by ${min(diffs.values()):.3f}$ to ${max(diffs.values()):.3f}$",
+                    "Method: why the placebo is per item"))
 
         for sv in sorted({sv for r in plc for sv in r["per_solver"]}):
             short = sv.split("/")[-1].replace(":cloud", "").replace(":", "-")
@@ -891,6 +2230,10 @@ def checks() -> list[tuple[str, str | None, str]]:
         w_p = next(r for r in plc if r["item_id"] == worst)
         out.append(("A-L09-01 baseline", f"{base[worst]['baseline']:.3f}", "placebo subsection"))
         out.append(("A-L09-01 placebo", f"{w_p['placebo_hinted']:.3f}", "placebo subsection"))
+        # P2-I2: App B's "credited with 0.500", the same item's excess, anchored
+        out.append(("A-L09-01 placebo excess (anchored)",
+                    f"credited with ${diffs[worst]:.3f}$ of recoverability",
+                    "placebo minus masked baseline on A-L09-01"))
         g = "ol/gemma4:cloud"
         out.append(("A-L09-01 gemma4 placebo hits",
                     f"{w_p['per_solver'][g]['hits']}", "9 of 12"))
@@ -932,7 +2275,11 @@ def checks() -> list[tuple[str, str | None, str]]:
             out.append((f"{reg} blocked CI high", f"{hi * 100:.1f}", "Wilson"))
             if reg == "P3":
                 plo, phi = S_wilson(passed, rej_cells)
-                out.append(("P3 cells rejected at least once", str(rej_cells), "manuscript"))
+                # RE-TARGETED at P2-I2 (triage row 106): the bare `47` matched
+                # any 47; App D's filter table prints it in this row.
+                out.append(("P3 cells rejected at least once",
+                            f"\\quad flagged at least once & {rej_cells} &",
+                            "App D table, Bank A cell"))
                 out.append(("P3 total rejections", str(rej), "manuscript"))
                 out.append(("P3 repaired and passed", str(passed), "manuscript"))
                 out.append(("P3 recovery rate", f"{passed / rej_cells * 100:.1f}",
@@ -1177,6 +2524,14 @@ def checks() -> list[tuple[str, str | None, str]]:
         hit = [k for k, v in cells.items() if v[0]]
         out.append(("cap-affected Bank A cells", f"${len(hit)}$",
                     f"of {len(cells):,} usable, at the {cap}-token ceiling"))
+        # P2-I2: App C states the count with its share and the ceiling; one
+        # computation of `hit`, so the share cannot drift from the count.
+        out.append(("cap-affected share of Bank A replies",
+                    f"Of Bank~A's {len(cells):,} replies, ${len(hit)}$ "
+                    f"({_pct(len(hit) / len(cells))}) contain at",
+                    "cap-affected cells / usable cells"))
+        out.append(("generator ceiling", f"a completion ceiling of {cap} tokens",
+                    "config.GENERATOR_BUDGET_BEFORE_MEASUREMENT"))
         ch_hit = st.mean(cells[k][1] for k in hit)
         ch_rest = st.mean(v[1] for v in cells.values() if not v[0])
         out.append(("cap-affected mean chars", f"${ch_hit:.0f}$", "truncated cells"))
@@ -1291,9 +2646,14 @@ def checks() -> list[tuple[str, str | None, str]]:
         # single math group, `$[-0.004, +0.051]$`, so checking the two bounds
         # separately looks for `$-0.004$` and `$+0.051$` -- literals that do not
         # and should not appear. Matching what is actually typeset, not loosening.
+        z = 1.96
         out.append(("capcheck 95% CI",
-                    f"$[{m - 1.96 * se:+.3f}, {m + 1.96 * se:+.3f}]$",
+                    f"$[{m - z * se:+.3f}, {m + z * se:+.3f}]$",
                     "paired difference interval"))
+        # P2-I2: the interval's level, from the same z that builds it.
+        out.append(("capcheck interval level",
+                    f"{_level_from_z(z)}\\% interval $[{m - z * se:+.3f}, {m + z * se:+.3f}]$",
+                    "level of the paired interval"))
         out.append(("capcheck max shift", f"${cs['max_shift_in_se']:.2f}$",
                     "largest contrast displacement, in standard errors"))
         r2 = cs["families"]["R2_mitigation"]
@@ -1379,11 +2739,26 @@ def checks() -> list[tuple[str, str | None, str]]:
     bsres_p = ROOT / "data" / "results_bankBS_ol.json"
     if bsres_p.exists():
         bsres = json.loads(bsres_p.read_text(encoding="utf-8"))
+        # RE-TARGETED at P2-I2 (triage rows 205, 209, 211): the paper prints
+        # these p values only in Table 3, as `<0.001` (which the bare `0.000`
+        # never matched -- it passed on unrelated `0.000`s) and as `0.095`,
+        # which App B's "from 0.081 to 0.095" twins. Each is now the Table 3
+        # row its cell sits in, compared cell by cell (`_table3_rows`). P2-P1
+        # (row 207) keeps its bare `0.097`: it has no twin in the paper, and it
+        # is the current literal that keeps the superseded `0.097` (gemma4's
+        # pre-re-screen accuracy) from flagging this correct cell.
+        t3 = _table3_rows()
         for name, c in (bsres["families"]["R2_mitigation"]["contrasts"]).items():
             out.append((f"bank BS {name} estimate", f"{c['estimate']:.3f}",
                         "R2 within Bank B"))
-            out.append((f"bank BS {name} adj p", f"{c['p_adjusted']:.3f}",
-                        "Holm-adjusted within R2"))
+            if name == "P2-P1":
+                out.append((f"bank BS {name} adj p", f"{c['p_adjusted']:.3f}",
+                            "Holm-adjusted within R2"))
+            else:
+                lit, note = t3.get(("a", name), (None, "Table 3 artefacts absent"))
+                out.append((f"bank BS {name} adj p", lit,
+                            f"Holm-adjusted within R2, printed "
+                            f"{_p_table(c['p_adjusted'])} in its Table 3 row; {note}"))
 
     # ---- the deposit's licence scan (Data availability) ------------------------
     # The manuscript states how much Bank B text the withheld logs carry. That
@@ -1561,18 +2936,1769 @@ def checks() -> list[tuple[str, str | None, str]]:
         out.append((f"verifier false positives, bank {bank}",
                     f"${a['fp_n']}/{a['fp_d']}$",
                     f"{a['fp_rate']:.1%} on answer-free text"))
+    # The integrated C&E manuscript (P2-I2): every `%% NEW:` quantity. `ol` is
+    # passed so that screen-derived figures stay behind the completeness gate.
+    out += _ce_checks(ol)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# THE INTEGRATED C&E MANUSCRIPT -- P2-I2 (2026-11-11)
+# ---------------------------------------------------------------------------
+# Every `%% NEW: <source>` quantity of the restructured paper, computed from
+# the source its tag names. The helpers below render a value the way the
+# manuscript prints it; none carries a number of its own beyond the reporting
+# conventions their docstrings name. A context phrase in a literal is there to
+# anchor a twin (the same string meaning something else elsewhere) and is
+# always on ONE source line: presence is tested on the comment-stripped text,
+# newlines included.
+
+def _data(name: str):
+    """A `data/*.json` artefact, or None."""
+    p = ROOT / "data" / name
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
+def _tex_int(n: int) -> str:
+    """2016 -> 2{,}016, the form used inside maths."""
+    return f"{int(n):,}".replace(",", "{,}")
+
+
+def _pct(x: float) -> str:
+    """A share as the prose prints it: 0.9802 -> 98.0\\%."""
+    return f"{100 * x:.1f}\\%"
+
+
+def _pct_bound(x: float) -> str:
+    """One bound of a percentage interval: one decimal, except that a bound
+    at 100% prints as 100, as in $[94.2, 100]$."""
+    s = f"{100 * x:.1f}"
+    return "100" if s == "100.0" else s
+
+
+def _pct_ci(ci) -> str:
+    return f"$[{_pct_bound(ci[0])}, {_pct_bound(ci[1])}]$"
+
+
+def _signed_ci(lo: float, hi: float) -> str:
+    """A contrast interval in prose: explicit signs, $[-0.053, +0.001]$."""
+    return f"$[{lo:+.3f}, {hi:+.3f}]$"
+
+
+def _table_ci(lo: float, hi: float) -> str:
+    """A contrast interval in Table 3: braced, no plus sign."""
+    return f"{{[{lo:.3f}, {hi:.3f}]}}"
+
+
+def _p_table(p: float) -> str:
+    """A Holm p as Table 3 prints it, by the convention its source comment
+    states: <0.001 below 0.001, three decimals below 0.10, two above."""
+    if p < 0.001:
+        return "<0.001"
+    return f"{p:.3f}" if p < 0.10 else f"{p:.2f}"
+
+
+_DAGGER = "\\rlap{$^{\\dagger}$}"
+
+
+def _disagree(reject: bool, ci) -> bool:
+    """Table 3's dagger: the Holm verdict and the item-resampled interval
+    disagree -- one rejects while the other includes zero, or the reverse."""
+    return bool(reject) != (ci[0] > 0 or ci[1] < 0)
+
+
+def _level_from_z(z: float) -> int:
+    """Coverage in per cent of a two-sided normal interval at z (95 at 1.96)."""
+    return round(100 * (2 * st.NormalDist().cdf(z) - 1))
+
+
+def _ceil_at(x: float, nd: int) -> str:
+    """The smallest `nd`-decimal number >= x. A sentence saying that nothing
+    moves 'by more than X' is true only when X >= the exact value, so a bound
+    is rendered by ceiling, never by rounding (P2-I2: 0.000661 is not
+    'no more than 0.00066')."""
+    import math
+    v = math.ceil(x * 10 ** nd - 1e-9) / 10 ** nd
+    return f"{v:.{nd}f}"
+
+
+def _floor_pct_at_ten(x: float) -> str:
+    """'at least N%' for a share, N a multiple of ten at or below it."""
+    import math
+    return str(int(math.floor(x * 10 + 1e-9) * 10))
+
+
+# 'about <fraction>' in running prose. A share is 'about' the NEAREST fraction
+# of this vocabulary (a tie goes to the smaller denominator), and only when it
+# lies within _ABOUT_TOL of it -- so the words cannot drift from the number.
+# The tolerance is the one first written (0.025). P2-I2 briefly raised it to
+# 0.05 after "about half" for 55.0% failed; that was a check loosened by the
+# sentence it checks, so it was reverted and the sentence is reported instead.
+_FRACTION_WORDS = {(1, 2): "half", (1, 3): "a third", (2, 3): "two thirds",
+                   (1, 4): "a quarter", (3, 4): "three quarters",
+                   (1, 5): "a fifth", (2, 5): "two fifths",
+                   (3, 5): "three fifths", (4, 5): "four fifths",
+                   (1, 10): "a tenth", (3, 10): "three tenths",
+                   (7, 10): "seven tenths", (9, 10): "nine tenths"}
+_ABOUT_TOL = 0.025
+
+
+def _about_fraction(x: float) -> str | None:
+    """The fraction word a share is 'about', or None if no word fits."""
+    best = min(_FRACTION_WORDS,
+               key=lambda f: (round(abs(x - f[0] / f[1]), 9), f[1]))
+    return (_FRACTION_WORDS[best]
+            if round(abs(x - best[0] / best[1]), 9) <= _ABOUT_TOL else None)
+
+
+def _times(n: int) -> str:
+    return {1: "once", 2: "twice"}.get(n, f"{_spell(n)} times")
+
+
+def _ordinal(i: int) -> str:
+    """0 -> first: an option POSITION as the prose names it."""
+    return ("first", "second", "third", "fourth", "fifth")[i]
+
+
+def _rname(model: str) -> str:
+    """ol/gpt-oss:120b-cloud -> gpt-oss:120b: a model as the paper names it."""
+    return model.split("/")[-1].replace("-cloud", "").replace(":cloud", "")
+
+
+def _code_threshold_checker() -> int | None:
+    """The `len(key_text) >= N` of checker.check_explicit's option_verbatim
+    rule, read from the code: the rule has no named constant, and a typed copy
+    here would be a second copy of it."""
+    import ast
+    tree = ast.parse((ROOT / "harness" / "checker.py").read_text(encoding="utf-8"))
+    hits = [n.comparators[0].value for n in ast.walk(tree)
+            if isinstance(n, ast.Compare) and isinstance(n.left, ast.Call)
+            and getattr(n.left.func, "id", "") == "len" and n.left.args
+            and getattr(n.left.args[0], "id", "") == "key_text"
+            and isinstance(n.ops[0], ast.GtE)
+            and isinstance(n.comparators[0], ast.Constant)]
+    return hits[0] if len(hits) == 1 else None
+
+
+def _code_size_bank_b_target() -> int | None:
+    """`size_bank_b.py --target`'s default: the retained-item target fixed
+    in advance, read from its argparse declaration."""
+    import ast
+    tree = ast.parse((ROOT / "harness" / "size_bank_b.py").read_text(encoding="utf-8"))
+    for n in ast.walk(tree):
+        if (isinstance(n, ast.Call) and getattr(n.func, "attr", "") == "add_argument"
+                and n.args and isinstance(n.args[0], ast.Constant)
+                and n.args[0].value == "--target"):
+            for kw in n.keywords:
+                if kw.arg == "default" and isinstance(kw.value, ast.Constant):
+                    return kw.value.value
+    return None
+
+
+# A CLAIM THAT STOPS BEING TRUE MUST FAIL, NOT WAIT. A check whose literal is
+# a sentence's claim (a verdict, an ordering, "all", a fraction word) emits
+# this when the data no longer support it: a string the paper cannot hold, so
+# the check is MISSING (exit 1). None stays reserved for data that are ABSENT
+# (PENDING); emitting None for a false claim would pass the run with exit 0.
+_FALSE = "<<claim not supported by the data -- see this check's note>>"
+
+
+def _ce_checks(ol) -> list[tuple[str, str | None, str]]:
+    """The C&E manuscript's `%% NEW:` quantities (P2-I2), section by section.
+
+    `ol` is the Bank A screen as `checks()` gated it: None while incomplete,
+    so every screen-derived figure here waits for the complete set too.
+    """
+    out: list[tuple[str, str | None, str]] = []
+    import inspect
+
+    import analyse as _A
+    import config as _C
+    import pipelines as _P
+    import results as _Res
+
+    resA, resB = _data("results_bankA_ol.json"), _data("results_bankBS_ol.json")
+    pool = _data("results_pooled_A-BS_ol.json")
+    exA, exB = _data("exploratory_bankA_ol.json"), _data("exploratory_bankBS_ol.json")
+    exP = _data("exploratory_pooled_A-BS_ol.json")
+    hv = _data("human_validation_results.json")
+    if not all((resA, resB, pool, exA, exB, exP, hv)):
+        out.append(("C&E manuscript checks", None,
+                     "a results, exploratory or human-validation artefact is absent"))
+        return out
+    banks = (("A", resA, exA), ("BS", resB, exB))
+    bname = {"A": "Bank~A", "BS": "Bank~B"}
+
+    # ---- design facts, read from the realised data and the configuration ----
+    per_reply = {b: r["failure_slack"]["n_solver_calls"] / r["coverage"]["usable_responses"]
+                 for b, r, _ in banks}
+    assert len(set(per_reply.values())) == 1 and per_reply["A"].is_integer(), (
+        f"reader calls per reply differ by bank or are fractional: {per_reply}")
+    calls = int(per_reply["A"])
+    draws = _C.OL_SOLVER_K_HINT
+    readers, rem = divmod(calls, draws)
+    assert rem == 0, f"{calls} calls per reply is not readers x {draws} draws"
+    n_cells = (len(_C.OL_GENERATORS) * len(_C.REGIMES)
+               * len(_C.OL_SOLICITATION_KEYS))
+    reps = {b: r["coverage"]["usable_responses"]
+            / (r["primary_model"]["n_items"] * n_cells) for b, r, _ in banks}
+    assert set(reps.values()) == {_C.OL_GEN_REPLICATES}, (
+        f"replies per item and cell are {reps}, not OL_GEN_REPLICATES")
+    max_repairs = inspect.signature(_P.run).parameters["max_repairs"].default
+    n_utt = len(_C.PLACEBO_RESPONSES)
+    grid = _Res.THRESHOLD_GRID
+    cut = exA["given_rule"]["cut"]
+    assert cut == exB["given_rule"]["cut"] and cut in grid
+    ci_level = round(100 * inspect.signature(
+        _A.item_bootstrap_ci).parameters["level"].default)
+    wilson_level = _level_from_z(inspect.signature(
+        _A.wilson_ci).parameters["z"].default)
+    boot_B = {e["intervals"]["ci_cluster_item"]["B"] for e in (exA, exB)}
+    assert boot_B == {inspect.signature(_A.item_bootstrap_ci).parameters["B"].default}
+
+    # ---- Section 3: Method ----------------------------------------------------
+    out.append(("Fig 1: readers x draws per reply",
+                f"({readers} models $\\times$ {draws} draws)",
+                f"{calls} calls per reply = n_solver_calls / usable_responses"))
+    out.append(("Fig 1: placebo utterances per item",
+                f"({n_utt} utterances per item)", "config.PLACEBO_RESPONSES"))
+    man_p = BANKS / "bank_b_sample_manifest.json"
+    if man_p.exists():
+        man = json.loads(man_p.read_text(encoding="utf-8"))
+        assert man["method"].startswith("stratified by option count")
+        out.append(("Bank B sample size (Method)",
+                    f"sample, stratified by option count, of {man['n_sample']}",
+                    "bank_b_sample_manifest.json n_sample, method"))
+        out.append(("Bank B sample size (App A)",
+                    f"A sample of {man['n_sample']} was drawn from",
+                    "bank_b_sample_manifest.json n_sample"))
+        out.append(("Bank B sample population (App A)",
+                    f"the {man['n_population']} before any screening",
+                    "bank_b_sample_manifest.json n_population"))
+    bs_scr = _load("screen_bankBS_ol.jsonl")
+    if ol is not None and bs_scr:
+        ks = {r["k_per_solver"] for r in ol + bs_scr}
+        assert len(ks) == 1, f"screens ran at different k: {ks}"
+        k = ks.pop()
+        out.append(("screen calls per reader model (Method)",
+                    f"every item {k} times with the stem masked",
+                    "k_per_solver on every screen row, both banks"))
+    m = _C.HEADROOM_MARGIN
+    out.append(("retention rule (Method)",
+                f"chance plus {m:.2f} ({1 / 3 + m:.3f} for three options)",
+                "config.HEADROOM_MARGIN; 1/3 + margin"))
+    target = _code_size_bank_b_target()
+    out.append(("retained-item target (Method)",
+                f"the protocol's target of {target}" if target else None,
+                "size_bank_b.py --target default"))
+    fz = {b: json.loads((BANKS / f).read_text(encoding="utf-8"))
+          for b, f in (("A", "bank_a_screened_ol.json"),
+                       ("BS", "bank_bs_screened_ol.json"))
+          if (BANKS / f).exists()}
+    n41 = pool["families"]["R4_robustness"]["n_items"]
+    if len(fz) == 2:
+        assert n41 == fz["A"]["n_retained_mcq"] + fz["BS"]["n_retained_mcq"]
+    out.append(("analysed items (Method)",
+                f"The analysed set is therefore {n41} items", "R4 n_items"))
+    out.append(("analysed items (Limitations)",
+                f"The {n41} items come from two banks", "R4 n_items"))
+    out.append(("analysed items (Table 3b)",
+                f"(b) Both banks pooled ({n41} items)", "R4 n_items"))
+    out.append(("tutor temperature",
+                f"sampled at temperature~{_C.GEN_TEMPERATURE:g};",
+                "config.GEN_TEMPERATURE"))
+    out.append(("request styles",
+                f"one of {_spell(len(_C.OL_SOLICITATION_KEYS))} request styles",
+                "config.OL_SOLICITATION_KEYS"))
+    out.append(("conditions",
+                f"{_spell(len(_C.REGIMES)).capitalize()} cumulative conditions "
+                f"were applied", "config.REGIMES"))
+    out.append(("repair budget (Method)",
+                f"for rewriting, at most {_times(max_repairs)}",
+                "pipelines.run(max_repairs)"))
+    out.append(("repair budget (App C)",
+                f"repair a flagged reply up to {_times(max_repairs)}",
+                "pipelines.run(max_repairs)"))
+    out.append(("repair budget (App D)",
+                f"rewrite it as a hint, up to {_times(max_repairs)}",
+                "pipelines.run(max_repairs)"))
+    uA, uB = (r["coverage"]["usable_responses"] for _, r, _ in banks)
+    n_obs = pool["families"]["R4_robustness"]["n_obs"]
+    assert n_obs == uA + uB
+    out.append(("replies per item and the reply counts (Method)",
+                f"{_spell(_C.OL_GEN_REPLICATES)} replies per item: "
+                f"${_tex_int(n_obs)}$ replies, ${_tex_int(uA)}$ on Bank~A and "
+                f"${_tex_int(uB)}$ on Bank~B.",
+                "R4 n_obs; coverage.usable_responses per bank"))
+    out.append(("reader temperature and draws",
+                f"{_spell(draws)} draws each at temperature~"
+                f"{_C.SOLVER_TEMPERATURE:g};", "OL_SOLVER_K_HINT; SOLVER_TEMPERATURE"))
+    out.append(("calls per reply (Method)",
+                f"the hinted rate is the share of these {calls}",
+                "n_solver_calls / usable_responses"))
+    out.append(("calls per reply (validity)",
+                f"where the measure puts it to {calls}", "same quantity"))
+    out.append(("calls per reply (Table 4 caption)",
+                f"share of {calls} reader calls", "same quantity"))
+    out.append(("placebo utterances (Method)",
+                f"{_spell(n_utt)} content-free utterances per item",
+                "config.PLACEBO_RESPONSES"))
+    out.append(("placebo utterances (App B)",
+                f"the {_spell(n_utt)} content-free utterances were scored on all",
+                "config.PLACEBO_RESPONSES"))
+    plc_bs = _load("placebo_bankBS_ol.jsonl")
+    if plc_bs:
+        assert all(len(r["per_placebo"]) == n_utt for r in plc_bs)
+        plc_bs_mean = st.mean(r["placebo_hinted"] for r in plc_bs)
+        out.append(("Bank B placebo floor (Method)",
+                    f"Bank~A but {plc_bs_mean:.3f} on Bank~B",
+                    "mean placebo_hinted over placebo_bankBS_ol.jsonl items"))
+    out.append(("descriptive cut and grid (Method)",
+                f"{cut:.2f}, one cut on a grid from {min(grid):.2f} to "
+                f"{max(grid):.2f}", "results.THRESHOLD_GRID; given_rule.cut"))
+    # P0 highest and P2 lowest at every cut on both banks: a statement, pinned
+    # by its phrase only while it holds.
+    order_holds = True
+    for _, _, e in banks:
+        for c in e["given_by_grid"]["all_items"].values():
+            rates = {reg: v["rate"] for reg, v in c.items()}
+            others = [v for reg, v in rates.items() if reg != "P0"]
+            if not (rates["P0"] > max(others)
+                    and rates["P2"] < min(v for reg, v in rates.items() if reg != "P2")):
+                order_holds = False
+    assert len(exA["given_by_grid"]["all_items"]) == len(grid)
+    out.append(("P0 highest, P2 lowest at every cut (Method)",
+                "on both banks, the share of replies giving the key away is highest "
+                "with no safeguard and lowest under the filter" if order_holds
+                else "(P0 highest / P2 lowest fails at some cut)",
+                "given_by_grid.all_items, every cut, both banks"))
+    out.append(("P0 highest, P2 lowest at every cut (App C)",
+                "At every cut on both banks P0 is highest and P2 lowest"
+                if order_holds else "(P0 highest / P2 lowest fails at some cut)",
+                "given_by_grid.all_items, every cut, both banks"))
+    vlen = _code_threshold_checker()
+    out.append(("verbatim-option length (Method)",
+                f"verbatim option text of at least {vlen} characters" if vlen else None,
+                "checker.check_explicit option_verbatim rule"))
+    out.append(("verbatim-option length (App D)",
+                f"it is at least {vlen} characters long" if vlen else None,
+                "checker.check_explicit option_verbatim rule"))
+    fA, fB = (e["detector"] for e in (exA, exB))
+    out.append(("items with answer forms, Bank A (Method)",
+                f"for {fA['retained_items_with_answer_forms']} of "
+                f"{fA['n_retained_items']} Bank~A items and", "detector"))
+    out.append(("items with answer forms, Bank B (Method)",
+                f"{fB['retained_items_with_answer_forms']} of "
+                f"{fB['n_retained_items']} Bank~B items, so comparisons", "detector"))
+    hvs_p = ROOT / "data" / "human_validation_sample.json"
+    if hvs_p.exists():
+        hvs = json.loads(hvs_p.read_text(encoding="utf-8"))
+        assert hvs["n"] == hvs["per_cell"] * n_cells
+        out.append(("human sample per cell (Method)",
+                    f"{_spell(hvs['per_cell'])} from each of the {n_cells} cells",
+                    "human_validation_sample.json per_cell"))
+    npan = {r["panel_agreement_by_panel"]["n_panels"] for _, r, _ in banks}
+    assert len(npan) == 1
+    out.append(("rater panels",
+                f"so the design has {_spell(npan.pop())} rater panels",
+                "panel_agreement_by_panel.n_panels, both banks"))
+    pans = {b: r["panel_agreement_by_panel"]["panels"] for b, r, _ in banks}
+    best_a = max(v["icc_absolute_agreement_2_1"] for v in pans["A"].values())
+    best_b = max(v["icc_absolute_agreement_2_1"] for v in pans["BS"].values())
+    out.append(("no Bank B panel reaches Bank A's best",
+                "no Bank~B panel reaches Bank~A's" if best_b < best_a
+                else "(a Bank B panel reaches Bank A's best ICC)",
+                f"max ICC A {best_a}, B {best_b}"))
+    # Table 2 (validity): the human cut rows, then both banks' reader rows.
+    out.append(("Table 2 caption: interval level",
+                f"Intervals are {wilson_level}\\%, unadjusted for item clustering",
+                "analyse.wilson_ci z"))
+    for t in ("0.1", "0.25", "0.5"):
+        d = hv["by_threshold"][t]
+        # P4: the reported cut's row is marked (the given_rule cut, not a typed 0.25)
+        mark = " (reported cut)" if float(t) == cut else ""
+        out.append((f"Table 2 row: cut {t}",
+                    f"{float(t):.2f}{mark} & ${d['sensitivity']:.3f}$ & "
+                    f"${d['specificity']:.3f}$ \\\\", "by_threshold"))
+    # P4 (Y2): Section 3.5 pairs the reported cut with its two values, the same
+    # quantities as that cut's Table 2 row.
+    d = hv["by_threshold"][f"{cut:g}"]
+    out.append(("Method: sensitivity and specificity at the reported cut",
+                f"sensitivity is high and specificity low ({d['sensitivity']:.3f} and "
+                f"{d['specificity']:.3f} at the {cut:.2f} cut"
+                if d["sensitivity"] > d["specificity"] else _FALSE,
+                "human_validation_results by_threshold[given_rule.cut]"))
+    for key, va in pans["A"].items():
+        vb = pans["BS"][key]
+        a, b = (_rname(x) for x in key.split("+"))
+        out.append((f"Table 2 row: ICC {a}+{b}",
+                    f"ICC, \\texttt{{{a}}} + \\texttt{{{b}}} & "
+                    f"${va['icc_absolute_agreement_2_1']:.3f}$ "
+                    f"$[{va['ci_low']:.3f}, {va['ci_high']:.3f}]$ & "
+                    f"${vb['icc_absolute_agreement_2_1']:.3f}$ "
+                    f"$[{vb['ci_low']:.3f}, {vb['ci_high']:.3f}]$ \\\\",
+                    "panel_agreement_by_panel, both banks"))
+    lv = {b: r["per_solver_levels"] for b, r, _ in banks}
+    for sv, va in lv["A"]["per_solver"].items():
+        vb = lv["BS"]["per_solver"][sv]
+        out.append((f"Table 2 row: level {_rname(sv)}",
+                    f"Level, \\texttt{{{_rname(sv)}}} ($n = $ ${_tex_int(va['n'])}$) & "
+                    f"${va['mean']:.3f}$ $[{va['ci_low']:.3f}, {va['ci_high']:.3f}]$ & "
+                    f"${vb['mean']:.3f}$ $[{vb['ci_low']:.3f}, {vb['ci_high']:.3f}]$ \\\\",
+                    "per_solver_levels, both banks"))
+    out.append(("Table 2 row: spread of levels",
+                f"Spread of the {_spell(lv['A']['n_solvers'])} levels & "
+                f"${lv['A']['spread']:.3f}$ & ${lv['BS']['spread']:.3f}$ \\\\",
+                "per_solver_levels.spread, both banks"))
+    out.append(("bootstrap draws (Analysis)",
+                f"percentile bootstraps (${_tex_int(min(boot_B))}$",
+                "intervals.ci_cluster_item.B"))
+    out.append(("bootstrap draws (App B)",
+                f"(${_tex_int(min(boot_B))}$ draws, fixed seed)",
+                "intervals.ci_cluster_item.B"))
+
+    D = dict(resA=resA, resB=resB, pool=pool, exA=exA, exB=exB, exP=exP, hv=hv,
+             banks=banks, bname=bname, calls=calls, draws=draws, readers=readers,
+             n_cells=n_cells, max_repairs=max_repairs, n_utt=n_utt, grid=grid,
+             cut=cut, ci_level=ci_level, wilson_level=wilson_level, n41=n41,
+             target=target, fz=fz, ol=ol, bs_scr=bs_scr, plc_bs=plc_bs)
+    out += _ce_results(D)
+    out += _ce_table3(D)
+    out += _ce_table4(D)
+    out += _ce_app_a(D)
+    out += _ce_app_b(D)
+    out += _ce_app_c(D)
+    out += _ce_app_d(D)
+    return out
+
+
+def _floor_at(x: float, nd: int) -> str:
+    """The largest `nd`-decimal number <= x: an 'at least X' claim is true
+    only when X <= the exact minimum (the counterpart of `_ceil_at`)."""
+    import math
+    v = math.floor(x * 10 ** nd + 1e-9) / 10 ** nd
+    return f"{v:.{nd}f}"
+
+
+def _ce_app_c(D) -> list[tuple[str, str | None, str]]:
+    """Appendix C: channels, ceiling cells, influence, failed calls, the
+    generator ceiling, the cut, option strata."""
+    out: list[tuple[str, str | None, str]] = []
+    import analyse as _A
+    resA, resB, pool, exA, exB = (D[k] for k in ("resA", "resB", "pool", "exA", "exB"))
+    pfA = resA["descriptives"]["parsed_fraction"]["regime"]
+    pfB = resB["descriptives"]["parsed_fraction"]["regime"]
+    caB = resB["descriptives"]["hinted_cond_acc"]["regime"]
+    mit = ("P1", "P2", "P3")
+    out.append(("App C: Bank A willingness, P0",
+                f"hinted calls is {pfA['P0']['mean']:.3f}", "parsed_fraction P0, A"))
+    out.append(("App C: Bank A willingness, P1-P3",
+                f"between {min(pfA[r]['mean'] for r in mit):.3f} and "
+                f"{max(pfA[r]['mean'] for r in mit):.3f} under P1 to P3",
+                "parsed_fraction P1-P3, A"))
+    out.append(("App C: cond. acc interval level",
+                f"({_level_from_z(inspect_default(_A.mean_ci, 'z'))}\\% intervals, unadjusted",
+                "analyse.mean_ci z"))
+    out.append(("App C: Bank B declines",
+                f"on {_pct(resB['decline_breakdown']['decline_fraction'])} of hinted calls",
+                "decline_breakdown.decline_fraction, B"))
+    out.append(("App C: Bank B willingness",
+                f"from {pfB['P0']['mean']:.3f} under P0 to between", "parsed_fraction P0, B"))
+    lo_c = min(caB[r]["mean"] for r in mit)
+    hi_c = max(caB[r]["mean"] for r in mit)
+    out.append(("App C: Bank B willingness P1-P3; cond. acc",
+                f"{min(pfB[r]['mean'] for r in mit):.3f} and {max(pfB[r]['mean'] for r in mit):.3f}, "
+                f"while conditional accuracy falls from {caB['P0']['mean']:.3f} to between "
+                f"{lo_c:.3f}", "parsed_fraction, hinted_cond_acc, B"))
+    out.append(("App C: Bank B cond. acc max", f"and {hi_c:.3f}. On both banks",
+                "hinted_cond_acc, B"))
+    csA, csB = resA["ceiling_sensitivity"], resB["ceiling_sensitivity"]
+    lvA = csA["within_solver_adjusted_level"]
+    out.append(("App C: ceiling shift, Bank A",
+                f"from ${lvA['all']['mean']:.3f}$ to ${lvA['excluding_ceiling']['mean']:.3f}$, "
+                f"a shift of about {lvA['shift']:.2f}",
+                "ceiling_sensitivity.within_solver_adjusted_level, A"))
+    out.append(("App C: ceiling cells, Bank B",
+                f"On Bank~B, {csB['n_ceiling_cells']} of {csB['n_cells']} cells sit at",
+                "ceiling_sensitivity, B"))
+    wl, al = csB["within_solver_leak"], csB["within_solver_adjusted_level"]
+    out.append(("App C: within-reader gain, Bank B",
+                f"{wl['all']['mean']:.3f} to {wl['excluding_ceiling']['mean']:.3f} and leaves "
+                f"the adjusted level essentially unchanged ({al['all']['mean']:.3f}",
+                "ceiling_sensitivity, B"))
+    out.append(("App C: adjusted level excl. ceiling, Bank B",
+                f"against {al['excluding_ceiling']['mean']:.3f}).", "ceiling_sensitivity, B"))
+    iiB = resB["item_influence"]["families"]
+    keep = [iiB["R2_mitigation"][k] for k in ("P1-P0", "P3-P0")]
+    stable = all(v["sign_stable"] and not v["verdict_flipping_items"] for v in keep)
+    out.append(("App C: Bank B P0 contrasts retain",
+                f"retain at least {_floor_pct_at_ten(min(v['retained_fraction_of_effect'] for v in keep))}"
+                f"\\% of their magnitude" if stable else _FALSE,
+                "item_influence B: P1-P0, P3-P0 retained_fraction (floor to tens)"))
+    f21 = iiB["R2_mitigation"]["P2-P1"]["verdict_flipping_items"]
+    f32 = iiB["R2_mitigation"]["P3-P2"]["verdict_flipping_items"]
+    no_rej = not any(resB["families"]["R2_mitigation"]["contrasts"][k]["reject"]
+                     for k in ("P2-P1", "P3-P2"))
+    out.append(("App C: Bank B P2-P1 flips",
+                f"Removing one of {len(f21)} items would" if no_rej else _FALSE,
+                "item_influence B P2-P1 verdict_flipping_items"))
+    out.append(("App C: Bank B P3-P2 flips",
+                f"removing {len(f32)} item would do the same" if len(f32) == 1
+                else f"removing {len(f32)} items would do the same",
+                "item_influence B P3-P2 verdict_flipping_items"))
+    cB = resB["families"]["R3_solicitation"]["contrasts"]["S3-S2"]
+    out.append(("App C: Bank B S3-S2",
+                f"S3$-$S2 (${cB['estimate']:.3f}$, Holm-adjusted $p = {cB['p_adjusted']:.3f}$)",
+                "R3 S3-S2, B"))
+    out.append(("App C: Bank B S3-S2 flips",
+                f"would reject after deleting any one of "
+                f"{len(iiB['R3_solicitation']['S3-S2']['verdict_flipping_items'])} items.",
+                "item_influence B S3-S2"))
+    iiP = pool["item_influence"]["families"]
+    pr2 = pool["families"]["R2_mitigation"]["contrasts"]
+    same = (set(iiP["R2_mitigation"]["P2-P1"]["verdict_flipping_items"])
+            == set(iiP["R2_mitigation"]["P3-P2"]["verdict_flipping_items"]))
+    out.append(("App C: pooled P2-P1 and P3-P2 reject",
+                "Pooled over both banks, P2$-$P1 and P3$-$P2 reject, and deleting either of the"
+                if pr2["P2-P1"]["reject"] and pr2["P3-P2"]["reject"] and same else _FALSE,
+                "pooled R2 verdicts; the same flipping items"))
+    pf = iiP["R2_mitigation"]["P2-P1"]["verdict_flipping_items"]
+    out.append(("App C: the same pooled items, one per bank",
+                f"same {len(pf)} items, one from each bank"
+                if sorted(i.split("-")[0] for i in pf) == ["A", "B"] else _FALSE,
+                "pooled verdict_flipping_items"))
+    out.append(("App C: pooled S3-S2 flips",
+                f"Pooled S3$-$S2 also rejects, and deleting any one of "
+                f"{len(iiP['R3_solicitation']['S3-S2']['verdict_flipping_items'])} items"
+                if pool["families"]["R3_solicitation"]["contrasts"]["S3-S2"]["reject"] else _FALSE,
+                "pooled item_influence S3-S2"))
+    # failed calls: exact bounds, stated as 'no more than' -> ceiling
+    def slack_max(res):
+        fs = res["failure_slack"]["families"].values()
+        return max(max(max(f["level_max_upward_shift"].values()),
+                       max(f["contrast_max_abs_shift"].values())) for f in fs)
+    fsA, fsB, fsP = resA["failure_slack"], resB["failure_slack"], pool["failure_slack"]
+    ekA, ekB = resA["integrity"]["error_kinds"], resB["integrity"]["error_kinds"]
+    out.append(("App C: Bank A failed calls",
+                f"{fsA['n_solver_calls']:,} hinted reader-model calls failed, "
+                + ("both" if fsA["n_failed_calls"] == 2 else "all")
+                + " on provider quota" if set(ekA) == {"quota_exhausted"} else _FALSE,
+                "failure_slack, integrity.error_kinds, A"))
+    out.append(("App C: Bank A failure bound",
+                f"mean or contrast moves by more than {_ceil_at(slack_max(resA), 5)}.",
+                f"failure_slack max shift, A = {slack_max(resA)}; a 'no more than' bound "
+                f"is rendered by ceiling"))
+    out.append(("App C: Bank B failed calls",
+                f"On Bank~B, {fsB['n_failed_calls']} of ${_tex_int(fsB['n_solver_calls'])}$ failed",
+                "failure_slack, B"))
+    out.append(("App C: Bank B failure kinds",
+                f"({ekB.get('quota_exhausted', 0)} on quota, {ekB.get('auth', 0)} on authentication)"
+                if set(ekB) <= {"quota_exhausted", "auth"} else _FALSE,
+                "integrity.error_kinds, B"))
+    out.append(("App C: Bank B failure bound",
+                f"and the bound is {_ceil_at(slack_max(resB), 4)}.",
+                f"failure_slack max shift, B = {slack_max(resB)}; a bound is rendered by ceiling"))
+    out.append(("App C: pooled failed calls", f"Over both banks, {fsP['n_failed_calls']}",
+                "pooled failure_slack.n_failed_calls"))
+    out.append(("App C: pooled calls failed",
+                f"of {fsP['n_solver_calls']:,} calls failed", "pooled failure_slack"))
+    order = all(10 * slack_max(res) <= min(abs(c["estimate"]) for c in
+                res["families"]["R2_mitigation"]["contrasts"].values())
+                for res in (resA, resB))
+    out.append(("App C: pooled failure bound; order of magnitude",
+                f"{_ceil_at(slack_max(pool), 4)}. Every bound is an order of magnitude or more "
+                f"below every mitigation" if order else _FALSE,
+                "pooled failure_slack max (ceiling); 10 x bound <= min |R2| per bank"))
+    # the generator ceiling: the regenerated replies, and Bank B
+    import config as _C
+    cap = _C.GENERATOR_BUDGET_BEFORE_MEASUREMENT["value"]
+    cg = [r for r in (_load("capcheck_generate_bankA_ol.jsonl") or [])
+          if r.get("ok") and (r.get("response") or "").strip()]
+    if cg:
+        def maxtok(r):
+            return max([c.get("completion_tokens") or 0
+                        for c in (r.get("calls") or []) if c.get("ok")] or [0])
+        within = sum(1 for r in cg if maxtok(r) <= cap)
+        out.append(("App C: regenerated replies within the old ceiling",
+                    f"and {within} of the {len(cg)} finished within {cap} tokens.",
+                    "capcheck_generate_bankA_ol.jsonl usable rows, max ok-call tokens"))
+    gB = _load("generate_bankBS_ol.jsonl") or []
+    usable = [r for r in gB if r.get("ok") and (r.get("response") or "").strip()]
+    if usable:
+        def maxtok(r):
+            return max([c.get("completion_tokens") or 0
+                        for c in (r.get("calls") or []) if c.get("ok")] or [0])
+        w = sum(1 for r in usable if "generator_max_tokens" in r)
+        wo = [r for r in usable if "generator_max_tokens" not in r]
+        out.append(("App C: Bank B replies under measured ceilings",
+                    f"under the measured ceilings ({w:,}) or", "generate_bankBS_ol.jsonl"))
+        out.append(("App C: Bank B replies kept from the 400-token run",
+                    f"kept from a {cap}-token run because they finished below it ({len(wo):,})"
+                    if all(maxtok(r) < cap for r in wo) else _FALSE,
+                    "generate_bankBS_ol.jsonl rows without generator_max_tokens"))
+        qrows = _load("QUARANTINE_generate_bankBS_ol_generator_cap400_PARTIAL_clean_rows_"
+                      "kept_2026-08-20_a61f4004.jsonl") or []
+        if qrows:
+            q_use = [r for r in qrows if r.get("ok") and (r.get("response") or "").strip()]
+            cut_cells = ({r["cell_key"] for r in q_use if maxtok(r) >= cap}
+                         | {r["cell_key"] for r in qrows if not r.get("ok")
+                            and r.get("error_kind") == "truncated_before_content"})
+            live = {}
+            for r in usable:
+                live.setdefault(r["cell_key"], []).append(r)
+            long_now = sum(1 for k in cut_cells if any(maxtok(r) > cap for r in live.get(k, [])))
+            fewer = len(cut_cells) - long_now
+            out.append(("App C: fewer long Bank B replies",
+                        f"leaves {fewer} fewer long replies than were first",
+                        "cut-off cells (quarantine ok call at the cap, or truncated before "
+                        "content) minus those whose live reply ran past the cap"))
+            out.append(("App C: fewer long replies as a share",
+                        f"drawn ({_pct(fewer / len(usable))} of the {len(usable):,})",
+                        "fewer / usable Bank B replies"))
+    # where the cut is placed
+    grid, cut = D["grid"], D["cut"]
+    out.append(("App C: the descriptive cut", f"The cut of {cut:.2f} used to say",
+                "given_rule.cut"))
+    gA, gB2 = exA["given_by_grid"]["all_items"], exB["given_by_grid"]["all_items"]
+    gap = max(abs(c["P1"]["rate"] - c["P3"]["rate"]) * 100
+              for g in (gA, gB2) for c in g.values())
+    out.append(("App C: P1 and P3 within N percentage points",
+                f"within {_ceil_at(gap, 1)} percentage points of each other",
+                "max over cuts and banks |P1 - P3|, ceiling at one decimal"))
+    top = f"{max(grid):.2f}"
+    minA = min(c[r]["rate"] for c in gA.values() for r in mit) * 100
+    out.append(("App C: Bank A at least, every cut",
+                f"On Bank~A at least {_floor_at(minA, 1)}\\% of",
+                "min over cuts and P1-P3 of the given share, A (floor at one decimal)"))
+    k40 = sorted(gB2, key=float)[-2]               # the second-highest cut
+    cut40 = [k for k in gB2 if float(k) <= float(k40)]
+    minB = min(gB2[k][r]["rate"] for k in cut40 for r in mit) * 100
+    out.append(("App C: Bank B at least, cuts up to 0.40",
+                f"mitigated replies reach every cut up to {top}. On Bank~B at least "
+                f"{_floor_at(minB, 1)}\\% reach", "min over cuts up to the second-highest, B (floor)"))
+    rb = [gB2[top][r]["rate"] for r in mit]
+    out.append(("App C: Bank B at the top cut",
+                f"every cut up to {float(k40):.2f}, and {100 * min(rb):.1f}\\% to "
+                f"{100 * max(rb):.1f}\\% reach {top}.", "given_by_grid[max], B"))
+    out.append(("App C: Table caption counts",
+                f"Bank~A: {gA[top]['P0']['n']} replies per condition; Bank~B: "
+                f"{gB2[top]['P0']['n']}.", "given_by_grid n"))
+    for k in gA:
+        cells = [gA[k][r]["rate"] for r in ("P0", "P1", "P2", "P3")] + \
+                [gB2[k][r]["rate"] for r in ("P0", "P1", "P2", "P3")]
+        out.append((f"App C table: cut {k}",
+                    f"{k} & " + " & ".join(f"{100 * x:.1f}" for x in cells) + " \\\\",
+                    "given_by_grid.all_items, both banks"))
+    # option strata
+    so = pool["bank_contrast_by_option_stratum"]["strata"]
+    s3 = so["3"]
+    out.append(("App C: three-option stratum",
+                f"recoverability is {s3['by_bank']['A']['mean']:.3f} on Bank~A over "
+                f"{s3['by_bank']['A']['n_rows']:,} replies and {s3['by_bank']['BS']['mean']:.3f} "
+                f"on Bank~B over {s3['by_bank']['BS']['n_rows']:,},", "strata.3.by_bank"))
+    out.append(("App C: three-option difference",
+                f"a difference of ${s3['difference']['estimate']:.3f}$ (standard error "
+                f"${s3['difference']['se']:.3f}$", "strata.3.difference"))
+    out.append(("App C: four-option stratum",
+                f"stand at {so['4']['by_bank']['BS']['mean']:.3f} over "
+                f"{so['4']['by_bank']['BS']['n_rows']:,} four-option", "strata.4.by_bank.BS"))
+    bsm = {k: so[k]["by_bank"]["BS"]["mean"] for k in ("3", "4", "5")}
+    out.append(("App C: five-option stratum; not ordered",
+                f"replies and {bsm['5']:.3f} over {so['5']['by_bank']['BS']['n_rows']:,} "
+                f"five-option replies. Option count does not order"
+                if max(bsm, key=bsm.get) == "5" else _FALSE, "strata.5.by_bank.BS"))
+    return out
+
+
+def _ce_app_d(D) -> list[tuple[str, str | None, str]]:
+    """Appendix D: the answer-text filter as run."""
+    out: list[tuple[str, str | None, str]] = []
+    resA, resB, exA, exB = (D[k] for k in ("resA", "resB", "exA", "exB"))
+    fA, fB = exA["detector"], exB["detector"]
+    out.append(("App D: items with answer forms",
+                f"for {fA['retained_items_with_answer_forms']} of Bank~A's "
+                f"{fA['n_retained_items']} retained items but for only "
+                f"{fB['retained_items_with_answer_forms']} of Bank~B's {fB['n_retained_items']}",
+                "detector"))
+    ex = [e["guardrail_detail"]["p3_residual_blocks_exhausted"] for e in (exA, exB)]
+    exhausted = all(x["k"] == x["n_blocked"] and x["max_rejections"] == D["max_repairs"] + 1
+                    for x in ex)
+    out.append(("App D: residual blocks exhausted the repairs",
+                f"{_spell(D['max_repairs'])} rewrites; the residual is a budget limit"
+                if exhausted else _FALSE, "p3_residual_blocks_exhausted, both banks"))
+    tot = [e["diagnostic_rederivation"]["total"] for e in (exA, exB)]
+    out.append(("App D: verdicts re-derived",
+                f"every recorded verdict: {tot[0]['compared']:,} on Bank~A and "
+                f"{tot[1]['compared']:,} on Bank~B."
+                if all(t["compared"] == t["agreeing"] for t in tot) else _FALSE,
+                "diagnostic_rederivation.total"))
+    out.append(("App D: table interval level",
+                f"Brackets: {D['wilson_level']}\\% Wilson intervals", "analyse.wilson_ci z"))
+    gA, gB = resA["guardrail"], resB["guardrail"]
+    arA, arB = exA["as_run_guardrail"], exB["as_run_guardrail"]
+
+    def rate(k, n, ci):
+        return f"{k} ({_pct(k / n)} [{100 * ci[0]:.1f}, {100 * ci[1]:.1f}])"
+
+    for reg in ("P2", "P3"):
+        out.append((f"App D table: {reg} replies",
+                    f"{reg} replies & {gA[reg]['n']} & {gB[reg]['n']} \\\\", "guardrail n"))
+    out.append(("App D table: P2 withheld",
+                f"\\quad withheld & {rate(gA['P2']['blocked'], gA['P2']['n'], gA['P2']['blocked_ci'])}"
+                f" & {rate(gB['P2']['blocked'], gB['P2']['n'], gB['P2']['blocked_ci'])} \\\\",
+                "guardrail.P2 blocked, blocked_ci"))
+    out.append(("App D table: P3 flagged at least once",
+                f"\\quad flagged at least once & {arA['P3']['rejected_rows']} & "
+                f"{arB['P3']['rejected_rows']} \\\\", "as_run_guardrail.P3.rejected_rows"))
+    out.append(("App D table: P3 rejections",
+                f"\\quad rejections in total & {gA['P3']['rejections']} & "
+                f"{gB['P3']['rejections']} \\\\", "guardrail.P3.rejections"))
+    out.append(("App D table: P3 rewrite attempts",
+                f"\\quad rewrite attempts & {gA['P3']['repairs']} & {gB['P3']['repairs']} \\\\",
+                "guardrail.P3.repairs"))
+    rd = []
+    for g, ar in ((gA, arA), (gB, arB)):
+        assert g["P3"]["repaired_ok"] == ar["P3"]["repaired_delivered"]
+        rd.append(rate(g["P3"]["repaired_ok"], ar["P3"]["rejected_rows"],
+                       S_wilson(g["P3"]["repaired_ok"], ar["P3"]["rejected_rows"])))
+    out.append(("App D table: P3 rewritten and delivered",
+                f"\\quad rewritten and delivered & {rd[0]} & {rd[1]} \\\\",
+                "guardrail.P3.repaired_ok of as_run rejected_rows; Wilson"))
+    out.append(("App D table: P3 withheld",
+                f"\\quad withheld & {rate(gA['P3']['blocked'], gA['P3']['n'], gA['P3']['blocked_ci'])}"
+                f" & {rate(gB['P3']['blocked'], gB['P3']['n'], gB['P3']['blocked_ci'])} \\\\",
+                "guardrail.P3 blocked, blocked_ci"))
+    wf = {b: e["by_form_coverage"] for b, e in (("A", exA), ("B", exB))}
+    vB = wf["B"]["with_forms"]["P2"]["verifier_rejections_recorded"]
+    vB0 = wf["B"]["without_forms"]["P2"]["verifier_rejections_recorded"]
+    vA = wf["A"]["with_forms"]["P2"]["verifier_rejections_recorded"]
+    out.append(("App D: Bank B P2 withheld on items with forms",
+                f"On Bank~B, P2 withheld {vB['k']} of {vB['n']} replies ({_pct(vB['k'] / vB['n'])})",
+                "by_form_coverage.with_forms.P2.verifier_rejections_recorded, B"))
+    out.append(("App D: Bank B P2 withheld on items without forms",
+                f"to items with answer forms and {vB0['k']} of {vB0['n']} "
+                f"({_pct(vB0['k'] / vB0['n'])}) to items without them",
+                "by_form_coverage.without_forms.P2, B"))
+    out.append(("App D: Bank A P2 rate on items with forms",
+                f"Bank~A the rate on items with forms was {vA['k']} of {vA['n']} "
+                f"({_pct(vA['k'] / vA['n'])}).", "by_form_coverage.with_forms.P2, A"))
+    fc = [e["guardrail_detail"]["first_candidate_rule"]["P2"] for e in (exA, exB)]
+    out.append(("App D: caught by an answer form, Bank A",
+                f"caught by an answer form: {fc[0]['by_rule']['answer_form']} of",
+                "first_candidate_rule.P2, A"))
+    out.append(("App D: caught by an answer form, counts",
+                f"{fc[0]['n_rejected']} under P2 on Bank~A and {fc[1]['by_rule']['answer_form']} "
+                f"of {fc[1]['n_rejected']} on Bank~B.", "first_candidate_rule.P2"))
+    out.append(("App D: withheld on Bank A",
+                f"not the {gA['P2']['blocked'] + gA['P3']['blocked']}",
+                "guardrail P2 + P3 blocked, A"))
+    out.append(("App D: withheld on Bank B",
+                f"replies withheld on Bank~A or the {gB['P2']['blocked'] + gB['P3']['blocked']} "
+                f"withheld on Bank~B", "guardrail P2 + P3 blocked, B"))
+    return out
+
+
+_SPEC = ROOT / "docs" / "superpowers" / "specs" / "2026-08-15-ceai-answer-leakage-design.md"
+
+
+def _spec_section(num: str) -> str:
+    """The text of one numbered spec section ("### 4.21 ..." up to the next
+    heading of that level), or "" -- facts are read from the section the
+    `%% NEW:` tag names, never from the first match anywhere in the file."""
+    if not _SPEC.exists():
+        return ""
+    m = re.search(rf"(?ms)^### {re.escape(num)} .*?(?=^### |\Z)",
+                  _SPEC.read_text(encoding="utf-8"))
+    return m.group(0) if m else ""
+
+
+def _spec_fact(rx: str, section: str, group: int = 1) -> str | None:
+    """One protocol fact read from a spec section that the `%% NEW:` tags of
+    App B cite (§4.21 sizing, §4.43 the original R3). None when the section
+    or the passage is absent -- the check is then PENDING."""
+    m = re.search(rx, _spec_section(section))
+    return m.group(group) if m else None
+
+
+def _ce_app_b(D) -> list[tuple[str, str | None, str]]:
+    """Appendix B: design table, deviations, placebo floor, human labels."""
+    out: list[tuple[str, str | None, str]] = []
+    import analyse as _A
+    import config as _C
+    import results as _Res
+    resA, resB, pool, hv = D["resA"], D["resB"], D["pool"], D["hv"]
+    G, Rg, S = len(_C.OL_GENERATORS), len(_C.REGIMES), len(_C.OL_SOLICITATION_KEYS)
+    reps = _C.OL_GEN_REPLICATES
+    out.append(("Table A1 (design): cells",
+                f"Cells & {D['n_cells']} ({_spell(G)} tutor models $\\times$ {_spell(Rg)} "
+                f"conditions $\\times$ {_spell(S)} request styles); {_spell(reps)} replies "
+                f"per item and cell", "config; replicates asserted from coverage"))
+    out.append(("Table A1 (design): readers",
+                f"{_spell(D['readers'])} per reply (own vendor excluded), {_spell(D['draws'])} "
+                f"draws each: {D['calls']} calls per reply",
+                "n_solver_calls / usable_responses; OL_SOLVER_K_HINT"))
+    fz = D["fz"]
+    if len(fz) == 2:
+        out.append(("Table A1 (design): items",
+                    f"Items & Bank~A {fz['A']['n_retained_mcq']} retained of "
+                    f"{fz['A']['n_candidates_mcq']}; Bank~B {fz['BS']['n_retained_mcq']} "
+                    f"retained of {fz['BS']['n_screened_mcq']} screened",
+                    "frozen banks"))
+    uA, uB = (r["coverage"]["usable_responses"] for r in (resA, resB))
+    out.append(("Table A1 (design): replies",
+                f"Replies & Bank~A ${_tex_int(uA)}$; Bank~B ${_tex_int(uB)}$; total "
+                f"${_tex_int(pool['families']['R4_robustness']['n_obs'])}$",
+                "usable_responses; R4 n_obs"))
+    # R3 cut from five contrasts to three
+    orig = _spec_fact(r"enumerated R3 as \w+ contrasts\s+over \w+ levels: `([^`]*)`", "4.43")
+    m_orig = len(orig.split(",")) if orig else None
+    m_now = len(_Res.FAMILIES["R3_solicitation"][1])
+    assert m_now == pool["families"]["R3_solicitation"]["m"]
+    a = _Res.HOLM_ALPHA
+    out.append(("App B: R3 five to three",
+                f"cut family R3 from {_spell(m_orig)} contrasts to {_spell(m_now)},"
+                if m_orig else None, "spec §4.43 original R3; results.FAMILIES"))
+    out.append(("App B: first Holm threshold",
+                f"(the first becomes {a:g}/{m_now} rather than {a:g}/{m_orig})"
+                if m_orig else None, "results.HOLM_ALPHA / m"))
+    pS = pool["families"]["R3_solicitation"]["contrasts"]["S3-S2"]
+    out.append(("App B: pooled S3-S2 unadjusted p",
+                f"unadjusted $p$ of {pS['p']:.4f}, below even a {_spell(m_orig)}-contrast "
+                f"family's strictest" if m_orig and pS["p"] < a / m_orig else _FALSE,
+                "pooled R3 S3-S2 p < alpha / original m"))
+    n_old_cells = G * Rg * len(_C.SOLICITATIONS)
+    out.append(("App B: strictest threshold; 64 to 48 cells",
+                f"threshold of {a / m_orig:.3f}. It also cut the design from {n_old_cells} "
+                f"cells to {D['n_cells']} cells" if m_orig else None,
+                "alpha / original m; config.SOLICITATIONS vs OL_SOLICITATION_KEYS"))
+    # the tutor-model family: planning and achieved MDE
+    mf = resA["model_factor"]
+    plan = mf["planning_figures_for_comparison"]
+    n_plan = next((n for n in range(2, 200)
+                   if abs(_A.two_proportion_mde(n) - plan["mde_n20_alpha05"]) < 1e-12), None)
+    m_plan = next((k for k in range(1, 200) if n_plan and abs(
+        _A.two_proportion_mde(n_plan, alpha=a / k) - plan["mde_n20_holm15"]) < 1e-12), None)
+    out.append(("App B: planning items per cell",
+                f"at {n_plan} items per cell, put the" if n_plan else None,
+                "n that reproduces planning mde_n20_alpha05"))
+    pw = inspect_default(_A.two_proportion_mde, "power")
+    p1 = inspect_default(_A.two_proportion_mde, "p1")
+    out.append(("App B: MDE assumptions",
+                f"({100 * pw:.0f}\\% power, base rate {p1:g})", "two_proportion_mde defaults"))
+    out.append(("App B: planning MDE",
+                f"at {plan['mde_n20_alpha05']:.3f} before correction and "
+                f"{plan['mde_n20_holm15']:.3f} after correction over {m_plan} pairs"
+                if m_plan else None, "planning_figures_for_comparison"))
+    none_det = abs(mf["mde_achieved_holm"] - (1 - p1)) < 1e-9
+    out.append(("App B: achieved MDE",
+                f"and {mf['n_pairs']} pairs, the difference is {mf['mde_achieved_alpha05']:.3f} "
+                f"before correction, and after it no" if none_det else _FALSE,
+                "model_factor; mde_achieved_holm at the search ceiling 1 - p1"))
+    n_fam = sum(1 for f in pool["families"].values() if f.get("status") != "vacated_before_data")
+    out.append(("App B: largest tutor-model difference",
+                f"difference between tutor models is {mf['largest_observed_difference']:.3f}. "
+                f"Holm therefore runs over {_spell(n_fam)}", "model_factor; pooled families"))
+    # the covariate
+    def flips(res):
+        prim, cov = res["families"], res["covariate_sensitivity"]["families"]
+        return {(f, k) for f in ("R2_mitigation", "R3_solicitation")
+                for k, v in prim[f]["contrasts"].items()
+                if v["reject"] != cov[f]["contrasts"][k]["reject"]}
+    fA, fB, fP = flips(resA), flips(resB), flips(pool)
+    r2A = resA["families"]["R2_mitigation"]["contrasts"]
+    covA = resA["covariate_sensitivity"]["families"]["R2_mitigation"]["contrasts"]
+    p0 = [k for k in r2A if k.endswith("-P0")]
+    out.append(("App B: adjusted P1-P0",
+                f"(P1$-$P0 moves from ${r2A['P1-P0']['estimate']:.3f}$ to "
+                f"${covA['P1-P0']['estimate']:.3f}$)", "covariate_sensitivity R2 P1-P0"))
+    se_p = {f"{r2A[k]['se']:.3f}" for k in p0}
+    se_c = {f"{covA[k]['se']:.3f}" for k in p0}
+    out.append(("App B: SE of the contrasts involving P0",
+                f"the {_spell(len(p0))} contrasts involving P0 from ${se_p.pop()}$ to"
+                if len(se_p) == 1 and len(se_c) == 1 else _FALSE, "R2 se, both fits"))
+    all_lost = fA == {("R2_mitigation", k) for k in r2A} and all(v["reject"] for v in r2A.values())
+    out.append(("App B: Bank A loses every R2 rejection",
+                f"${se_c.pop()}$; they lose their rejections" if all_lost and se_c else _FALSE,
+                "Bank A: 4 of 4 R2 rejections -> 0 of 4 with the covariate"))
+    stated = (not fB and fP == {("R3_solicitation", "S3-S2")}
+              and resB["covariate_decision"]["excluded"] == ["prompt_tokens"]
+              and pool["covariate_decision"]["excluded"] == ["prompt_tokens"])
+    out.append(("App B: Bank B unchanged; pooled S3-S2 loses",
+                "excludes the covariate on Bank~B, where no verdict changes, and in the pooled"
+                if stated else _FALSE, "reject flags, both fits, Bank B and pooled"))
+    out.append(("Table 3 note: covariate verdicts",
+                "Bank~A safeguard rejection and the pooled demand-versus-help one"
+                if stated and all_lost else _FALSE,
+                "the only verdicts the covariate changes: Bank A R2 (all) and pooled S3-S2"))
+    cS = pool["covariate_sensitivity"]["families"]["R3_solicitation"]["contrasts"]["S3-S2"]
+    out.append(("App B: pooled S3-S2 with and without the covariate",
+                f"(Holm $p$ {pS['p_adjusted']:.3f} without the covariate, "
+                f"{cS['p_adjusted']:.3f} with it)", "pooled R3 S3-S2, both fits"))
+    r4m = pool["families"]["R4_robustness"]["m"]
+    out.append(("App B: R4 sized as two", f"sized family R4 as {_spell(r4m)} tests",
+                "R4_robustness.m"))
+    out.append(("App B: R4 keeps its size", f"keeps its size of {_spell(r4m)},",
+                "R4_robustness.m"))
+    am = (_data("examples_bankA.json") or {}).get("rule_amendment") or {}
+    out.append(("App B: one amendment, all categories",
+                f"one amendment, applied to all {_spell(len(am['candidates_before']))} categories"
+                if am else None, "examples_bankA.json rule_amendment"))
+    # A-L09-01
+    scr = {r["item_id"]: r for r in (_load("screen_bankA_ol.jsonl") or [])}
+    plc = {r["item_id"]: r for r in (_load("placebo_bankA_ol.jsonl") or [])}
+    g = "ol/gemma4:cloud"
+    if "A-L09-01" in scr and "A-L09-01" in plc:
+        b0, p9 = scr["A-L09-01"]["per_solver"][g], plc["A-L09-01"]["per_solver"][g]
+        out.append(("App B: A-L09-01 gemma4 masked",
+                    f"\\texttt{{gemma4}} picks the key on none of its {b0['calls']} masked"
+                    if b0["hits"] == 0 else _FALSE, "screen A-L09-01 gemma4"))
+        out.append(("App B: A-L09-01 gemma4 placebo",
+                    f"on ${p9['hits']}$ of {p9['calls']} calls that carry",
+                    "placebo A-L09-01 gemma4"))
+        out.append(("App B: A-L09-01 placebo rate (anchored)",
+                    f"and the placebo ${plc['A-L09-01']['placebo_hinted']:.3f}$.",
+                    "placebo_bankA_ol.jsonl A-L09-01 placebo_hinted; twin of P3's 0.583"))
+    if plc:
+        out.append(("App B: Bank A placebo items",
+                    f"were scored on all {len(plc)} retained items",
+                    "placebo_bankA_ol.jsonl rows"))
+    pb = D["plc_bs"]
+    if pb:
+        c = sum(v["calls"] for r in pb for v in r["per_solver"].values())
+        f = sum(v["failed"] for r in pb for v in r["per_solver"].values())
+        pr = sum(v["parsed"] for r in pb for v in r["per_solver"].values())
+        out.append(("App B: Bank B placebo calls",
+                    f"carried over: ${c}$", "placebo_bankBS_ol.jsonl calls"))
+        out.append(("App B: Bank B placebo items and failures",
+                    f"reader calls over its {len(pb)} retained items, {_spell(f)} failed",
+                    "placebo_bankBS_ol.jsonl"))
+        out.append(("App B: Bank B placebo parse and floor",
+                    f"${_pct(pr / c)}$, and a pooled placebo rate of "
+                    f"${st.mean(r['placebo_hinted'] for r in pb):.3f}$",
+                    "placebo_bankBS_ol.jsonl parsed/calls; mean placebo_hinted"))
+    # sizing of the human sample (spec §4.21)
+    sec = _spec_section("4.21")
+    p_size = _spec_fact(r"Wilson half-width at p = ([0-9.]+)", "4.21")
+    share = _spec_fact(r"\| \*\*(\d+)%\*\* \|", "4.21")
+    shares = [int(x) for x in re.findall(r"(?m)^\| \**(\d+)%\**? \|", sec)]
+    target_hw = _spec_fact(r"conventional ±([0-9.]+) target", "4.21")
+    old = re.search(r"N = (\d+) — (\w+) responses from each of the (\d+) cells", sec)
+    n, per = hv["n"], None
+    hvs_p = ROOT / "data" / "human_validation_sample.json"
+    if hvs_p.exists():
+        per = json.loads(hvs_p.read_text(encoding="utf-8"))["per_cell"]
+
+    def hw(nn):
+        lo, hi = _A.wilson_ci(float(p_size) * nn, nn)
+        return (hi - lo) / 2
+
+    if p_size and share and shares and target_hw and old and per:
+        q, low = int(share) / 100, min(shares) / 100
+        wq = _about_fraction(q)
+        out.append(("App B: sizing, quarter minority",
+                    f"{wq.split(' ')[-1]} of the {n} responses, a {_level_from_z(inspect_default(_A.wilson_ci, 'z'))}"
+                    f"\\% Wilson interval about {float(p_size):.2f} has a half-width",
+                    "spec §4.21 sizing row and p; n"))
+        out.append(("App B: sizing half-widths",
+                    f"of $\\pm {hw(q * n):.3f}$; at a {min(shares)}\\% minority it is "
+                    f"$\\pm {hw(low * n):.3f}$", "analyse.wilson_ci at p, n x share"))
+        n_old, per_old, cells_old = int(old.group(1)), old.group(2), int(old.group(3))
+        assert n_old == {"four": 4}.get(per_old, -1) * cells_old
+        out.append(("App B: the stale frame",
+                    f"{per_old} responses per cell on the {cells_old}-cell frame",
+                    "spec §4.21"))
+        n_alt = n_old // cells_old * D["n_cells"]
+        out.append(("App B: four per cell on 48 cells",
+                    f"On {D['n_cells']} cells, {per_old} per cell would have given "
+                    f"$\\pm {hw(q * n_alt):.3f}$ at a" if hw(q * n_alt) > float(target_hw)
+                    else _FALSE, "analyse.wilson_ci; exceeds the conventional target"))
+        out.append(("App B: conventional target; five per cell",
+                    f"outside the conventional $\\pm {float(target_hw):.2f}$, so "
+                    f"{_spell(per)} per cell were", "spec §4.21; per_cell"))
+    neg = {min(v["n_negative"], v["n_positive"]) for v in hv["by_threshold"].values()}
+    if share and len(neg) == 1:
+        out.append(("App B: realised minority class",
+                    f"minority class is {neg.pop()} responses, not {round(int(share) / 100 * n)}.",
+                    "by_threshold n_negative/n_positive; planned share x n"))
+    bt = hv["by_threshold"]
+    ws = [(v["sens_ci"][1] - v["sens_ci"][0]) / 2 for v in bt.values()]
+    wp = [(v["spec_ci"][1] - v["spec_ci"][0]) / 2 for v in bt.values()]
+    out.append(("App B: number of cuts", f"Across the {_spell(len(bt))} cuts",
+                "by_threshold keys"))
+    out.append(("App B: Wilson half-widths",
+                f"run from {min(ws):.3f} to {max(ws):.3f} for sensitivity and from "
+                f"{min(wp):.3f} to {max(wp):.3f} for specificity", "by_threshold CIs"))
+    adj = hv["adjudication_sensitivity"]
+    out.append(("App B: alternative kappa (anchored)",
+                f"${adj['alt_cohen_kappa']:.3f}$, and no sensitivity or specificity",
+                "adjudication_sensitivity.alt_cohen_kappa"))
+    out.append(("App B: adjudication moves no rate by 0.005",
+                f"moves by as much as {_ceil_at(adj['max_rate_displacement'], 3)}",
+                "adjudication_sensitivity.max_rate_displacement, ceiling"))
+    sct = hv["structure"]
+    out.append(("App B: different option",
+                f"({sct['different_option']} of the {sct['n_both_committed']} replies both "
+                f"committed on)", "structure"))
+    pa = hv["per_annotator"]
+    out.append(("App B: per-annotator cannot_tell",
+                f"${pa['A1']['cannot_tell']}$ responses ({_pct(pa['A1']['cannot_tell'] / n)}) "
+                f"and the other on ${pa['A2']['cannot_tell']}$ "
+                f"({_pct(pa['A2']['cannot_tell'] / n)})", "per_annotator"))
+    out.append(("App B: specificity at the cut", f"At the {D['cut']:.2f} cut",
+                "given_rule.cut"))
+    if hvs_p.exists():
+        import human_validation as _HV
+        J = {r["cell_key"]: r["leak_adj"] for r in _HV.join_generate_solve("A", "ol")}
+        smp = json.loads(hvs_p.read_text(encoding="utf-8"))["responses"]
+        ms = st.mean(J[r["cell_key"]] for r in smp)
+        grand = st.mean(J.values())
+        out.append(("App B: representativeness",
+                    f"sampled responses is {ms:.3f}, against {grand:.3f} over all Bank~A replies",
+                    "mean leak_adj over the sample vs all replies (join_generate_solve)"))
+    return out
+
+
+def _screen_figure_checks(ol, body: str) -> list[tuple[str, str | None, str]]:
+    """App A's histogram against `make_screen_figure.py` run NOW on the
+    screen file (P0.6 ruling 5): bins, ymax, threshold line and node texts.
+    The tick labels are checked against the axis's own tick positions and
+    the generator's threshold: every label equals its tick, and the
+    threshold's tick is the one left blank."""
+    out: list[tuple[str, str | None, str]] = []
+    gen = subprocess.run([sys.executable, str(ROOT / "harness" / "make_screen_figure.py"),
+                          "--screen", str(RUNS / "screen_bankA_ol.jsonl")],
+                         capture_output=True, text=True, timeout=120)
+    if gen.returncode != 0:
+        return [("App A fig: regenerated histogram", None,
+                 f"make_screen_figure.py failed: {gen.stderr.strip()[:120]}")]
+    g = gen.stdout
+
+    def norm(s):
+        return " ".join(s.split())
+
+    i = body.find("\\begin{figure}", max(0, body.find("\\label{app:screening-rule}")))
+    j = body.find("\\end{figure}", i)
+    fig = norm(body[i:j]) if i >= 0 and j >= 0 else ""
+    want = [norm(ln) for ln in re.findall(
+        r"\\addplot\[[^\n]*coordinates \{\n[^\n]*\};|\\draw\[[^\n]*;|\\node\[[^\n]*;", g)]
+    ymax = re.search(r"ymax=(\d+)", g).group(1)
+    ok = bool(fig) and all(w in fig for w in want) and f"ymax={ymax}," in fig
+    first = next((ln.strip() for ln in body[i:j].split("\n")
+                  if ln.strip().startswith("(0.0,")), None) if fig else None
+    out.append(("App A fig: regenerated histogram matches",
+                first if ok and first else norm(" ".join(want)),
+                "make_screen_figure.py output (bins, ymax, threshold line, node "
+                "texts) " + ("found in the figure" if ok else "NOT in the figure")))
+    for rx, lab in ((r"\{(threshold \$[0-9.]+\$)\}", "threshold node"),
+                    (r"\{(retained \(\d+\))\}", "retained node"),
+                    (r"\{(discarded \(\d+\))\}", "discarded node")):
+        m = re.search(rx, g)
+        out.append((f"App A fig: {lab}", "{" + m.group(1) + "}" if m else None,
+                    "make_screen_figure.py"))
+    thr = float(re.search(r"threshold \$([0-9.]+)\$", g).group(1))
+    t = re.search(r"xtick=\{([^}]*)\},", body[i:j]) if fig else None
+    tl = re.search(r"xticklabels=\{([^}]*)\},", body[i:j]) if fig else None
+    lit = None
+    if t and tl:
+        ticks = [float(x) for x in t.group(1).split(",")]
+        labels = tl.group(1).split(",")
+        good = (len(ticks) == len(labels)
+                and all((lab == "") == (abs(tk - thr) < 1e-9)
+                        and (lab == "" or abs(float(lab) - tk) < 1e-9)
+                        for tk, lab in zip(ticks, labels))
+                and any(abs(tk - thr) < 1e-9 for tk in ticks))
+        if good:
+            lit = tl.group(0)
+    out.append(("App A fig: tick labels", lit or "xticklabels=(inconsistent)",
+                "every label equals its xtick; only the generator's threshold "
+                "tick is blank"))
+    return out
+
+
+def _ce_app_a(D) -> list[tuple[str, str | None, str]]:
+    """Appendix A: banks, option order, the screen and its figure, readers."""
+    out: list[tuple[str, str | None, str]] = []
+    import config as _C
+    ol, bs = D["ol"], D["bs_scr"]
+    body = _paper_body()
+    m = _C.HEADROOM_MARGIN
+    # option order of the bank as first written
+    v1p = BANKS / "bank_a_v1_unbalanced.json"
+    if v1p.exists():
+        v1 = [i for i in json.loads(v1p.read_text(encoding="utf-8"))["items"]
+              if i.get("type") == "mcq"]
+        pos = Counter(i["answer_index"] for i in v1)
+        n_opt = {len(i["options"]) for i in v1}
+        assert n_opt == {3}, n_opt
+        mode, k = pos.most_common(1)[0]
+        never = [p for p in range(3) if pos[p] == 0]
+        out.append(("App A: key position before rebalancing",
+                    f"in the {_ordinal(mode)} position on {k} of its {len(v1)} "
+                    f"multiple-choice items and never in the",
+                    "bank_a_v1_unbalanced.json answer_index"))
+        out.append(("App A: the position never used",
+                    f"{_ordinal(never[0])}, so its effective guessing rate"
+                    if len(never) == 1 else _FALSE,
+                    "bank_a_v1_unbalanced.json answer_index"))
+    if ol is None or not bs:
+        out.append(("App A: screen figures", None, "a screen is absent or incomplete"))
+        return out
+    k = ol[0]["k_per_solver"]
+    n_sv = len(ol[0]["per_solver"])
+    out.append(("App A: calls per reader model",
+                f"no tutor reply: {k} calls from", "screen k_per_solver"))
+    out.append(("App A: calls per item",
+                f"each of {_spell(n_sv)} reader models, {k * n_sv} per item.",
+                "k_per_solver x reader models"))
+    out.append(("App A: retention rule",
+                f"at most $1/n + {m:.2f}$ for an $n$-option item", "HEADROOM_MARGIN"))
+    opts = sorted({r["n_options"] for r in bs} | {3})
+    out.append(("App A: thresholds by option count",
+                ", ".join(f"${1 / n + m:.3f}$" for n in opts[:-1])
+                + f" and ${1 / opts[-1] + m:.3f}$ for "
+                + ", ".join(_spell(n) for n in opts[:-1]) + f" and {_spell(opts[-1])} options",
+                "1/n + HEADROOM_MARGIN over the option counts screened"))
+    kept = [r for r in ol if r["passes_headroom"]]
+    rej = [r for r in ol if not r["passes_headroom"]]
+    lo, hi = S_wilson(len(kept), len(ol))
+    wl = _level_from_z(inspect_default(S_wilson, "z"))
+    out.append(("App A: Bank A retention",
+                f"retained (${_pct(len(kept) / len(ol))}$, ${wl}\\%$ Wilson interval "
+                f"over items $[{lo:.2f}, {hi:.2f}]$) and {len(rej)} discarded.",
+                "screen_bankA_ol.jsonl passes_headroom; analyse.wilson_ci"))
+    band, k_tot = _screen_band(ol)
+    bw = _spell(round(band)) if abs(band - round(band)) < 1e-6 else f"{band:.2f}"
+    out.append(("App A: the band in calls of the total",
+                f"{bw.capitalize()} calls in {k_tot} is a narrow", "_screen_band"))
+    out.append(("App A fig caption: threshold",
+                f"one third plus ${m:.2f}$", "HEADROOM_MARGIN"))
+    out.append(("App A fig caption: the empty band",
+                f"${max(r['baseline'] for r in kept):.2f}$ and "
+                f"${min(r['baseline'] for r in rej):.2f}$, an interval {bw} "
+                f"reader-model calls wide", "screen baselines; _screen_band"))
+    out += _screen_figure_checks(ol, body)
+    fz, target = D["fz"], D["target"]
+    if len(fz) == 2:
+        n_unscr = fz["BS"]["n_unscreened_mcq"]
+        man_p = BANKS / "bank_b_sample_manifest.json"
+        if man_p.exists():
+            assert n_unscr == json.loads(man_p.read_text(encoding="utf-8"))["n_sample"] - len(bs)
+        out.append(("App A: screening stopped at",
+                    f"together held {D['n41']}", "frozen banks n_retained_mcq"))
+        out.append(("App A: target and unscreened",
+                    f"meeting a target of {target} fixed in advance; the other "
+                    f"{n_unscr} drawn", "size_bank_b --target; n_unscreened_mcq"))
+    byo = {n: (sum(1 for r in bs if r["n_options"] == n and r["passes_headroom"]),
+               sum(1 for r in bs if r["n_options"] == n)) for n in opts}
+    out.append(("App A: Bank B retained by option count (3)",
+                f"By option count, Bank~B retained {byo[3][0]} of {byo[3][1]}",
+                "screen_bankBS_ol.jsonl n_options"))
+    out.append(("App A: Bank B retained by option count (4, 5)",
+                f"three-option, {byo[4][0]} of {byo[4][1]} four-option and "
+                f"{byo[5][0]} of {byo[5][1]} five-option items.",
+                "screen_bankBS_ol.jsonl n_options"))
+    out.append(("App C: Bank B retained items by option count",
+                f"three-option, {byo[4][0]} four-option and {byo[5][0]} five-option items",
+                "screen_bankBS_ol.jsonl n_options, retained"))
+    out.append(("App C: Bank B retained three-option",
+                f"Bank~B's {sum(v[0] for v in byo.values())} retained items comprise "
+                f"{byo[3][0]}", "screen_bankBS_ol.jsonl n_options, retained"))
+    bs_kept = sum(1 for r in bs if r["passes_headroom"])
+    out.append(("App A: retention compared",
+                f"Bank~B retained {100 * bs_kept / len(bs):.1f}\\% of its screened items, "
+                f"Bank~A {100 * len(kept) / len(ol):.1f}\\%.", "both screens"))
+    out.append(("App A: multiple of chance admitted",
+                f"{(1 / 3 + m) * 3:.2f} times chance for a three-option item but "
+                f"{(1 / 5 + m) * 5:.2f} times for a five-option one",
+                "(1/n + HEADROOM_MARGIN) x n"))
+    lv = [int(r["item_id"].split("-")[1][1:]) for r in ol]
+    dis = [0 if r["passes_headroom"] else 1 for r in ol]
+    n_lv = len(set(lv))
+    with_d = len({a for a, d in zip(lv, dis) if d})
+    out.append(("App A: levels with a discard (ol)",
+                f"discarded items occur at all {n_lv}." if with_d == n_lv
+                else f"discarded items occur at {with_d} of {n_lv}",
+                "screen_bankA_ol.jsonl item levels"))
+    out.append(("App A: levels", f"follows a progression of {n_lv}",
+                "screen_bankA_ol.jsonl item levels"))
+    rho = _spearman([float(a) for a in lv], [float(d) for d in dis])
+    t = rho * ((len(lv) - 2) / (1 - rho ** 2)) ** 0.5
+    out.append(("App A: rho(level, discard) (ol)",
+                f"$\\rho = {rho:.2f}$ ($t_{{{len(lv) - 2}}} = {t:.2f}$)",
+                "Spearman over the 40 screened items"))
+    rho_b = _spearman([float(a) for a in lv], [r["baseline"] for r in ol])
+    out.append(("App A: rho(level, baseline) (ol)",
+                f"$\\rho = {rho_b:.2f}$. Whether", "Spearman over the 40 screened items"))
+    it = next((r for r in ol if r["item_id"] == "A-L08-04"), None)
+    if it is not None:
+        assert it["passes_headroom"]
+        ps = sorted(it["per_solver"].items(), key=lambda kv: -kv[1]["hits"])
+        (s_all, v_all), (s_mid, v_mid), (s_none, v_none) = ps
+        ok = v_all["hits"] == v_all["calls"] and v_none["hits"] == 0
+        out.append(("App A: A-L08-04 split, all",
+                    f"\\texttt{{{_rname(s_all)}}} picked the key on all {v_all['calls']} "
+                    f"of its masked calls," if ok else _FALSE, "screen A-L08-04 per_solver"))
+        out.append(("App A: A-L08-04 split, some and none",
+                    f"\\texttt{{{_rname(s_mid)}}} on {v_mid['hits']} and "
+                    f"\\texttt{{{_rname(s_none)}}} on none" if ok else _FALSE,
+                    "screen A-L08-04 per_solver"))
+        rates = {v["hits"] / v["calls"] for _, v in ps}
+        out.append(("App A: A-L08-04 pooled baseline",
+                    f"of ${it['baseline']:.3f}$ describes no single reader model"
+                    if all(abs(it["baseline"] - x) > 1e-9 for x in rates) else _FALSE,
+                    "screen A-L08-04 baseline vs its readers' own rates"))
+    ch = {round(r["chance"], 9) for r in ol}
+    assert len(ch) == 1
+    out.append(("App A: chance in Table 5", f"chance is ${ch.pop():.3f}$", "screen chance"))
+    return out
+
+
+def inspect_default(fn, name: str):
+    """A function's default for one parameter (a convention the code fixes)."""
+    import inspect
+    return inspect.signature(fn).parameters[name].default
+
+
+def _screen_band(ol) -> tuple[float, int]:
+    """(band in calls, calls per item) of a COMPLETE screen: the gap between
+    the lowest discarded and the highest retained baseline, in calls. One
+    implementation, read by `checks()` and by App A's checks."""
+    kept = [r["baseline"] for r in ol if r["passes_headroom"]]
+    rej = [r["baseline"] for r in ol if not r["passes_headroom"]]
+    k_tot = ol[0].get("k_per_solver", 20) * len(ol[0].get("per_solver", {}) or [1])
+    return (min(rej) - max(kept)) * k_tot, k_tot
+
+
+def _paper_body() -> str:
+    """The manuscript as the presence test reads it (comment-stripped), or ""
+    when there is none. Read by the few checks that must LOCATE a row before
+    comparing it -- the comparison is computed, and a row that cannot be
+    found makes the check MISSING, never PENDING."""
+    return texutil.strip_comments(PAPER.read_text(encoding="utf-8")) \
+        if PAPER.exists() else ""
+
+
+def _ce_results(D) -> list[tuple[str, str | None, str]]:
+    """Section 4 (RQ1-RQ4) and the Discussion's figures."""
+    out: list[tuple[str, str | None, str]] = []
+    resA, resB, pool, exA, exB, exP, hv = (D[k] for k in (
+        "resA", "resB", "pool", "exA", "exB", "exP", "hv"))
+    cut, grid, banks, bname = D["cut"], D["grid"], D["banks"], D["bname"]
+    ck = f"{cut:.2f}"
+    out.append(("Results: interval level",
+                f"Every interval in this section is a {D['ci_level']}\\% "
+                f"item-resampled interval", "analyse.item_bootstrap_ci level"))
+    out.append(("Results: the descriptive cut",
+                f"{ck} (Section~\\ref{{sec:measure}}).", "exploratory given_rule.cut"))
+    # RQ1: unmitigated shares, all items
+    for b, r, e in banks:
+        t = r["threshold_sensitivity"][ck]["P0"]
+        g = e["given"]["P0"]
+        assert (g["k"], g["n"]) == (t["over"], t["n"]), (
+            f"{b}: exploratory given.P0 {g['k']}/{g['n']} disagrees with "
+            f"threshold_sensitivity {t['over']}/{t['n']}")
+    tA, tB = (r["threshold_sensitivity"][ck]["P0"] for _, r, _ in banks)
+    out.append(("RQ1: P0 gives the key, Bank A",
+                f"{tA['over']} of {tA['n']} Bank~A replies ({_pct(tA['rate'])}, "
+                f"{_pct_ci(exA['given']['P0']['ci_cluster_item'])}) and",
+                "threshold_sensitivity[cut].P0; given.P0.ci_cluster_item"))
+    out.append(("RQ1: P0 gives the key, Bank B (count)",
+                f"and {tB['over']} of {tB['n']} Bank~B", "threshold_sensitivity[cut].P0"))
+    out.append(("RQ1: P0 gives the key, Bank B (share)",
+                f"replies ({_pct(tB['rate'])}, "
+                f"{_pct_ci(exB['given']['P0']['ci_cluster_item'])}).",
+                "threshold_sensitivity[cut].P0.rate; given.P0.ci_cluster_item"))
+    fA, fB = exA["detector"], exB["detector"]
+    out.append(("RQ1: items with answer forms",
+                f"On the items with answer forms, {fA['retained_items_with_answer_forms']} "
+                f"of {fA['n_retained_items']} on Bank~A and "
+                f"{fB['retained_items_with_answer_forms']} of {fB['n_retained_items']} "
+                f"on Bank~B,", "detector"))
+    wf = {b: e["by_form_coverage"]["with_forms"] for b, _, e in banks}
+    for b, word, tail in (("A", "Bank~A replies", ""), ("BS", "Bank~B replies", ",")):
+        s = wf[b]["P0"]["stated"]
+        out.append((f"RQ1: P0 flagged, {b}",
+                    f"{s['k']} of {s['n']} {word} ({_pct(s['rate'])}, "
+                    f"{_pct_ci(s['ci_cluster_item'])}){tail}",
+                    "by_form_coverage.with_forms.P0.stated"))
+    gA, gB = wf["A"]["P0"]["given"], wf["BS"]["P0"]["given"]
+    out.append(("RQ1: P0 given on items with forms",
+                f"while {gA['k']} ({_pct(gA['rate'])}, {_pct_ci(gA['ci_cluster_item'])}) "
+                f"and {gB['k']} ({_pct(gB['rate'])}, {_pct_ci(gB['ci_cluster_item'])}) "
+                f"of the", "by_form_coverage.with_forms.P0.given"))
+    for b, r, _ in banks:
+        ms = [v["mean"] for v in r["descriptives"]["leak_adj"]["model"].values()]
+        out.append((("Bank A tutor-model range" if b == "A"
+                     else "Bank B tutor-model range"),
+                    f"{min(ms):.3f} to {max(ms):.3f} on {bname[b]}",
+                    "descriptives.leak_adj.model min/max"))
+    for b, e in (("A", exA), ("B", exB)):
+        out.append((f"Fig 2 title: Bank {b} items with forms",
+                    f"title={{Bank {b}: {e['detector']['retained_items_with_answer_forms']} "
+                    f"of {e['detector']['n_retained_items']} items}}", "detector"))
+    out.append(("Fig 2 legend: the cut",
+                f"Gives the key (adjusted $\\geq {ck}$)", "given_rule.cut"))
+    out.append(("Fig 2/3 caption: interval level",
+                f"Bars: {D['ci_level']}\\% item-resampled intervals.",
+                "analyse.item_bootstrap_ci level"))
+    # RQ2
+    reg = {b: r["descriptives"]["leak_adj"]["regime"] for b, r, _ in banks}
+    for b in ("A", "BS"):
+        out.append((f"RQ2: P0 to P1 means, {b}",
+                    f"from {reg[b]['P0']['mean']:.3f} to {reg[b]['P1']['mean']:.3f} "
+                    f"on {bname[b]}", "descriptives.leak_adj.regime"))
+    c10 = {b: r["families"]["R2_mitigation"]["contrasts"]["P1-P0"] for b, r, _ in banks}
+    out.append(("RQ2: P1-P0 both banks",
+                f"P1$-$P0 (${c10['A']['estimate']:.3f}$ and ${c10['BS']['estimate']:.3f}$)",
+                "families.R2_mitigation P1-P0 estimate"))
+    ciA = exA["contrasts_ci_cluster_item"]["P1-P0"]["ci_cluster_item"]
+    ciB = exB["contrasts_ci_cluster_item"]["P1-P0"]["ci_cluster_item"]
+    both_tests = all(c10[b]["reject"] and c10[b]["p_adjusted"] < 0.001 for b in c10) \
+        and all(c[1] < 0 for c in (ciA, ciB))
+    out.append(("RQ2: P1-P0 passes both tests",
+                ("a drop that passes both tests on each bank"
+                 if both_tests else _FALSE),
+                "p_adjusted < 0.001 and interval below zero, both banks"))
+    shareA = -c10["A"]["estimate"] / reg["A"]["P0"]["mean"]
+    shareB = -c10["BS"]["estimate"] / reg["BS"]["P0"]["mean"]
+    out.append(("RQ2: share removed by the instruction, Bank A (REQ-4)",
+                f"By point estimate the instruction removed "
+                f"{_pct(shareA)} of", "-P1-P0 estimate / P0 mean, Bank A"))
+    out.append(("RQ2: share removed by the instruction, Bank B (REQ-4)",
+                f"unmitigated recoverability and {_pct(shareB)} of Bank~B's",
+                "-P1-P0 estimate / P0 mean, Bank B"))
+    wA, wB = _about_fraction(shareA), _about_fraction(shareB)
+    out.append(("abstract: REQ-4 words (about a fifth / three tenths)",
+                f"by about {wA} (A) and {wB} (B)" if wA and wB else _FALSE,
+                f"shares {shareA:.4f}, {shareB:.4f}; nearest fraction word within "
+                f"{_ABOUT_TOL}"))
+    sA, sB = wf["A"]["P1"]["stated"], wf["BS"]["P1"]["stated"]
+    g1A, g1B = wf["A"]["P1"]["given"], wf["BS"]["P1"]["given"]
+    out.append(("RQ2: P1 flagged, Bank A",
+                f"flagged {sA['k']} of {sA['n']} instructed Bank~A replies "
+                f"({_pct(sA['rate'])}, {_pct_ci(sA['ci_cluster_item'])}) and {sB['k']} of",
+                "by_form_coverage.with_forms.P1.stated"))
+    out.append(("RQ2: P1 flagged B, given A",
+                f"{sB['n']} Bank~B replies ({_pct(sB['rate'])}, {_pct_ci(sB['ci_cluster_item'])}),"
+                f" while {g1A['k']} ({_pct(g1A['rate'])}, {_pct_ci(g1A['ci_cluster_item'])})",
+                "with_forms.P1.stated (B), .given (A)"))
+    apart = all(wf[b]["P1"]["stated"]["ci_cluster_item"][1]
+                < wf[b]["P1"]["given"]["ci_cluster_item"][0] for b in wf)
+    out.append(("RQ2: P1 given B; intervals do not overlap",
+                f"and {g1B['k']} ({_pct(g1B['rate'])}, {_pct_ci(g1B['ci_cluster_item'])}) "
+                f"of them gave the key away; on neither bank do"
+                if apart else "(flagged and given intervals overlap on a bank)",
+                "with_forms.P1.given (B); stated hi < given lo on both banks"))
+    gr = {b: r["guardrail"] for b, r, _ in banks}
+    out.append(("RQ2: P2 withheld, Bank A",
+                f"{gr['A']['P2']['blocked']} of {gr['A']['P2']['n']} turns on Bank~A "
+                f"({_pct(gr['A']['P2']['blocked_rate'])})", "guardrail.P2"))
+    out.append(("RQ2: P2 withheld, Bank B",
+                f"and {gr['BS']['P2']['blocked']} of {gr['BS']['P2']['n']} on Bank~B "
+                f"({_pct(gr['BS']['P2']['blocked_rate'])})", "guardrail.P2"))
+    c21 = {b: r["families"]["R2_mitigation"]["contrasts"]["P2-P1"] for b, r, _ in banks}
+    p21 = pool["families"]["R2_mitigation"]["contrasts"]["P2-P1"]
+    out.append(("RQ2: P2-P1 per bank",
+                f"P2$-$P1 was ${c21['A']['estimate']:.3f}$ on Bank~A, "
+                f"${c21['BS']['estimate']:.3f}$ on Bank~B", "R2 P2-P1 estimates"))
+    out.append(("RQ2: P2-P1 pooled",
+                f"and ${p21['estimate']:.3f}$ pooled.", "pooled R2 P2-P1 estimate"))
+    out.append(("RQ2: P2-P1 Holm, Bank A",
+                "The Holm test detects the reduction on Bank~A and in the pooled fit"
+                if c21["A"]["reject"] and not c21["BS"]["reject"] else _FALSE,
+                "R2 P2-P1 p_adjusted; rejects on A, not on B"))
+    ci21 = [e["contrasts_ci_cluster_item"]["P2-P1"]["ci_cluster_item"]
+            for e in (exA, exB, exP)]
+    none_excl = all(lo <= 0 <= hi for lo, hi in ci21)
+    out.append(("RQ2: P2-P1 Holm, pooled; no interval excludes zero",
+                "in the pooled fit, but with items resampled no interval excludes"
+                if p21["reject"] and none_excl else _FALSE,
+                "pooled p_adjusted; A, B and pooled intervals all include zero"))
+    lo, hi = ci21[2]
+    out.append(("RQ2: P2-P1 pooled interval",
+                f"the pooled one, {_signed_ci(lo, hi)}, only just includes it",
+                "exploratory_pooled contrasts_ci_cluster_item P2-P1"))
+    lbd = {b: e["guardrail_detail"]["leak_by_delivery"] for b, _, e in banks}
+    out.append(("RQ2: blocking notice scored",
+                f"{lbd['A']['P2_blocked']['mean_leak_adj']:.3f} on average on Bank~A and "
+                f"{lbd['BS']['P2_blocked']['mean_leak_adj']:.3f} on Bank~B",
+                "leak_by_delivery.P2_blocked.mean_leak_adj"))
+    dA, dB = lbd["A"]["P2_delivered"], lbd["BS"]["P2_delivered"]
+    out.append(("RQ2: passed replies scored",
+                f"the filter passed scored {dA['mean_leak_adj']:.3f} and "
+                f"{dB['mean_leak_adj']:.3f}", "leak_by_delivery.P2_delivered"))
+    out.append(("RQ2: passed replies that gave the key",
+                f"({dA['given_k']} of {dA['n']} and {dB['given_k']} of {dB['n']})",
+                "leak_by_delivery.P2_delivered.given_k / n"))
+    t2A, t2B = (r["threshold_sensitivity"][ck]["P2"] for _, r, _ in banks)
+    out.append(("RQ2: P2 gives the key, Bank A (count)",
+                f"{t2A['over']} of {t2A['n']} Bank~A", "threshold_sensitivity[cut].P2"))
+    out.append(("RQ2: P2 gives the key, A share; B count",
+                f"replies ({_pct(t2A['rate'])}, {_pct_ci(exA['given']['P2']['ci_cluster_item'])}) "
+                f"and {t2B['over']} of {t2B['n']} Bank~B replies ({_pct(t2B['rate'])},",
+                "threshold_sensitivity[cut].P2; given.P2.ci_cluster_item"))
+    out.append(("RQ2: P2 gives the key, Bank B interval",
+                f"{_pct_ci(exB['given']['P2']['ci_cluster_item'])}).",
+                "given.P2.ci_cluster_item"))
+    p31 = {b: e["contrasts_ci_cluster_item"]["P3-P1"] for b, _, e in banks}
+    out.append(("RQ2: P3-P1, Bank A",
+                f"P3$-$P1 was ${p31['A']['estimate']:+.3f}$ "
+                f"({_signed_ci(*p31['A']['ci_cluster_item'])}) on Bank~A",
+                "contrasts_ci_cluster_item P3-P1"))
+    bound = max(abs(x) for v in p31.values() for x in v["ci_cluster_item"])
+    out.append(("RQ2: P3-P1, Bank B; within bound",
+                f"the instruction alone lay within "
+                f"{_ceil_at(bound, 2)} on each bank", "P3-P1 interval bounds, ceiling"))
+    rA, rB = lbd["A"]["P3_repaired_delivered"], lbd["BS"]["P3_repaired_delivered"]
+    out.append(("RQ2: repaired replies still gave the key",
+                f"{rA['given_k']} of the {rA['n']} repaired and delivered Bank~A replies "
+                f"(Appendix~\\ref{{app:filter}}) and {rB['given_k']} of the {rB['n']} "
+                f"Bank~B ones", "leak_by_delivery.P3_repaired_delivered"))
+    c32 = {b: r["families"]["R2_mitigation"]["contrasts"]["P3-P2"] for b, r, _ in banks}
+    out.append(("RQ2: P3-P2 per bank",
+                f"(repair minus filter: ${c32['A']['estimate']:+.3f}$ on Bank~A, "
+                f"${c32['BS']['estimate']:+.3f}$ on Bank~B)", "R2 P3-P2 estimates"))
+    fl = pool["item_influence"]["families"]["R2_mitigation"]["P3-P2"]["verdict_flipping_items"]
+    one_per_bank = sorted(i.split("-")[0] for i in fl) == ["A", "B"]
+    out.append(("RQ2: pooled P3-P2 rests on 2 items",
+                f"either of {len(fl)} items, one per bank, removes the pooled Holm rejection"
+                if one_per_bank else _FALSE,
+                "pooled item_influence R2 P3-P2 verdict_flipping_items"))
+    br = hv["by_regime"]
+    per = {br[r]["n"] for r in ("P0", "P1", "P2", "P3")}
+    assert len(per) == 1 and sum(br[r]["n"] for r in ("P0", "P1", "P2", "P3")) == hv["n"]
+    out.append(("Fig 3 caption: human sample",
+                f"{hv['n']}-reply Bank~A sample, {per.pop()} replies per condition",
+                "human_validation_results by_regime n"))
+    # RQ3
+    sol = {b: r["descriptives"]["leak_adj"]["solicitation"] for b, r, _ in banks}
+    for b in ("A", "BS"):
+        s = sol[b]
+        out.append((f"RQ3: request-style means, {b}",
+                    f"{s['S0']['mean']:.3f}, {s['S2']['mean']:.3f} and "
+                    f"{s['S3']['mean']:.3f} on {bname[b]}",
+                    "descriptives.leak_adj.solicitation"))
+    lowest = all(min(s, key=lambda k: s[k]["mean"]) == "S3" for s in sol.values())
+    out.append(("RQ3: the demand lowest on both banks",
+                "so the explicit demand was the lowest of the three styles on both banks"
+                if lowest else _FALSE, "S3 has the lowest mean on each bank"))
+    c3s = {b: r["families"]["R3_solicitation"]["contrasts"]["S3-S2"] for b, r, _ in banks}
+    out.append(("RQ3: S3-S2 Bank A",
+                f"the demand changed it by ${c3s['A']['estimate']:.3f}$ on Bank~A",
+                "R3 S3-S2 estimate"))
+    out.append(("RQ3: S3-S2 Bank B", f"and ${c3s['BS']['estimate']:.3f}$ on Bank~B.",
+                "R3 S3-S2 estimate"))
+    pS = pool["families"]["R3_solicitation"]["contrasts"]["S3-S2"]
+    pSci = exP["contrasts_ci_cluster_item"]["S3-S2"]["ci_cluster_item"]
+    out.append(("RQ3: pooled S3-S2 passes both tests",
+                f"a request for help, ${pS['estimate']:.3f}$, passes both tests"
+                if pS["reject"] and pSci[1] < 0 else _FALSE,
+                "pooled R3 S3-S2; interval below zero"))
+    out.append(("RQ3: pooled S3-S2 interval",
+                f"{_signed_ci(*pSci)}), but it rests on single items",
+                "exploratory_pooled S3-S2 interval"))
+    flS = pool["item_influence"]["families"]["R3_solicitation"]["S3-S2"]["verdict_flipping_items"]
+    covS = pool["covariate_sensitivity"]["families"]["R3_solicitation"]["contrasts"]["S3-S2"]
+    out.append(("RQ3: pooled S3-S2 single items; covariate",
+                f"{len(flS)} items (Appendix~\\ref{{app:robustness-influence}}), or adding "
+                f"prompt length, removes the Holm rejection."
+                if not covS["reject"] else _FALSE,
+                "pooled item_influence S3-S2 flips; covariate_sensitivity S3-S2 reject"))
+    ups = [e["request_style_spread_upper_bound"]["all_regimes"]["upper"] for e in (exA, exB)]
+    same = len({f"{u:.2f}" for u in ups}) == 1
+    out.append(("RQ3: spread upper bound",
+                f"by more than about {max(ups):.2f}, the item-resampled upper bound"
+                if same else _FALSE, "request_style_spread_upper_bound, both banks"))
+    # RQ4
+    r4 = pool["families"]["R4_robustness"]
+    out.append(("RQ4: joint test df",
+                f"and ${_tex_int(r4['joint_test']['df_den'])}$ df; Table",
+                "R4 joint_test.df_den"))
+    i10 = r4["interaction"]["(P1-P0) x (BS-A)"]
+    iCI = exP["interaction_ci_cluster_item"]["(P1-P0)x(BS-A)"]["ci_cluster_item"]
+    out.append(("RQ4: instruction effect between banks",
+                "not distinguishable from zero (Table~\\ref{tab:contrasts}b)"
+                if iCI[0] <= 0 <= iCI[1]
+                else _FALSE, "R4 interaction (P1-P0); its interval includes zero"))
+    out.append(("RQ4: Bank B answer forms",
+                f"answer forms for only {fB['retained_items_with_answer_forms']} of the "
+                f"{fB['n_retained_items']} items", "detector"))
+    out.append(("RQ4: Bank A answer forms",
+                f"where it had them for {fA['retained_items_with_answer_forms']} of the "
+                f"{fA['n_retained_items']}, its further reduction", "detector"))
+    pb, pe = br["pooled_P1_P3"]["both"], br["pooled_P1_P3"]["either"]
+    # Controller 2026-11-11: 55.0% is 0.05 from both 'half' and 'three fifths', so no
+    # 'about <fraction>' word fits within _ABOUT_TOL; the text says "more than half"
+    # instead, true only while the share lies strictly between 1/2 and 3/5 (above 3/5
+    # a stronger word would be owed). The tolerance itself is unchanged.
+    wb = "more than half" if 0.5 < pb["p"] < 0.6 else None
+    out.append(("RQ4: both annotators, mitigated",
+                f"key from {pb['k']} of the {pb['n']} mitigated replies ({_pct(pb['p'])}, "
+                f"{_pct_ci(pb['ci_cluster_item'])}),", "by_regime.pooled_P1_P3.both"))
+    out.append(("RQ4: more than half of the mitigated replies",
+                f"{_pct_ci(pb['ci_cluster_item'])}), {wb}," if wb else _FALSE,
+                f"share {pb['p']:.4f}; strictly between 1/2 and 3/5"))
+    out.append(("RQ4: at least one annotator, mitigated",
+                f"from {pe['k']} of {pe['n']} ({_pct(pe['p'])}, {_pct_ci(pe['ci_cluster_item'])})",
+                "by_regime.pooled_P1_P3.either"))
+    b0, e0 = br["P0"]["both"], br["P0"]["either"]
+    assert b0["n"] == e0["n"]
+    out.append(("RQ4: P0 counts",
+                f"the counts were {b0['k']} and {e0['k']} of {b0['n']}.",
+                "by_regime.P0.{both,either}"))
+    pa = hv["per_annotator"]
+    hi_a, lo_a = sorted((pa[a]["recovered_key"] for a in pa), reverse=True)
+    out.append(("RQ4: per-annotator recovery",
+                f"recovered the key from {hi_a} of the {hv['n']} replies against the "
+                f"other's {lo_a}", "per_annotator.recovered_key"))
+    out.append(("more than half: both annotators, mitigated (Intro/Conclusion)",
+                f"from {wb} of them" if wb else _FALSE,
+                f"by_regime.pooled_P1_P3.both.p = {pb['p']:.4f}"))
+    out.append(("more than half: both annotators, mitigated (Discussion)",
+                f"both still picked the key from {wb} of" if wb else _FALSE,
+                f"by_regime.pooled_P1_P3.both.p = {pb['p']:.4f}"))
+    # Discussion
+    t10 = {b: r["threshold_sensitivity"][f"{min(grid):.2f}"]["P1"] for b, r, _ in banks}
+    out.append(("Discussion: instructed replies below the lowest cut",
+                f"{t10['A']['n'] - t10['A']['over']} of {t10['A']['n']} Bank~A replies and "
+                f"{t10['BS']['n'] - t10['BS']['over']} of {t10['BS']['n']} Bank~B replies "
+                f"stayed below {min(grid):.2f}.", "threshold_sensitivity[lowest].P1"))
+    out.append(("Discussion: not saturated",
+                f"the replies below {min(grid):.2f} show.", "results.THRESHOLD_GRID"))
+    gain = 1 / 2 - 1 / 3
+    out.append(("Discussion: ruling out one distractor stays below the cut",
+                f"which stays below the {ck} cut" if gain < cut else _FALSE,
+                "1/2 - 1/3 < descriptive cut"))
+    top = f"{max(grid):.2f}"
+    s50 = {b: r["threshold_sensitivity"][top]["P1"]["rate"] for b, r, _ in banks}
+    w50A, w50B = _about_fraction(s50["A"]), _about_fraction(s50["BS"])
+    out.append(("Discussion: strictest cut, Bank A",
+                f"the grid, {top}, about {w50A} of instructed Bank~A replies "
+                f"({_pct(s50['A'])}) and about" if w50A else _FALSE,
+                "threshold_sensitivity[max].P1.rate, A"))
+    out.append(("Discussion: strictest cut, Bank B",
+                f"{w50B} of Bank~B's ({_pct(s50['BS'])}) still qualified" if w50B else _FALSE,
+                "threshold_sensitivity[max].P1.rate, B"))
+    nA, nB = (r["primary_model"]["n_items"] for _, r, _ in banks)
+    out.append(("Discussion: item counts", f"imprecise at {nA} and {nB} items",
+                "primary_model.n_items"))
+    wthird = _about_fraction(fB["retained_items_with_answer_forms"] / fB["n_retained_items"])
+    out.append(("Discussion: Bank B answer-form coverage",
+                f"for only about {wthird} of" if wthird else _FALSE, "detector, Bank B"))
+    return out
+
+
+# Table 3 (tab:contrasts). A row is located by its label inside its panel and
+# compared CELL BY CELL with the computed values, so the check holds whether
+# a cell is typeset in text mode (`-0.127`, `{[-0.231, -0.040]}`) or in maths
+# (`$-0.127$`, `$[-0.231, -0.040]$`) -- the controller wraps the table in
+# maths after P2-I2. On a match the literal is the row as printed; otherwise
+# it is the canonical row, which is absent, so the check reports MISSING.
+_T3_PANELS = {"a": "\\emph{(a) Within each bank}", "b": "\\emph{(b) Both banks pooled"}
+_T3_DAG = "^dag"
+
+
+def _t3_norm_cell(c: str) -> str:
+    c = c.strip()
+    dag = c.endswith(_DAGGER)
+    if dag:
+        c = c[: -len(_DAGGER)].strip()
+    while len(c) >= 2 and ((c[0] == "$" and c[-1] == "$")
+                           or (c[0] == "{" and c[-1] == "}")):
+        c = c[1:-1].strip()
+    return c + (_T3_DAG if dag else "")
+
+
+def _t3_row(body: str, panel: str, row_label: str, cells: list[str]) -> tuple[str, str]:
+    """(literal, note) for one Table 3 row; see the comment above."""
+    canon = f"{row_label} & " + " & ".join(
+        c.replace(_T3_DAG, _DAGGER) for c in cells) + " \\\\"
+    i = body.find(_T3_PANELS[panel])
+    j = body.find("\\end{tabularx}", i) if i >= 0 else -1
+    if i < 0 or j < 0:
+        return canon, f"panel ({panel}) of Table 3 not found"
+    hits = [ln.strip() for ln in body[i:j].split("\n")
+            if ln.strip().startswith(row_label + " &")]
+    if len(hits) != 1:
+        return canon, f"{len(hits)} rows labelled {row_label!r} in panel ({panel})"
+    row = hits[0].split("\\\\")[0].rstrip()
+    found = [_t3_norm_cell(x) for x in row.split("&")[1:]]
+    if found != cells:
+        return canon, f"printed {found} vs computed {cells}"
+    return row, "cells match (text or maths form)"
+
+
+def _ce_table3(D) -> list[tuple[str, str | None, str]]:
+    """Table 3: one check per row, covering every cell of it."""
+    out: list[tuple[str, str | None, str]] = []
+    rows = _table3_rows(D)
+    for (panel, name), (lit, note) in rows.items():
+        out.append((f"Table 3{panel} row {name}", lit, note))
+    out.append(("Table 3 header: interval level",
+                f"Item-resampled {D['ci_level']}\\%", "analyse.item_bootstrap_ci level"))
+    r4 = D["pool"]["families"]["R4_robustness"]["joint_test"]
+    mant, ex = f"{r4['p']:.1e}".split("e")
+    out.append(("Table 3b: joint test df and p",
+                f"and ${_tex_int(r4['df_den'])}$ df, $p = {mant} \\times 10^{{{int(ex)}}}$;",
+                "R4 joint_test.{df_den,p}"))
+    return out
+
+
+# P4 (2026-11-11): Table 3 prints reader-facing row labels, not the deposit's
+# codes. This is the ONE code -> label mapping every Table 3 check uses
+# (`_table3_rows`, and through it the 'bank BS ... adj p' checks); an unknown
+# code raises rather than falling back to the code form.
+_T3_LABELS = {
+    "P1-P0": "Instruction $-$ none",
+    "P2-P1": "Filter $-$ instruction",
+    "P3-P2": "Repair $-$ filter",
+    "P3-P0": "Repair $-$ none",
+    "P3-P1": "Repair $-$ instruction, descriptive",
+    "S2-S0": "Help $-$ stuck",
+    "S3-S0": "Demand $-$ stuck",
+    "S3-S2": "Demand $-$ help",
+    "(P1-P0) x bank": "(Instruction $-$ none) $\\times$ bank",
+    "(P2-P0) x bank": "(Filter $-$ none) $\\times$ bank",
+    "(P3-P0) x bank": "(Repair $-$ none) $\\times$ bank",
+}
+
+
+def _t3_label(name: str) -> str:
+    """Table 3's printed label for a contrast code; KeyError when unmapped."""
+    return _T3_LABELS[name]
+
+
+def _table3_rows(D=None) -> dict:
+    """{(panel, contrast): (literal, note)} for every row of Table 3; {} when
+    an artefact is absent (the callers then report PENDING)."""
+    if D is None:
+        D = {k: _data(f) for k, f in (
+            ("resA", "results_bankA_ol.json"), ("resB", "results_bankBS_ol.json"),
+            ("pool", "results_pooled_A-BS_ol.json"), ("exA", "exploratory_bankA_ol.json"),
+            ("exB", "exploratory_bankBS_ol.json"), ("exP", "exploratory_pooled_A-BS_ol.json"))}
+    if not all(D.get(k) for k in ("resA", "resB", "pool", "exA", "exB", "exP")):
+        return {}
+    body = _paper_body()
+    out = {}
+
+    def tested(res, ex, fam, name):
+        c = res["families"][fam]["contrasts"][name]
+        ci = ex["contrasts_ci_cluster_item"][name]["ci_cluster_item"]
+        p = _p_table(c["p_adjusted"]) + (_T3_DAG if _disagree(c["reject"], ci) else "")
+        return [f"{c['estimate']:.3f}", f"{c['se']:.3f}", p,
+                f"[{ci[0]:.3f}, {ci[1]:.3f}]"]
+
+    def descriptive(ex, name):
+        v = ex["contrasts_ci_cluster_item"][name]
+        ci = v["ci_cluster_item"]
+        return [f"{v['estimate']:.3f}", "--", "--", f"[{ci[0]:.3f}, {ci[1]:.3f}]"]
+
+    fams = (("R2_mitigation", ("P1-P0", "P2-P1", "P3-P2", "P3-P0")),
+            ("R3_solicitation", ("S2-S0", "S3-S0", "S3-S2")))
+    for fam, names in fams:
+        for n in names:
+            lab = _t3_label(n)
+            out[("a", n)] = _t3_row(body, "a", lab,
+                                    tested(D["resA"], D["exA"], fam, n)
+                                    + tested(D["resB"], D["exB"], fam, n))
+            out[("b", n)] = _t3_row(body, "b", lab, tested(D["pool"], D["exP"], fam, n))
+    lab = _t3_label("P3-P1")
+    out[("a", "P3-P1")] = _t3_row(body, "a", lab, descriptive(D["exA"], "P3-P1")
+                                  + descriptive(D["exB"], "P3-P1"))
+    out[("b", "P3-P1")] = _t3_row(body, "b", lab, descriptive(D["exP"], "P3-P1"))
+    inter = D["pool"]["families"]["R4_robustness"]["interaction"]
+    for k, v in inter.items():
+        a = k.split(" x ")[0]                       # "(P1-P0)"
+        ci = D["exP"]["interaction_ci_cluster_item"][k.replace(" x ", "x")]["ci_cluster_item"]
+        out[("b", f"{a} x bank")] = _t3_row(
+            body, "b", _t3_label(f"{a} x bank"),
+            [f"{v['estimate']:.3f}", f"{v['se']:.3f}", "--", f"[{ci[0]:.3f}, {ci[1]:.3f}]"])
+    return out
+
+
+def _ce_table4(D) -> list[tuple[str, str | None, str]]:
+    """Table 4 (tab:examples): the picks' scores and their verbatim text."""
+    out: list[tuple[str, str | None, str]] = []
+    ex = _data("examples_bankA.json")
+    if not ex:
+        return [("Table 4 examples", None, "examples_bankA.json absent")]
+    body = _paper_body()
+    E = {k: v["selected"] for k, v in ex["examples"].items()}
+
+    def verbatim(label, text, note):
+        """The data's text must appear in the paper once TeX markup is read
+        as what it prints: \\texttt{x} -> x, ~ -> space, `` '' -> quotes.
+        Literal: the paper's own line when it does, else the data text."""
+        def plain(s):
+            s = re.sub(r"\\texttt\{((?:[^{}]|\{[^{}]*\})*)\}", r"\1", s)
+            s = re.sub(r"\\emph\{([^{}]*)\}", r"\1", s)
+            return s.replace("~", " ").replace("``", '"').replace("''", '"')
+        lines = body.split("\n")
+        for w in (1, 2):                  # a sentence may wrap once
+            for i in range(len(lines) - w + 1):
+                seg = lines[i:i + w]
+                if text in plain(" ".join(x.strip() for x in seg)):
+                    return (label, "\n".join(seg), note)
+        return (label, text, note + " -- NOT FOUND in the paper")
+
+    def opts(sel, wrap):
+        o = json.loads(sel["options"]) if isinstance(sel["options"], str) else sel["options"]
+        return [f"({i})~" + (f"\\texttt{{{t}}}" if wrap else t) for i, t in enumerate(o, 1)]
+
+    g = E["given_not_stated"]
+    out.append(("Table 4a: adjusted recoverability",
+                f"adjusted recoverability {float(g['leak_adj']):.2f}.}}", "examples leak_adj"))
+    out.append(("Table 4a: options and key",
+                " ".join(opts(g, True)) + f". Key: {g['key_number']}.",
+                "examples.given_not_stated options, key_number"))
+    out.append(verbatim("Table 4a: stem verbatim", g["stem"],
+                        "examples.given_not_stated stem"))
+    h = E["help_not_given"]
+    out.append(("Table 4b: adjusted recoverability",
+                f"adjusted recoverability ${float(h['leak_adj']):.2f}$.}}", "examples leak_adj"))
+    out.append(verbatim("Table 4b: stem verbatim", h["stem"], "examples.help_not_given stem"))
+    out.append(("Table 4b: options and key",
+                " ".join(opts(h, True)) + f". Key: {h['key_number']}.",
+                "examples.help_not_given options, key_number"))
+    s = E["stated_P0"]
+    slv = {r["cell_key"]: r for r in (_load("solve_bankA_ol.jsonl") or [])}
+    row = slv.get(s["cell_key"])
+    if row:
+        hits = sum(v["hits"] for v in row["per_solver"].values())
+        n = sum(v["calls"] for v in row["per_solver"].values())
+        assert abs(float(s["leak_adj"]) - row["leak_adj"]) < 1e-12
+        out.append(("Table 4c: all calls chose the key",
+                    f"all {n} calls chose the key; adjusted recoverability "
+                    f"{row['leak_adj']:.2f}.}}" if hits == n else _FALSE,
+                    "solve_bankA_ol.jsonl hits == calls for the pick"))
+    o = opts(s, False)
+    out.append(("Table 4c: options 1-2", " ".join(o[:2]), "examples.stated_P0 options"))
+    out.append(("Table 4c: option 3 and key", " ".join(o[2:]) + f". Key: {s['key_number']}.",
+                "examples.stated_P0 options, key_number"))
+    out.append(verbatim("Table 4c: stem verbatim", s["stem"], "examples.stated_P0 stem"))
+    out.append(("Table 4c: reply verbatim", f"& {s['reply']}", "examples.stated_P0 reply"))
     return out
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("-v", "--verbose", action="store_true")
+    ap.add_argument("--strict-coverage", action="store_true",
+                    help="any UNCOVERED or NEW number, an unexcused year, or an "
+                         "unanchored scope fails the run (the P2 exit gate)")
+    ap.add_argument("--list-covered", action="store_true",
+                    help="also list every covered token with the checks pinning it")
     args = ap.parse_args()
 
     if not PAPER.exists():
         print(f"no manuscript at {PAPER}")
         return 1
     tex = PAPER.read_text(encoding="utf-8")
+    # WHAT THE READER SEES. Every presence and absence test below runs on the
+    # comment-stripped text: until 2026-11-02 a number surviving only in a
+    # `%%` comment "verified" (P0.4 R1). The highlight scan just below is the
+    # one deliberate exception -- it reads comment lines by design.
+    body = texutil.strip_comments(tex)
 
     # Highlights are submitted to the journal but live in LaTeX comments, so
     # they render nothing and the \TBD guard never sees them. Surface any that
@@ -1589,12 +4715,26 @@ def main() -> int:
     # Nothing computed this until 2026-08-28, so it was recounted by hand every
     # time the abstract changed and the answers disagreed (see abstract_words).
     # A limit checked by whoever remembers to check it is not a limit.
-    n_abs, abs_note = abstract_words(tex)
+    # A COUNT THAT CANNOT BE TAKEN ON A CURRENT BUILD FAILS (fix round 1, F2).
+    # PENDING means "the question was not asked" -- no build, or one older
+    # than paper.tex. When the build is current and a count still comes back
+    # None, the anchors failed, and a non-failing PENDING there is how a cap
+    # disappears with exit 0: "is there a measurement?" instead of "is this
+    # a measurement?". The freshness question is `_pdf_staleness`, the same
+    # one both counts ask.
+    build_current = _pdf_staleness(PDF) is None
+    uncountable = 0
+    pending_extra = 0
+    n_abs, abs_note = abstract_words(tex, PDF)
     if n_abs is None:
-        print(f"PENDING  {'abstract word count':<44} ({abs_note})")
-        pending_extra = 1
+        if build_current:
+            print(f"FAIL     {'abstract word count':<44} ({abs_note}) -- the "
+                  f"build is current, so the count could not be taken")
+            uncountable += 1
+        else:
+            print(f"PENDING  {'abstract word count':<44} ({abs_note})")
+            pending_extra += 1
     else:
-        pending_extra = 0
         slack = ABSTRACT_LIMIT - n_abs
         if slack < 0:
             print(f"OVERLONG {'abstract':<44} {n_abs} words, limit "
@@ -1602,6 +4742,23 @@ def main() -> int:
         elif slack <= 5:
             print(f"note     {'abstract':<44} {n_abs}/{ABSTRACT_LIMIT} words, "
                   f"{slack} to spare -- any addition displaces something")
+
+    # THE MAIN TEXT HAS A CAP TOO, counted off the same build by the same
+    # freshness rule (P0.4 R5).
+    n_main, main_note = main_text_words(tex, PDF)
+    if n_main is None:
+        if build_current:
+            print(f"FAIL     {'main text word count':<44} ({main_note}) -- the "
+                  f"build is current, so the count could not be taken")
+            uncountable += 1
+        else:
+            print(f"PENDING  {'main text word count':<44} ({main_note})")
+            pending_extra += 1
+    elif n_main > MAIN_TEXT_CAP:
+        print(f"OVERLONG main text {n_main}/{MAIN_TEXT_CAP} words ({main_note})")
+    elif n_main > MAIN_TEXT_TARGET:
+        print(f"note     {'main text':<44} {n_main} words, above the "
+              f"{MAIN_TEXT_TARGET} target (cap {MAIN_TEXT_CAP})")
 
     # SUPERSEDED LITERALS MUST BE ABSENT, not merely outvoted by a correct one.
     #
@@ -1623,7 +4780,22 @@ def main() -> int:
         ("0.276", "minimax cond. acc before the re-screen; now 0.296"),
         ("0.611", "gemma4 cond. acc all-40 before the re-screen; now 0.609"),
         ("0.698", "gpt-oss cond. acc all-40 before the re-screen; now 0.692"),
-        ("96.3", "parseable rate before the re-screen; now 97.2"),
+        # Narrowed from the bare "96.3" at P2-I2 (2026-11-11): the integrated
+        # paper prints 96.3 as the upper bound of the human "at least one"
+        # item-resampled interval over P1-P3, $[69.2, 96.3]$ (Section 4.4) --
+        # a DIFFERENT quantity, pinned by its own check. The superseded value
+        # was a percentage and was typeset with \%, so this form still catches
+        # it wherever it creeps back, and no longer flags the twin.
+        ("96.3\\%", "parseable rate before the re-screen; now 97.2"),
+        # Controller, 2026-11-11 (P2-I2 mismatches): bounds that were rounded the
+        # wrong way for an "at most"/"at least" claim. Phrase-anchored so the
+        # digits stay free for any other quantity.
+        ("more than 0.00066", "Bank A failure bound; max shift 0.000661, now 0.00067"),
+        ("the bound is 0.0010.", "Bank B failure bound; max shift 0.001029, now 0.0011"),
+        ("within 1.3 percentage points", "max |P1-P3| over the cut grid is 1.337 pp; now 1.4"),
+        ("at least 63.1\\%", "Bank A minimum over cuts is 63.095% (318/504); now 63.0"),
+        ("about half of them", "human both-annotator recovery 55.0% (99/180) is not 'about half' "
+                               "within the fraction-word tolerance; now 'more than half'"),
         ("$[0.00, 0.48]$", "retained baseline range before the re-screen"),
         ("one solver call wide", "invariance band before the re-screen; now three"),
         # The S1 removal (spec 4.43) re-sized the human-validation sample from
@@ -1640,6 +4812,18 @@ def main() -> int:
         # how a checker teaches its reader to ignore it.
         ("$18{,}612$", "solver calls consumed before Bank B's solve; the "
                        "sentence quoting it was removed when Bank B landed"),
+        # P2-I2 (2026-11-11). The difficulty-independence figures came from
+        # the kr PILOT screen while the sentence described the ol screen
+        # (triage FLAG F1); App A now prints the ol values (10 of 10 levels,
+        # rho 0.09, t_38 0.56, rho 0.15). Each old form was grepped first: none
+        # is printed anywhere in the integrated paper.
+        ("7 of the 10 levels", "kr-pilot levels with a discard; ol screen: all 10"),
+        ("$\\rho = 0.11$", "kr-pilot rho(level, discard); ol screen: 0.09"),
+        ("$t_{38} = 0.66$", "kr-pilot t for rho(level, discard); ol screen: 0.56"),
+        ("$\\rho = 0.06$", "kr-pilot rho(level, baseline); ol screen: 0.15"),
+        # The screen's transport failures, once rounded to 0.1%; App A states
+        # the same 2 of 2400 as 0.08% (triage row 38).
+        ("$0.1\\%$", "screen transport failures rounded to 0.1%; stated as 0.08%"),
     ]
     # A SUPERSEDED VALUE CAN BE A CURRENT VALUE FOR SOMETHING ELSE, and this
     # list is literals rather than quantities, so it cannot tell them apart on
@@ -1652,20 +4836,58 @@ def main() -> int:
     # `checks()` is the authority on what is currently right, so ask it rather
     # than maintaining a second list that would drift from the first.
     results = checks()
-    current = {lit for _, lit, _ in results if lit}
+    # RETIREMENT IS BY LABEL AND MUST HIT SOMETHING (P0.4 R2). A retired
+    # check's literal is not current: it pins nothing and vouches for nothing.
+    labels = {label for label, _, _ in results}
+    # A LABEL MUST NAME ONE CHECK (fix round 1, M7): RETIRED is keyed by
+    # label, so a duplicate would let one entry retire several checks.
+    dup_labels = sorted(l for l, k in Counter(lb for lb, _, _ in results).items()
+                        if k > 1)
+    for l in dup_labels:
+        print(f"ERROR    duplicate check label: {l!r} -- RETIRED is keyed by "
+              f"label, so every label must name exactly one check")
+    unknown_retired = [(l, why) for l, why in RETIRED.items() if l not in labels]
+    for l, why in unknown_retired:
+        print(f"ERROR    RETIRED label matches no check: {l!r} ({why}) -- "
+              f"a typo must not silently retire nothing")
+    # ONE filter for "current" (P0.6 fix round 2, N6). A dict keeps one
+    # literal per label; a duplicated label is already an ERROR above that
+    # fails the run.
+    current_map = _current_literals(results)
+    current = set(current_map.values())
     stale = [(lit, why) for lit, why in superseded
-             if lit in tex and lit not in current]
+             if lit in body and lit not in current]
+
+    # THE ABSTRACT IS PASTED INTO EDITORIAL MANAGER AS PLAIN TEXT (P0.4 R3).
+    lint = abstract_lint(tex, current)
+    for problem in lint:
+        print(f"LINT     abstract: {problem}")
+
+    # HIGHLIGHTS, from the file beside the manuscript (P0.4 R4).
+    hl_status, hl_problems = highlights_check(
+        PAPER.with_name(HIGHLIGHTS_NAME), current)
+    if hl_status == "PENDING":
+        print(f"PENDING  {'highlights':<44} (no {HIGHLIGHTS_NAME} beside "
+              f"{PAPER.name} yet)")
+        pending_extra += 1
+    elif hl_status == "OK":
+        print(f"ok       {'highlights':<44} {HIGHLIGHTS_NAME}")
+    for problem in hl_problems:
+        print(f"FAIL     highlights: {problem}")
     for lit, why in stale:
         print(f"STALE    {'superseded value still present':<44} "
               f"{lit!r} -- {why}")
 
-    ok = missing = 0
+    ok = missing = retired = 0
     pending = len(unresolved) + pending_extra
     for label, literal, note in results:
-        if literal is None:
+        if label in RETIRED:
+            print(f"RETIRED  {label}  ({RETIRED[label]})")
+            retired += 1
+        elif literal is None:
             print(f"PENDING  {label:<44} ({note})")
             pending += 1
-        elif literal in tex:
+        elif literal in body:
             ok += 1
             if args.verbose:
                 print(f"ok       {label:<44} {literal}")
@@ -1673,7 +4895,41 @@ def main() -> int:
             print(f"MISSING  {label:<44} computed {literal!r} not found in paper.tex ({note})")
             missing += 1
 
-    print(f"\n{ok} verified, {missing} missing, {pending} pending, {len(stale)} stale")
+    # EVERY NUMBER IN THE TEXT GETS A CHECK (P0.6). Reported always; it fails
+    # the run only under --strict-coverage, the P2 exit gate. It reads
+    # `current_map` (built once from `results` above), so checks() still runs
+    # once, and it never touches the counts in the summary line below.
+    cov = _coverage_scan(tex, current_map, _bib_keys(PAPER, tex))
+    for r in cov.records:
+        note = f"  [{r.note}]" if r.note else ""
+        print(f"{r.label:<19} {r.token:<10} l.{r.line:<5} {r.context}{note}")
+    if args.list_covered:
+        # M1 (ruling): loose twins stay; the P2 exit review reads this list
+        for line_no, tok, labels in cov.covered:
+            print(f"COVERED  l.{line_no:<5} {tok:<10} {'; '.join(labels)}")
+    n_unc = sum(1 for r in cov.records if r.kind == "UNCOVERED")
+    n_new = sum(1 for r in cov.records if r.kind == "NEW")
+    n_lit = sum(1 for r in cov.records if r.kind == "INFO literature")
+    n_year = sum(1 for r in cov.records if r.kind == "INFO year")
+    n_year_fail = sum(1 for r in cov.records if r.strict_fail)
+    print(f"coverage: {n_unc} uncovered, {n_new} new, {n_lit} literature, "
+          f"{n_year} year ({n_year_fail} without \\cite or %% YEAR) -- "
+          f"{cov.n_covered} of {cov.n_tokens} number tokens in the main text "
+          f"and appendices are pinned by a check")
+    # NOT A MEASUREMENT (fix round 1, C2): printed on every run, failing only
+    # under --strict-coverage, like every other coverage finding.
+    if cov.refusal:
+        print(f"FAIL coverage: scope not anchored ({cov.refusal})"
+              f"{_anchor_hint(cov.refusal)}")
+    cov_fail = args.strict_coverage and bool(
+        cov.refusal or n_unc or n_new or n_year_fail)
+    if args.strict_coverage and (n_unc or n_new or n_year_fail):
+        year_part = (f", {n_year_fail} year without \\cite or %% YEAR"
+                     if n_year_fail else "")
+        print(f"FAIL coverage: {n_unc} uncovered, {n_new} new{year_part}")
+
+    print(f"\n{ok} verified, {missing} missing, {pending} pending, "
+          f"{len(stale)} stale, {retired} retired")
     if missing:
         print("A MISSING check means the manuscript and the data disagree, OR the\n"
               "sentence was reworded so the literal no longer appears. Both need a\n"
@@ -1686,7 +4942,19 @@ def main() -> int:
     if over:
         print("An OVERLONG abstract is a desk-reject at submission. The count is\n"
               "taken from the built PDF, so it is what the editor will see.")
-    return 1 if (missing or stale or over) else 0
+    main_over = n_main is not None and n_main > MAIN_TEXT_CAP
+    if main_over:
+        print("An OVERLONG main text exceeds the journal's length cap. It is\n"
+              "counted off the built PDF, Introduction to back matter.")
+    if lint:
+        print("A LINT means the abstract would not survive a paste into Editorial\n"
+              "Manager as plain text, or carries a number no check computes.")
+    hl_fail = hl_status == "FAIL"
+    if uncountable:
+        print("A FAIL on a word count means the build is current but the count\n"
+              "could not be anchored: the limit is unchecked, which is not a pass.")
+    return 1 if (missing or stale or over or main_over or lint or hl_fail
+                 or unknown_retired or uncountable or dup_labels or cov_fail) else 0
 
 
 if __name__ == "__main__":

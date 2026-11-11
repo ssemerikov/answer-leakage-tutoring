@@ -883,3 +883,166 @@ def decline_breakdown(records: list[dict]) -> dict:
         "declined": calls - parsed - failed,
         "decline_fraction": (calls - parsed - failed) / calls if calls else 0.0,
     }
+
+
+# ------------------------------------------------- item-cluster bootstrap
+
+def cluster_bootstrap_ci(values: list, clusters: list, statistic: str = "mean",
+                         groups: list | None = None, B: int = 10000,
+                         seed: int = 20261103,
+                         level: float = 0.95) -> tuple[float, float]:
+    """Percentile ITEM-CLUSTER bootstrap interval. Added 2026-11 (P1C fix 1).
+
+    WHY. Replies are not independent: Bank A's 504 replies per regime come from
+    14 items, Bank B's 972 from 27, and replies to one item share its key, its
+    distractors and its difficulty. A Wilson or normal interval over replies
+    treats them as 504 independent draws and comes out several times too narrow.
+    Here the ITEM is the unit: each replicate draws as many items as there are,
+    with replacement, and keeps every reply of each drawn item.
+
+    `values` are per-reply numbers and `clusters` their item ids (same length).
+    `statistic`:
+      "proportion"  share of 1s; `values` must be 0/1 (bools allowed);
+      "mean"        mean of `values` (a ratio over the pooled replies, the same
+                    estimator as the point estimate, not a mean of item means);
+      "spread"      max - min over the `groups` of the group means, e.g. the
+                    three request styles within a regime. Biased upward (a max
+                    of noisy means), so its interval is an upper bound only.
+
+    B replicates from `numpy.random.default_rng(seed)`, re-seeded on every call
+    so each interval is reproducible on its own. Items are ordered by `sorted`
+    before indexing. Endpoints are `numpy.quantile` at (1-level)/2 and
+    1-(1-level)/2, numpy's default (linear) interpolation. With fewer than two
+    items there is no between-item variation to resample, and it raises.
+    """
+    import numpy as np
+
+    if statistic not in ("proportion", "mean", "spread"):
+        raise ValueError(f"unknown statistic {statistic!r}; "
+                         f"use 'proportion', 'mean' or 'spread'")
+    if len(values) != len(clusters):
+        raise ValueError(f"{len(values)} values but {len(clusters)} cluster "
+                         f"ids; each reply needs its item (length mismatch)")
+    if statistic == "spread":
+        if groups is None or len(groups) != len(values):
+            raise ValueError("'spread' needs one group label per value (groups)")
+        glabels = sorted(set(groups))
+    else:
+        glabels = [None]
+        groups = [None] * len(values)
+    if statistic == "proportion" and any(float(v) not in (0.0, 1.0) for v in values):
+        raise ValueError("'proportion' takes 0/1 values only")
+    ids = sorted(set(clusters))
+    if len(ids) < 2:
+        raise ValueError(f"fewer than two clusters ({len(ids)}): an item-cluster "
+                         f"bootstrap has no between-item variation to resample")
+
+    ci_, gi = {c: i for i, c in enumerate(ids)}, {g: j for j, g in enumerate(glabels)}
+    S = np.zeros((len(ids), len(glabels)))
+    N = np.zeros((len(ids), len(glabels)))
+    for v, c, g in zip(values, clusters, groups):
+        S[ci_[c], gi[g]] += float(v)
+        N[ci_[c], gi[g]] += 1.0
+
+    rng = np.random.default_rng(seed)
+    draws = rng.integers(0, len(ids), size=(B, len(ids)))
+    M = np.zeros((B, len(ids)))
+    np.add.at(M, (np.arange(B)[:, None], draws), 1.0)
+    sums, counts = M @ S, M @ N
+    if (counts == 0).any():
+        raise ValueError("a bootstrap replicate has a group with no replies; "
+                         "the group means are undefined")
+    means = sums / counts
+    stat = means[:, 0] if len(glabels) == 1 else means.max(axis=1) - means.min(axis=1)
+    a = (1.0 - level) / 2.0
+    lo, hi = np.quantile(stat, [a, 1.0 - a])
+    return (float(lo), float(hi))
+
+
+# ------------------------------------- item bootstrap of a per-item statistic
+
+def _item_layout(per_item: dict, strata: dict | None, weights: dict | None):
+    """The strata of an item bootstrap, in the one order both functions use.
+
+    Returns [(stratum, sorted item ids, values array, weight)] with strata in
+    `sorted` order. Default weights are n_s / N, which makes the statistic the
+    mean over ALL items whatever the strata.
+    """
+    import numpy as np
+
+    if strata is None:
+        strata = {i: None for i in per_item}
+    missing = [i for i in per_item if i not in strata]
+    if missing:
+        raise ValueError(f"{len(missing)} item(s) have no stratum, e.g. "
+                         f"{sorted(map(str, missing))[0]!r}")
+    labels = sorted(set(strata[i] for i in per_item), key=lambda s: (s is not None, s))
+    n_all = len(per_item)
+    if weights is None:
+        weights = {s: sum(1 for i in per_item if strata[i] == s) / n_all
+                   for s in labels}
+    if set(weights) != set(labels):
+        raise ValueError(f"weights name strata {sorted(map(str, weights))} but "
+                         f"the items fall in {sorted(map(str, labels))}")
+    out = []
+    for s in labels:
+        ids = sorted(i for i in per_item if strata[i] == s)
+        if len(ids) < 2:
+            raise ValueError(f"stratum {s!r} holds fewer than two items "
+                             f"({len(ids)}): an item bootstrap has no "
+                             f"between-item variation to resample there")
+        v = np.array([float(per_item[i]) for i in ids])
+        if not np.isfinite(v).all():
+            raise ValueError(f"stratum {s!r}: every per-item value must be "
+                             f"finite (a NaN or inf is a missing cell)")
+        out.append((s, ids, v, float(weights[s])))
+    return out
+
+
+def item_statistic(per_item: dict, strata: dict | None = None,
+                   weights: dict | None = None) -> float:
+    """The point estimate `item_bootstrap_ci` resamples: sum over strata of
+    weight x (mean of that stratum's per-item values). One layout, so the
+    estimate and its interval cannot be two different formulas."""
+    return float(sum(w * v.mean() for _, _, v, w in
+                     _item_layout(per_item, strata, weights)))
+
+
+def item_bootstrap_ci(per_item: dict, strata: dict | None = None,
+                      weights: dict | None = None, B: int = 10000,
+                      seed: int = 20261103,
+                      level: float = 0.95) -> tuple[float, float]:
+    """Percentile ITEM bootstrap of a statistic already reduced to one value
+    per item. Added 2026-11 (P1F), beside `cluster_bootstrap_ci`, which is
+    unchanged.
+
+    WHY A SECOND FUNCTION. A within-item contrast (P1 - P0 on one item) is a
+    difference of two condition means OF THAT ITEM, so it exists per item, not
+    per reply; `cluster_bootstrap_ci` resamples reply-level values. Here the
+    caller passes `per_item` = {item id: that item's value}; each replicate
+    draws items with replacement and keeps each drawn item's value.
+
+    `strata` = {item id: stratum} resamples WITHIN each stratum (the bank, when
+    two banks are pooled), so every replicate keeps each stratum's item count.
+    The statistic is sum_s weights[s] * (mean of stratum s's drawn values):
+    default weights n_s / N give the mean over all items; {"A": -1, "BS": 1}
+    gives Bank B's mean minus Bank A's (the bank x condition interaction).
+
+    Draws, as `cluster_bootstrap_ci`: one `numpy.random.default_rng(seed)` per
+    call; strata in `sorted` order; item ids sorted within each stratum; for
+    each stratum in turn one `integers(0, n_s, size=(B, n_s))` block. With one
+    stratum that is exactly `cluster_bootstrap_ci`'s draw. Endpoints are
+    `numpy.quantile` at (1-level)/2 and 1-(1-level)/2 (linear). A stratum with
+    fewer than two items raises.
+    """
+    import numpy as np
+
+    layout = _item_layout(per_item, strata, weights)
+    rng = np.random.default_rng(seed)
+    stat = np.zeros(B)
+    for _, ids, v, w in layout:
+        draws = rng.integers(0, len(ids), size=(B, len(ids)))
+        stat += w * v[draws].mean(axis=1)
+    a = (1.0 - level) / 2.0
+    lo, hi = np.quantile(stat, [a, 1.0 - a])
+    return (float(lo), float(hi))
